@@ -8,8 +8,9 @@ import {
   Stethoscope,
   Users
 } from "lucide-react";
+import { Role } from "@prisma/client";
 import { AppShell } from "@/components/app-shell";
-import { ClinicalAiComposer } from "@/components/clinical-ai-composer";
+import { ClinicalAiComposer, type AiType } from "@/components/clinical-ai-composer";
 import { SafetyBanner } from "@/components/safety-banner";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/security/session";
@@ -17,6 +18,7 @@ import { getSession } from "@/lib/security/session";
 export default async function DashboardPage() {
   const user = await getSession();
   const clinicId = user?.clinicId ?? "";
+  const roleConfig = getRoleDashboardConfig(user?.role ?? Role.DOCTOR);
   const [
     patientCount,
     consultCount,
@@ -49,18 +51,16 @@ export default async function DashboardPage() {
         <section className="command-band">
           <div>
             <p className="eyebrow">Today&apos;s clinic command center</p>
-            <h2>AI-assisted workflow, still doctor-led.</h2>
-            <p>Track operational load, pending AI review, follow-ups, documents, and risk signals from one working surface.</p>
+            <h2>{roleConfig.headline}</h2>
+            <p>{roleConfig.description}</p>
           </div>
           <div className="command-actions">
-            <a className="button" href="/consultations">
-              <Stethoscope size={18} />
-              New consult
-            </a>
-            <a className="button secondary" href="/ai-review">
-              <ShieldCheck size={18} />
-              Review AI drafts
-            </a>
+            {roleConfig.actions.map((action) => (
+              <a className={action.primary ? "button" : "button secondary"} href={action.href} key={action.href}>
+                {action.icon === "consult" ? <Stethoscope size={18} /> : <ShieldCheck size={18} />}
+                {action.label}
+              </a>
+            ))}
           </div>
         </section>
         <div className="grid stats-grid">
@@ -76,10 +76,10 @@ export default async function DashboardPage() {
         </div>
         <ClinicalAiComposer
           compact
-          title="Daily AI note assistant"
-          description="Paste quick doctor bullets and generate a summary, follow-up plan, or clinic task bundle without leaving the dashboard."
-          defaultText={"- patient reports fatigue for 3 weeks\n- glucose readings 160-190\n- missed eye exam\n- mild tingling feet\n- ordered HbA1c, urine ACR, B12"}
-          presets={["CONSULTATION_SUMMARY", "TASK_EXTRACTION", "FOLLOW_UP_INSTRUCTIONS", "VISIT_SUMMARY"]}
+          title={roleConfig.aiTitle}
+          description={roleConfig.aiDescription}
+          defaultText={roleConfig.aiDefaultText}
+          presets={roleConfig.aiPresets}
         />
         <div className="grid two-column">
           <section className="card card-pad">
@@ -218,6 +218,59 @@ export default async function DashboardPage() {
       </div>
     </AppShell>
   );
+}
+
+function getRoleDashboardConfig(role: Role): {
+  headline: string;
+  description: string;
+  actions: Array<{ href: string; label: string; primary: boolean; icon: "consult" | "review" }>;
+  aiTitle: string;
+  aiDescription: string;
+  aiDefaultText: string;
+  aiPresets: AiType[];
+} {
+  if (role === Role.CLINIC_ADMIN) {
+    return {
+      headline: "Clinic operations, compliance, and AI governance in one view.",
+      description: "Monitor audit readiness, pending reviews, follow-up load, documents, and staff work queues before production hosting.",
+      actions: [
+        { href: "/audit", label: "Open audit log", primary: true, icon: "review" },
+        { href: "/ai-review", label: "Review AI drafts", primary: false, icon: "review" }
+      ],
+      aiTitle: "Admin workflow AI",
+      aiDescription: "Summarize clinic operations notes into tasks, follow-up reminders, or risk flags for staff coordination.",
+      aiDefaultText: "- assistant backlog needs review\n- pending AI drafts require doctor signoff\n- several follow-ups due this week",
+      aiPresets: ["TASK_EXTRACTION", "FOLLOW_UP_INSTRUCTIONS", "RISK_FLAG_EXPLAINER"]
+    };
+  }
+
+  if (role === Role.ASSISTANT) {
+    return {
+      headline: "Assistant work queue focused on follow-ups, documents, and tasks.",
+      description: "Keep clinic operations moving while doctors review AI-generated clinical drafts.",
+      actions: [
+        { href: "/tasks", label: "Open tasks", primary: true, icon: "review" },
+        { href: "/follow-ups", label: "Follow-ups", primary: false, icon: "review" }
+      ],
+      aiTitle: "Assistant task helper",
+      aiDescription: "Paste operational notes and extract call tasks, scheduling reminders, and follow-up wording.",
+      aiDefaultText: "- call patient for BP log\n- upload lab report\n- schedule follow-up after HbA1c result",
+      aiPresets: ["TASK_EXTRACTION", "FOLLOW_UP_INSTRUCTIONS"]
+    };
+  }
+
+  return {
+    headline: "AI-assisted workflow, still doctor-led.",
+    description: "Track operational load, pending AI review, follow-ups, documents, and risk signals from one working surface.",
+    actions: [
+      { href: "/consultations", label: "New consult", primary: true, icon: "consult" },
+      { href: "/ai-review", label: "Review AI drafts", primary: false, icon: "review" }
+    ],
+    aiTitle: "Daily AI note assistant",
+    aiDescription: "Paste quick doctor bullets and generate a summary, follow-up plan, or clinic task bundle without leaving the dashboard.",
+    aiDefaultText: "- patient reports fatigue for 3 weeks\n- glucose readings 160-190\n- missed eye exam\n- mild tingling feet\n- ordered HbA1c, urine ACR, B12",
+    aiPresets: ["CONSULTATION_SUMMARY", "TASK_EXTRACTION", "FOLLOW_UP_INSTRUCTIONS", "VISIT_SUMMARY"]
+  };
 }
 
 function Stat({ title, value, icon }: { title: string; value: number; icon: React.ReactNode }) {

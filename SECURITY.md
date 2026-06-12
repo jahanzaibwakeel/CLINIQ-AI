@@ -24,6 +24,7 @@
 - Output parser enforces `AI draft, doctor review required.`
 - AI generation metadata includes source context and provider/model.
 - AI drafts require explicit review and can be approved or rejected with audit logging.
+- Reviewed AI drafts can be edited before approval and applied into records with audit metadata.
 - External PHI transfer requires explicit `ALLOW_EXTERNAL_AI=true`.
 
 ## Recommended Production Hardening

@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { Bot, ClipboardCheck, FileText, Loader2, Sparkles } from "lucide-react";
 import { csrfHeaders } from "@/lib/client/csrf";
 
-type AiType =
+export type AiType =
   | "CONSULTATION_SUMMARY"
   | "SOAP_NOTE"
   | "HISTORY_TIMELINE"

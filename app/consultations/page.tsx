@@ -1,3 +1,5 @@
+import { Role } from "@prisma/client";
+import { redirect } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { ClinicalAiComposer } from "@/components/clinical-ai-composer";
 import { ConsultationCreateForm } from "@/components/consultation-create-form";
@@ -6,6 +8,7 @@ import { getSession } from "@/lib/security/session";
 
 export default async function ConsultationsPage() {
   const user = await getSession();
+  if (user?.role === Role.ASSISTANT) redirect("/");
   const consultations = await prisma.consultation.findMany({
     where: { clinicId: user?.clinicId ?? "" },
     include: { patient: true, doctor: true },

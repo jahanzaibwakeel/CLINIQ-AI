@@ -23,14 +23,28 @@ export function AiReviewQueue({ items }: { items: ReviewItem[] }) {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [note, setNote] = useState("");
   const [error, setError] = useState("");
+  const [drafts, setDrafts] = useState<Record<string, string>>(() =>
+    Object.fromEntries(items.map((item) => [item.id, JSON.stringify(item.output, null, 2)]))
+  );
 
-  async function review(id: string, reviewStatus: "REVIEWED" | "REJECTED") {
+  async function review(id: string, reviewStatus: "REVIEWED" | "REJECTED", applyToRecord = false) {
     setBusyId(id);
     setError("");
+    let output: unknown = undefined;
+    if (reviewStatus === "REVIEWED") {
+      try {
+        output = JSON.parse(drafts[id] ?? "{}");
+      } catch {
+        setBusyId(null);
+        setError("Edited AI output is not valid JSON. Fix it before approving.");
+        return;
+      }
+    }
+
     const response = await fetch(`/api/ai/generations/${id}/review`, {
       method: "PATCH",
       headers: csrfHeaders({ "Content-Type": "application/json" }),
-      body: JSON.stringify({ reviewStatus, reviewerNote: note || undefined })
+      body: JSON.stringify({ reviewStatus, reviewerNote: note || undefined, output, applyToRecord })
     });
     setBusyId(null);
 
@@ -86,10 +100,22 @@ export function AiReviewQueue({ items }: { items: ReviewItem[] }) {
             <pre className="result-box" style={{ overflowX: "auto" }}>
               {JSON.stringify(item.output, null, 2)}
             </pre>
+            <label className="field">
+              <span className="label">Editable reviewed output</span>
+              <textarea
+                className="textarea"
+                value={drafts[item.id] ?? ""}
+                onChange={(event) => setDrafts((current) => ({ ...current, [item.id]: event.target.value }))}
+              />
+            </label>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               <button className="button" disabled={busyId === item.id} onClick={() => review(item.id, "REVIEWED")} type="button">
                 {busyId === item.id ? <Loader2 size={18} /> : <CheckCircle2 size={18} />}
-                Approve draft
+                Approve only
+              </button>
+              <button className="button" disabled={busyId === item.id} onClick={() => review(item.id, "REVIEWED", true)} type="button">
+                {busyId === item.id ? <Loader2 size={18} /> : <CheckCircle2 size={18} />}
+                Approve + apply
               </button>
               <button className="button secondary" disabled={busyId === item.id} onClick={() => review(item.id, "REJECTED")} type="button">
                 <XCircle size={18} />

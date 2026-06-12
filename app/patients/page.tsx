@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Role } from "@prisma/client";
 import { AppShell } from "@/components/app-shell";
 import { PatientCreateForm } from "@/components/patient-create-form";
 import { prisma } from "@/lib/db";
@@ -45,7 +46,19 @@ export default async function PatientsPage() {
             </table>
           </div>
         </section>
-        <PatientCreateForm />
+        {user?.role === Role.DOCTOR || user?.role === Role.CLINIC_ADMIN ? (
+          <PatientCreateForm />
+        ) : (
+          <section className="card card-pad">
+            <div className="section-head">
+              <h2 className="section-title">Assistant patient workspace</h2>
+              <span className="badge good">Read-only</span>
+            </div>
+            <p className="muted">
+              Assistants can review patient context for scheduling, documents, tasks, and follow-ups. Patient creation is limited to doctors and clinic admins.
+            </p>
+          </section>
+        )}
       </div>
     </AppShell>
   );

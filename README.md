@@ -12,6 +12,8 @@ MediPilot AI is a production-minded, local-first AI clinical workflow assistant 
 - Doctor-facing AI review queue to approve or reject AI drafts before clinical use.
 - Admin audit viewer for login, AI, document, patient, task, and consultation activity.
 - Follow-up operations page and task status quick actions for daily clinic workflow.
+- Role-specific navigation and dashboard emphasis for doctors, clinic admins, and assistants.
+- AI draft review supports doctor-edited output and approve-to-record actions.
 - Valkey/Redis cache support with memory fallback.
 - Docker Compose, GitHub Actions CI, tests, seed data, and deployment docs.
 

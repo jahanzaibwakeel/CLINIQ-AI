@@ -13,25 +13,28 @@ import {
   Users,
   CalendarCheck
 } from "lucide-react";
+import { Role } from "@prisma/client";
 import { getSession } from "@/lib/security/session";
 import { LogoutButton } from "@/components/logout-button";
 
 const nav = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/patients", label: "Patients", icon: Users },
-  { href: "/consultations", label: "Consultations", icon: Stethoscope },
-  { href: "/documents", label: "Documents", icon: FileText },
-  { href: "/assistant", label: "AI Assistant", icon: Bot },
-  { href: "/ai-review", label: "AI Review", icon: CheckSquare },
-  { href: "/tasks", label: "Tasks", icon: ClipboardList },
-  { href: "/follow-ups", label: "Follow-ups", icon: CalendarClock },
-  { href: "/audit", label: "Audit", icon: ShieldCheck },
-  { href: "/settings", label: "Settings", icon: Settings }
+  { href: "/", label: "Dashboard", icon: LayoutDashboard, roles: [Role.DOCTOR, Role.CLINIC_ADMIN, Role.ASSISTANT] },
+  { href: "/patients", label: "Patients", icon: Users, roles: [Role.DOCTOR, Role.CLINIC_ADMIN, Role.ASSISTANT] },
+  { href: "/consultations", label: "Consultations", icon: Stethoscope, roles: [Role.DOCTOR, Role.CLINIC_ADMIN] },
+  { href: "/documents", label: "Documents", icon: FileText, roles: [Role.DOCTOR, Role.CLINIC_ADMIN, Role.ASSISTANT] },
+  { href: "/assistant", label: "AI Assistant", icon: Bot, roles: [Role.DOCTOR, Role.CLINIC_ADMIN] },
+  { href: "/ai-review", label: "AI Review", icon: CheckSquare, roles: [Role.DOCTOR, Role.CLINIC_ADMIN] },
+  { href: "/tasks", label: "Tasks", icon: ClipboardList, roles: [Role.DOCTOR, Role.CLINIC_ADMIN, Role.ASSISTANT] },
+  { href: "/follow-ups", label: "Follow-ups", icon: CalendarClock, roles: [Role.DOCTOR, Role.CLINIC_ADMIN, Role.ASSISTANT] },
+  { href: "/audit", label: "Audit", icon: ShieldCheck, roles: [Role.CLINIC_ADMIN] },
+  { href: "/settings", label: "Settings", icon: Settings, roles: [Role.DOCTOR, Role.CLINIC_ADMIN, Role.ASSISTANT] }
 ];
 
 export async function AppShell({ children, active = "/" }: { children: React.ReactNode; active?: string }) {
   const user = await getSession();
   if (!user) redirect("/login");
+  const visibleNav = nav.filter((item) => item.roles.includes(user.role));
+  const activeLabel = active === "/" ? `${user.role === Role.ASSISTANT ? "Assistant" : user.role === Role.CLINIC_ADMIN ? "Admin" : "Doctor"} Dashboard` : visibleNav.find((n) => n.href === active)?.label;
 
   return (
     <div className="app-shell">
@@ -46,7 +49,7 @@ export async function AppShell({ children, active = "/" }: { children: React.Rea
           </div>
         </div>
         <nav className="nav-list" aria-label="Main navigation">
-          {nav.map((item) => {
+          {visibleNav.map((item) => {
             const Icon = item.icon;
             const isActive = active === item.href;
             return (
@@ -65,7 +68,7 @@ export async function AppShell({ children, active = "/" }: { children: React.Rea
         <div className="topbar">
           <div>
             <p className="eyebrow">Riverside Family Clinic</p>
-            <h1 className="page-title">{active === "/" ? "Doctor Dashboard" : nav.find((n) => n.href === active)?.label}</h1>
+            <h1 className="page-title">{activeLabel}</h1>
           </div>
           <div className="user-pill">
             <div className="avatar">{user.name.slice(0, 1)}</div>

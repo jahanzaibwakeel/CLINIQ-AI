@@ -137,8 +137,15 @@ Allowed roles: doctor, clinic admin.
 Marks an AI draft as reviewed or rejected and writes an audit log.
 
 ```json
-{ "reviewStatus": "REVIEWED", "reviewerNote": "Optional audit note" }
+{
+  "reviewStatus": "REVIEWED",
+  "reviewerNote": "Optional audit note",
+  "output": { "disclaimer": "AI draft, doctor review required.", "summary": "Edited draft" },
+  "applyToRecord": true
+}
 ```
+
+When `applyToRecord` is true, supported reviewed outputs can update consultation summaries/SOAP notes, create reviewed tasks or follow-ups, update parsed document data, or store reviewed note content.
 
 ### `POST /api/search`
 
