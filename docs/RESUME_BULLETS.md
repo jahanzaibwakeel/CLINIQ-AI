@@ -8,5 +8,6 @@
 - Added automatic AI document triage that parses uploaded reports, explains risk flags, and extracts task candidates immediately after chunking and embedding.
 - Built role-specific product surfaces for doctors, clinic admins, and assistants, plus an AI draft review workflow that lets clinicians edit and apply reviewed output to records.
 - Built an admin Ops dashboard with request IDs, AI latency, cache/fallback rates, token estimates, document triage volume, readiness checks, and audit signals.
+- Added admin staff security visibility with role coverage, last-login state, active status, failed-login counters, and temporary account lockout.
 - Added healthcare safety controls including doctor-review disclaimers, AI draft metadata, provider/model traceability, review status, audit logging, and external PHI opt-in controls.
 - Delivered deployment readiness with Docker Compose, PostgreSQL/Valkey health checks, GitHub Actions CI, tests, seed data, environment examples, and production security documentation.

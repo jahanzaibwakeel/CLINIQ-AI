@@ -5,6 +5,8 @@ import { apiError, parseJson } from "@/lib/http";
 import { loginSchema } from "@/lib/validation";
 import { setSessionCookie } from "@/lib/security/session";
 import { rateLimit } from "@/lib/rate-limit";
+import { isAccountLocked, lockoutCopy, nextFailedLoginState } from "@/lib/security/login-policy";
+import { requestIdFrom } from "@/lib/observability";
 
 function clientKey(request: Request) {
   return (
@@ -16,6 +18,7 @@ function clientKey(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    const requestId = requestIdFrom(request);
     const ip = clientKey(request);
     const limited = await rateLimit(`login:ip:${ip}`, 60, 60);
     if (limited) return limited;
@@ -30,8 +33,27 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
     }
 
+    if (isAccountLocked(user.lockedUntil)) {
+      await prisma.auditLog.create({
+        data: {
+          clinicId: user.clinicId,
+          actorId: user.id,
+          action: "LOGIN_BLOCKED_LOCKED_ACCOUNT",
+          entityType: "User",
+          entityId: user.id,
+          metadata: { ip, requestId, lockedUntil: user.lockedUntil }
+        }
+      });
+      return NextResponse.json({ error: lockoutCopy(user.lockedUntil) }, { status: 423 });
+    }
+
     const valid = await bcrypt.compare(input.password, user.passwordHash);
     if (!valid) {
+      const failedState = nextFailedLoginState(user.failedLoginCount);
+      await prisma.user.update({
+        where: { id: user.id },
+        data: failedState
+      });
       await prisma.auditLog.create({
         data: {
           clinicId: user.clinicId,
@@ -39,11 +61,20 @@ export async function POST(request: Request) {
           action: "LOGIN_FAILED",
           entityType: "User",
           entityId: user.id,
-          metadata: { ip }
+          metadata: { ip, requestId, failedLoginCount: failedState.failedLoginCount, lockedUntil: failedState.lockedUntil }
         }
       });
       return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
     }
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        failedLoginCount: 0,
+        lockedUntil: null,
+        lastLoginAt: new Date()
+      }
+    });
 
     await setSessionCookie({
       id: user.id,
@@ -60,7 +91,7 @@ export async function POST(request: Request) {
         action: "LOGIN_SUCCESS",
         entityType: "User",
         entityId: user.id,
-        metadata: { ip }
+        metadata: { ip, requestId }
       }
     });
 

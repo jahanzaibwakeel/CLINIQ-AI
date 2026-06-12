@@ -1,8 +1,21 @@
-import { Bot, Cpu, Database, LockKeyhole, ShieldCheck } from "lucide-react";
+import { Bot, Cpu, Database, GlobeLock, LockKeyhole, Server, ShieldCheck } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { env, ollamaBaseUrl } from "@/lib/env";
+import { cacheHealth } from "@/lib/cache";
+import { prisma } from "@/lib/db";
+import { getSession } from "@/lib/security/session";
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+  const user = await getSession();
+  const clinicId = user?.clinicId ?? "";
+  const [cache, aiDrafts, auditEvents] = await Promise.all([
+    cacheHealth(),
+    prisma.aiGeneration.count({ where: { clinicId, reviewStatus: "DRAFT" } }),
+    prisma.auditLog.count({ where: { clinicId } })
+  ]);
+  const externalAiEnabled = env.ALLOW_EXTERNAL_AI === "true";
+  const productionOriginConfigured = Boolean(process.env.NEXT_PUBLIC_APP_URL || process.env.TRUSTED_ORIGINS);
+
   return (
     <AppShell active="/settings">
       <div className="grid" style={{ gap: 16 }}>
@@ -10,7 +23,25 @@ export default function SettingsPage() {
           <Setting icon={<Cpu size={20} />} title="AI provider" value={env.AI_PROVIDER} note="Default mode is local Ollama. No paid API is required." />
           <Setting icon={<Bot size={20} />} title="Free model" value={env.OLLAMA_MODEL} note={`Configured endpoint: ${ollamaBaseUrl}`} />
           <Setting icon={<ShieldCheck size={20} />} title="Safety mode" value="Doctor review" note="Every generation is stored as a draft until reviewed." />
-          <Setting icon={<LockKeyhole size={20} />} title="PHI policy" value={env.ALLOW_EXTERNAL_AI === "true" ? "External AI enabled" : "Local-first"} note="Private patient data is not sent externally by default." />
+          <Setting icon={<LockKeyhole size={20} />} title="PHI policy" value={externalAiEnabled ? "External AI enabled" : "Local-first"} note="Private patient data is not sent externally by default." />
+        </div>
+        <section className="command-band">
+          <div>
+            <p className="eyebrow">Deployment readiness</p>
+            <h2>Configuration, AI safety, and hosting posture in one place.</h2>
+            <p>Use this screen before domain hosting to confirm local-first AI, security headers, cache state, audit coverage, and review backlog.</p>
+          </div>
+          <div className="command-actions">
+            <span className="button secondary">
+              <Server size={18} />
+              {cache === "ok" ? "Valkey ready" : cache === "memory" ? "Memory cache" : "Cache degraded"}
+            </span>
+          </div>
+        </section>
+        <div className="grid dashboard-metrics">
+          <ReadinessMetric title="Pending AI review" value={aiDrafts} label="drafts" detail="Doctor review required before record use" tone={aiDrafts > 10 ? "orange" : "green"} />
+          <ReadinessMetric title="Audit events" value={auditEvents} label="records" detail="Clinical, AI, login, and document actions" tone="blue" />
+          <ReadinessMetric title="External AI" value={externalAiEnabled ? "On" : "Off"} label="policy" detail="External PHI transfer is opt-in only" tone={externalAiEnabled ? "orange" : "green"} />
         </div>
         <section className="card card-pad">
           <div className="section-head">
@@ -38,15 +69,30 @@ export default function SettingsPage() {
             </div>
           </div>
         </section>
-        <section className="card card-pad">
-          <div className="section-head">
-            <h2 className="section-title">Data store</h2>
-            <Database size={20} />
-          </div>
-          <p className="muted">
-            PostgreSQL stores clinical records, AI metadata, audit logs, document chunks, and embeddings. Valkey caches AI calls and rate limits.
-          </p>
-        </section>
+        <div className="grid two-column">
+          <section className="card card-pad">
+            <div className="section-head">
+              <h2 className="section-title">Data store</h2>
+              <Database size={20} />
+            </div>
+            <div className="timeline-list">
+              <ReadinessCheck title="PostgreSQL" detail="Stores clinical records, AI metadata, audit logs, chunks, and embeddings." state="Configured" good />
+              <ReadinessCheck title="Valkey/Redis" detail={cache === "ok" ? "Network cache is reachable." : cache === "memory" ? "Using safe in-memory fallback for local demos." : "Cache check failed; inspect VALKEY_URL."} state={cache} good={cache !== "degraded"} />
+              <ReadinessCheck title="Migrations" detail="Prisma migrations are committed for deploy-time database setup." state="Versioned" good />
+            </div>
+          </section>
+          <section className="card card-pad">
+            <div className="section-head">
+              <h2 className="section-title">Hosting checklist</h2>
+              <GlobeLock size={20} />
+            </div>
+            <div className="timeline-list">
+              <ReadinessCheck title="Trusted origin" detail="Set NEXT_PUBLIC_APP_URL or TRUSTED_ORIGINS before production domain hosting." state={productionOriginConfigured ? "Set" : "Needed"} good={productionOriginConfigured} />
+              <ReadinessCheck title="Security headers" detail="Middleware applies CSP, HSTS in production, frame denial, and content sniffing protection." state="Enabled" good />
+              <ReadinessCheck title="Account lockout" detail="Known users lock temporarily after repeated failed password attempts." state="Enabled" good />
+            </div>
+          </section>
+        </div>
       </div>
     </AppShell>
   );
@@ -62,5 +108,42 @@ function Setting({ icon, title, value, note }: { icon: React.ReactNode; title: s
         <p className="muted">{note}</p>
       </div>
     </section>
+  );
+}
+
+function ReadinessMetric({
+  title,
+  value,
+  label,
+  detail,
+  tone
+}: {
+  title: string;
+  value: number | string;
+  label: string;
+  detail: string;
+  tone: "blue" | "green" | "orange";
+}) {
+  return (
+    <section className={`metric-panel ${tone}`}>
+      <p>{title}</p>
+      <div>
+        <strong>{value}</strong>
+        <span>{label}</span>
+      </div>
+      <small>{detail}</small>
+    </section>
+  );
+}
+
+function ReadinessCheck({ title, detail, state, good }: { title: string; detail: string; state: string; good: boolean }) {
+  return (
+    <div className="timeline-item">
+      <div>
+        <strong>{title}</strong>
+        <p className="muted">{detail}</p>
+      </div>
+      <span className={good ? "badge good" : "badge warn"}>{state}</span>
+    </div>
   );
 }

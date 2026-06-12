@@ -12,39 +12,69 @@ export async function processDocumentJob(input: {
   user: SessionUser;
   requestId?: string;
 }) {
-  await prisma.document.update({
-    where: { id: input.documentId },
-    data: { status: "PROCESSING" }
-  });
+  try {
+    await prisma.document.update({
+      where: { id: input.documentId },
+      data: { status: "PROCESSING" }
+    });
 
-  const chunks = input.extractedText.match(/[\s\S]{1,1200}/g) ?? [input.extractedText];
-  for (const [index, chunk] of chunks.entries()) {
-    const documentChunk = await prisma.documentChunk.create({
-      data: {
-        documentId: input.documentId,
-        chunkIndex: index,
-        content: chunk,
-        metadata: { processor: "inline-worker" }
+    const chunks = input.extractedText.match(/[\s\S]{1,1200}/g) ?? [input.extractedText];
+    for (const [index, chunk] of chunks.entries()) {
+      const documentChunk = await prisma.documentChunk.create({
+        data: {
+          documentId: input.documentId,
+          chunkIndex: index,
+          content: chunk,
+          metadata: { processor: "inline-worker" }
+        }
+      });
+      const vector = await embedText(chunk);
+      await prisma.embedding.create({
+        data: {
+          clinicId: input.clinicId,
+          patientId: input.patientId,
+          documentChunkId: documentChunk.id,
+          model: "configured-provider-or-local-hash",
+          vector,
+          contentPreview: chunk.slice(0, 240)
+        }
+      });
+    }
+
+    await prisma.document.update({
+      where: { id: input.documentId },
+      data: { status: "PROCESSED" }
+    });
+
+    await createDocumentTriageDrafts(input);
+  } catch (error) {
+    await prisma.document.update({
+      where: { id: input.documentId },
+      data: { status: "FAILED" }
+    });
+    await auditLog({
+      user: input.user,
+      action: "DOCUMENT_PROCESSING_FAILED",
+      entityType: "Document",
+      entityId: input.documentId,
+      patientId: input.patientId,
+      metadata: {
+        requestId: input.requestId,
+        error: error instanceof Error ? error.message : "Unknown document processing error"
       }
     });
-    const vector = await embedText(chunk);
-    await prisma.embedding.create({
-      data: {
-        clinicId: input.clinicId,
-        patientId: input.patientId,
-        documentChunkId: documentChunk.id,
-        model: "configured-provider-or-local-hash",
-        vector,
-        contentPreview: chunk.slice(0, 240)
-      }
-    });
+    throw error;
   }
+}
 
-  await prisma.document.update({
-    where: { id: input.documentId },
-    data: { status: "PROCESSED" }
-  });
-
+async function createDocumentTriageDrafts(input: {
+  clinicId: string;
+  patientId: string;
+  documentId: string;
+  extractedText: string;
+  user: SessionUser;
+  requestId?: string;
+}) {
   const patient = await prisma.patient.findUnique({
     where: { id: input.patientId },
     select: {

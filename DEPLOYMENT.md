@@ -100,6 +100,7 @@ On the server, keep a production `.env` beside `docker-compose.prod.yml`. The de
 - `/api/health`: app process is alive
 - `/api/ready`: app can reach PostgreSQL and reports cache state as `ok`, `memory`, or `degraded`
 - `/ops`: admin-only in-app operations dashboard for AI latency, fallback rate, cache hit rate, request IDs, and review backlog
+- `/staff`: admin-only role and login-security dashboard for active users, lockouts, and last-login state
 
 ## Render/Fly.io/Railway
 
@@ -138,6 +139,7 @@ Recommended when PHI should remain on premises:
 - Seed/demo data removed or isolated.
 - Rate limits reviewed.
 - Role permissions verified.
+- Staff accounts reviewed for active status, lockouts, and role coverage.
 - Dependency updates monitored.
 - Error monitoring added.
 

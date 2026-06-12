@@ -236,6 +236,7 @@ function getRoleDashboardConfig(role: Role): {
       actions: [
         { href: "/ops", label: "Open ops", primary: true, icon: "review" },
         { href: "/audit", label: "Open audit log", primary: false, icon: "review" },
+        { href: "/staff", label: "Staff security", primary: false, icon: "review" },
         { href: "/ai-review", label: "Review AI drafts", primary: false, icon: "review" }
       ],
       aiTitle: "Admin workflow AI",

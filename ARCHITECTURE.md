@@ -20,6 +20,7 @@ Core entities:
 
 - Clinics own users and clinical records.
 - Users have roles: `DOCTOR`, `CLINIC_ADMIN`, `ASSISTANT`.
+- Users also store active state, failed-login count, temporary lockout expiry, and last-login timestamp for admin security review.
 - Patients contain demo-only demographics, conditions, medications, allergies, and risk score.
 - Consultations store raw notes, summaries, SOAP JSON, status, and sign-off fields.
 - Documents store extraction results, chunks, and parsed JSON.
@@ -35,8 +36,9 @@ Core entities:
 3. Mutating routes validate input with Zod.
 4. Clinical writes create audit log records.
 5. Middleware attaches `X-Request-Id` for app/API traceability.
-6. AI routes build patient context, call the AI service, validate output, store draft metadata and telemetry, and return structured JSON.
-7. Document uploads chunk/embed text and automatically create doctor-review-required AI triage drafts for document parsing, risk flags, and task candidates.
+6. Login attempts apply rate limiting, known-account lockout policy, and audit metadata.
+7. AI routes build patient context, call the AI service, validate output, store draft metadata and telemetry, and return structured JSON.
+8. Document uploads chunk/embed text and automatically create doctor-review-required AI triage drafts for document parsing, risk flags, and task candidates.
 
 ## Deployment Topology
 

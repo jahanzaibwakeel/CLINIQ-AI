@@ -12,6 +12,8 @@ Body:
 { "email": "doctor@medipilot.local", "password": "DemoPassword123!" }
 ```
 
+Known active accounts are temporarily locked after repeated failed password attempts. Lockout and login events are written to the audit log with request metadata.
+
 ### `POST /api/auth/logout`
 
 Clears the session.
@@ -63,6 +65,8 @@ Creates an extracted-text document record, chunks it, embeds chunks, marks proce
 - task extraction
 
 All generated triage outputs remain AI drafts until reviewed.
+
+If processing fails, the document status is set to `FAILED` and a `DOCUMENT_PROCESSING_FAILED` audit event is created.
 
 ## Tasks
 

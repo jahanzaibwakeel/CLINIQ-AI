@@ -7,6 +7,7 @@
 - Role-based route checks.
 - Zod validation on API input.
 - Per-IP and per-email login throttling.
+- Known-user account lockout after repeated failed password attempts.
 - AI rate limiting.
 - Security headers through middleware: CSP, frame denial, content sniffing protection, referrer policy, and permissions policy.
 - Production origin allow-listing for mutating API requests through `NEXT_PUBLIC_APP_URL` or `TRUSTED_ORIGINS`.
@@ -14,6 +15,7 @@
 - Audit logs for successful and failed known-user login attempts.
 - Clinic-admin audit viewer for recent security and clinical events.
 - Clinic-admin Ops dashboard for AI telemetry, fallback visibility, review backlog, and request trace IDs.
+- Clinic-admin Staff page for role coverage, active status, lockout state, and last login review.
 - Middleware attaches `X-Request-Id` to responses and AI generations for traceability.
 - External AI disabled by default.
 - AI output stored as draft with review status.
@@ -29,6 +31,7 @@
 - AI drafts require explicit review and can be approved or rejected with audit logging.
 - Reviewed AI drafts can be edited before approval and applied into records with audit metadata.
 - Uploaded documents automatically create AI triage drafts while preserving doctor review before clinical use.
+- Document processing failures mark the document as failed and write an audit event.
 - External PHI transfer requires explicit `ALLOW_EXTERNAL_AI=true`.
 
 ## Recommended Production Hardening
@@ -41,6 +44,7 @@
 - Add row-level tenant isolation tests.
 - Add backup restore drills.
 - Add account lockout and password reset workflows.
+- Add self-service password reset and admin user invitation workflows.
 - Add formal HIPAA/GDPR/legal review before real clinical use.
 
 ## Known Limitations
