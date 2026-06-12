@@ -1,0 +1,310 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  DOCTOR
+  CLINIC_ADMIN
+  ASSISTANT
+}
+
+enum ConsultationStatus {
+  DRAFT
+  IN_REVIEW
+  SIGNED
+}
+
+enum DocumentStatus {
+  UPLOADED
+  PROCESSING
+  PROCESSED
+  FAILED
+}
+
+enum AiGenerationType {
+  CONSULTATION_SUMMARY
+  SOAP_NOTE
+  HISTORY_TIMELINE
+  DOCUMENT_PARSE
+  FOLLOW_UP_INSTRUCTIONS
+  TASK_EXTRACTION
+  RISK_FLAG_EXPLAINER
+  VISIT_SUMMARY
+  REFERRAL_LETTER
+  ASSISTANT_RESPONSE
+  SEMANTIC_SEARCH
+}
+
+enum ReviewStatus {
+  DRAFT
+  REVIEWED
+  REJECTED
+}
+
+enum TaskStatus {
+  OPEN
+  IN_PROGRESS
+  DONE
+  CANCELLED
+}
+
+enum FollowUpStatus {
+  SCHEDULED
+  COMPLETED
+  MISSED
+  CANCELLED
+}
+
+model Clinic {
+  id        String   @id @default(cuid())
+  name      String
+  timezone  String   @default("UTC")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users         User[]
+  patients      Patient[]
+  auditLogs     AuditLog[]
+  aiGenerations AiGeneration[]
+}
+
+model User {
+  id           String   @id @default(cuid())
+  clinicId     String
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         Role
+  title        String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  clinic        Clinic         @relation(fields: [clinicId], references: [id])
+  patients      Patient[]      @relation("PrimaryDoctor")
+  consultations Consultation[]
+  notes         Note[]
+  documents     Document[]
+  tasksAssigned Task[]         @relation("TaskAssignee")
+  tasksCreated  Task[]         @relation("TaskCreator")
+  followUps     FollowUp[]
+  auditLogs     AuditLog[]
+  aiReviews     AiGeneration[] @relation("AiReviewer")
+}
+
+model Patient {
+  id              String   @id @default(cuid())
+  clinicId        String
+  primaryDoctorId String?
+  firstName       String
+  lastName        String
+  dateOfBirth     DateTime
+  sex             String
+  phone           String?
+  email           String?
+  mrn             String   @unique
+  allergies       String[]
+  medications     String[]
+  conditions      String[]
+  riskScore       Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  clinic        Clinic         @relation(fields: [clinicId], references: [id])
+  primaryDoctor User?          @relation("PrimaryDoctor", fields: [primaryDoctorId], references: [id])
+  consultations Consultation[]
+  notes         Note[]
+  documents     Document[]
+  tasks         Task[]
+  followUps     FollowUp[]
+  aiGenerations AiGeneration[]
+  auditLogs     AuditLog[]
+
+  @@index([clinicId, lastName, firstName])
+}
+
+model Consultation {
+  id              String             @id @default(cuid())
+  clinicId        String
+  patientId       String
+  doctorId        String
+  status          ConsultationStatus @default(DRAFT)
+  reason          String
+  rawNotes        String
+  summary         String?
+  soapNote        Json?
+  startedAt       DateTime
+  signedAt        DateTime?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  patient       Patient        @relation(fields: [patientId], references: [id])
+  doctor        User           @relation(fields: [doctorId], references: [id])
+  notes         Note[]
+  tasks         Task[]
+  followUps     FollowUp[]
+  aiGenerations AiGeneration[]
+  auditLogs     AuditLog[]
+
+  @@index([clinicId, patientId, startedAt])
+}
+
+model Note {
+  id             String   @id @default(cuid())
+  clinicId       String
+  patientId      String
+  consultationId String?
+  authorId       String
+  title          String
+  body           String
+  tags           String[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  patient      Patient       @relation(fields: [patientId], references: [id])
+  consultation Consultation? @relation(fields: [consultationId], references: [id])
+  author       User          @relation(fields: [authorId], references: [id])
+}
+
+model Document {
+  id             String         @id @default(cuid())
+  clinicId       String
+  patientId      String
+  uploadedById   String
+  fileName       String
+  mimeType       String
+  storageKey     String
+  extractedText  String?
+  parsedJson     Json?
+  status         DocumentStatus @default(UPLOADED)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  patient       Patient         @relation(fields: [patientId], references: [id])
+  uploadedBy    User            @relation(fields: [uploadedById], references: [id])
+  chunks        DocumentChunk[]
+  aiGenerations AiGeneration[]
+
+  @@index([clinicId, patientId, status])
+}
+
+model DocumentChunk {
+  id         String   @id @default(cuid())
+  documentId String
+  chunkIndex Int
+  content    String
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  document   Document    @relation(fields: [documentId], references: [id])
+  embeddings Embedding[]
+
+  @@unique([documentId, chunkIndex])
+}
+
+model Embedding {
+  id              String   @id @default(cuid())
+  clinicId        String
+  patientId       String
+  noteId          String?
+  documentChunkId String?
+  model           String
+  vector          Json
+  contentPreview  String
+  createdAt       DateTime @default(now())
+
+  documentChunk DocumentChunk? @relation(fields: [documentChunkId], references: [id])
+
+  @@index([clinicId, patientId])
+}
+
+model AiGeneration {
+  id             String           @id @default(cuid())
+  clinicId       String
+  patientId      String?
+  consultationId String?
+  documentId     String?
+  type           AiGenerationType
+  provider       String
+  model          String
+  promptVersion  String
+  sourceContext  Json
+  output         Json
+  rawOutput      String?
+  reviewStatus   ReviewStatus     @default(DRAFT)
+  reviewerId     String?
+  reviewedAt     DateTime?
+  createdAt      DateTime         @default(now())
+
+  clinic       Clinic        @relation(fields: [clinicId], references: [id])
+  patient      Patient?      @relation(fields: [patientId], references: [id])
+  consultation Consultation? @relation(fields: [consultationId], references: [id])
+  document     Document?     @relation(fields: [documentId], references: [id])
+  reviewer     User?         @relation("AiReviewer", fields: [reviewerId], references: [id])
+
+  @@index([clinicId, patientId, type, createdAt])
+}
+
+model Task {
+  id             String     @id @default(cuid())
+  clinicId       String
+  patientId      String?
+  consultationId String?
+  createdById    String
+  assigneeId     String?
+  title          String
+  description    String?
+  status         TaskStatus @default(OPEN)
+  dueAt          DateTime?
+  source         String     @default("manual")
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  patient      Patient?      @relation(fields: [patientId], references: [id])
+  consultation Consultation? @relation(fields: [consultationId], references: [id])
+  createdBy    User          @relation("TaskCreator", fields: [createdById], references: [id])
+  assignee     User?         @relation("TaskAssignee", fields: [assigneeId], references: [id])
+}
+
+model FollowUp {
+  id             String         @id @default(cuid())
+  clinicId       String
+  patientId      String
+  consultationId String?
+  ownerId        String
+  title          String
+  instructions   String
+  scheduledFor   DateTime
+  status         FollowUpStatus @default(SCHEDULED)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  patient      Patient       @relation(fields: [patientId], references: [id])
+  consultation Consultation? @relation(fields: [consultationId], references: [id])
+  owner        User          @relation(fields: [ownerId], references: [id])
+}
+
+model AuditLog {
+  id             String   @id @default(cuid())
+  clinicId       String
+  actorId        String?
+  patientId      String?
+  consultationId String?
+  action         String
+  entityType     String
+  entityId       String
+  metadata       Json?
+  createdAt      DateTime @default(now())
+
+  clinic       Clinic        @relation(fields: [clinicId], references: [id])
+  actor        User?         @relation(fields: [actorId], references: [id])
+  patient      Patient?      @relation(fields: [patientId], references: [id])
+  consultation Consultation? @relation(fields: [consultationId], references: [id])
+
+  @@index([clinicId, createdAt])
+}

@@ -1,0 +1,57 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: medipilot
+      POSTGRES_PASSWORD: medipilot
+      POSTGRES_DB: medipilot_ai
+    ports:
+      - "${POSTGRES_HOST_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U medipilot -d medipilot_ai"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  valkey:
+    image: valkey/valkey:8-alpine
+    ports:
+      - "${VALKEY_HOST_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ollama:
+    image: ollama/ollama:latest
+    profiles: ["ollama"]
+    ports:
+      - "${OLLAMA_HOST_PORT:-11434}:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+
+  web:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://medipilot:medipilot@postgres:5432/medipilot_ai?schema=public
+      VALKEY_URL: redis://valkey:6379
+      PORT: ${APP_CONTAINER_PORT:-3000}
+      SESSION_SECRET: replace-this-in-production-with-a-long-random-secret
+      AI_PROVIDER: ollama
+      OLLAMA_BASE_URL: http://ollama:11434
+      OLLAMA_MODEL: qwen2.5:7b
+      ALLOW_EXTERNAL_AI: "false"
+    ports:
+      - "${APP_HOST_PORT:-3000}:${APP_CONTAINER_PORT:-3000}"
+
+volumes:
+  postgres_data:
+  ollama_data:

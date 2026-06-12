@@ -1,0 +1,164 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import { Bot, FileSearch, Sparkles } from "lucide-react";
+import { csrfHeaders } from "@/lib/client/csrf";
+
+type AiType =
+  | "CONSULTATION_SUMMARY"
+  | "SOAP_NOTE"
+  | "HISTORY_TIMELINE"
+  | "DOCUMENT_PARSE"
+  | "FOLLOW_UP_INSTRUCTIONS"
+  | "TASK_EXTRACTION"
+  | "RISK_FLAG_EXPLAINER"
+  | "VISIT_SUMMARY"
+  | "REFERRAL_LETTER"
+  | "ASSISTANT_RESPONSE";
+
+const aiOptions: Array<{ value: AiType; label: string }> = [
+  { value: "CONSULTATION_SUMMARY", label: "Consult summary" },
+  { value: "SOAP_NOTE", label: "SOAP note" },
+  { value: "HISTORY_TIMELINE", label: "History timeline" },
+  { value: "DOCUMENT_PARSE", label: "Document parser" },
+  { value: "FOLLOW_UP_INSTRUCTIONS", label: "Follow-up instructions" },
+  { value: "TASK_EXTRACTION", label: "Task extraction" },
+  { value: "RISK_FLAG_EXPLAINER", label: "Risk flag explainer" },
+  { value: "VISIT_SUMMARY", label: "Patient visit summary" },
+  { value: "REFERRAL_LETTER", label: "Referral letter" },
+  { value: "ASSISTANT_RESPONSE", label: "Ask patient context" }
+];
+
+export function AiWorkbench({ patientId, defaultText = "" }: { patientId?: string; defaultText?: string }) {
+  const [type, setType] = useState<AiType>("SOAP_NOTE");
+  const [input, setInput] = useState(defaultText);
+  const [question, setQuestion] = useState("What should I review before finalizing this note?");
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<Record<string, unknown> | null>(null);
+  const [error, setError] = useState("");
+
+  const output = useMemo(() => (result ? JSON.stringify(result, null, 2) : ""), [result]);
+
+  async function generate() {
+    setLoading(true);
+    setError("");
+    setResult(null);
+    const response = await fetch("/api/ai/generate", {
+      method: "POST",
+      headers: csrfHeaders({ "Content-Type": "application/json" }),
+      body: JSON.stringify({
+        type,
+        patientId,
+        input,
+        question: type === "ASSISTANT_RESPONSE" ? question : undefined
+      })
+    });
+    setLoading(false);
+    if (!response.ok) {
+      setError("AI generation failed. The app will use safe fallbacks when configured providers are unavailable.");
+      return;
+    }
+    const data = (await response.json()) as { output: Record<string, unknown>; provider: string; model: string; usedFallback: boolean };
+    setResult({
+      metadata: {
+        provider: data.provider,
+        model: data.model,
+        usedFallback: data.usedFallback,
+        reviewStatus: "DRAFT"
+      },
+      output: data.output
+    });
+  }
+
+  return (
+    <section className="card card-pad">
+      <div className="section-head">
+        <h2 className="section-title">AI drafting workbench</h2>
+        <span className="badge warn">AI draft, doctor review required</span>
+      </div>
+      <div className="form-grid">
+        <label className="field">
+          <span className="label">AI module</span>
+          <select className="select" value={type} onChange={(event) => setType(event.target.value as AiType)}>
+            {aiOptions.map((option) => (
+              <option value={option.value} key={option.value}>{option.label}</option>
+            ))}
+          </select>
+        </label>
+        {type === "ASSISTANT_RESPONSE" ? (
+          <label className="field">
+            <span className="label">Doctor question</span>
+            <input className="input" value={question} onChange={(event) => setQuestion(event.target.value)} />
+          </label>
+        ) : null}
+        <label className="field">
+          <span className="label">Selected note, document, or context</span>
+          <textarea className="textarea" value={input} onChange={(event) => setInput(event.target.value)} placeholder="Paste or write clinical context for AI drafting..." />
+        </label>
+        <button className="button" disabled={loading || input.length < 5} onClick={generate} type="button">
+          <Sparkles size={18} />
+          {loading ? "Drafting..." : "Generate AI draft"}
+        </button>
+        {error ? <div className="badge warn">{error}</div> : null}
+        <div className="result-box">
+          {output || (
+            <span className="muted">
+              AI output will appear here with provider/model metadata and review status.
+            </span>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function SemanticSearchBox({ patientId }: { patientId?: string }) {
+  const [query, setQuery] = useState("microalbuminuria diabetes follow up");
+  const [results, setResults] = useState<Array<{ contentPreview: string; score: number }>>([]);
+  const [loading, setLoading] = useState(false);
+
+  async function search() {
+    setLoading(true);
+    const response = await fetch("/api/search", {
+      method: "POST",
+      headers: csrfHeaders({ "Content-Type": "application/json" }),
+      body: JSON.stringify({ query, patientId })
+    });
+    setLoading(false);
+    if (response.ok) {
+      const data = (await response.json()) as { results: Array<{ contentPreview: string; score: number }> };
+      setResults(data.results);
+    }
+  }
+
+  return (
+    <section className="card card-pad">
+      <div className="section-head">
+        <h2 className="section-title">Semantic patient search</h2>
+        <FileSearch size={19} />
+      </div>
+      <div className="form-grid">
+        <label className="field">
+          <span className="label">Search notes and document chunks</span>
+          <input className="input" value={query} onChange={(event) => setQuery(event.target.value)} />
+        </label>
+        <button className="button secondary" disabled={loading || query.length < 2} onClick={search} type="button">
+          <Bot size={18} />
+          {loading ? "Searching..." : "Search context"}
+        </button>
+        {results.length ? (
+          <div className="risk-list">
+            {results.map((result, index) => (
+              <div className="card-pad" style={{ border: "1px solid var(--border)", borderRadius: 8 }} key={`${result.contentPreview}-${index}`}>
+                <strong>Match {(result.score * 100).toFixed(1)}%</strong>
+                <p className="muted">{result.contentPreview}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="empty">No search results yet.</div>
+        )}
+      </div>
+    </section>
+  );
+}
