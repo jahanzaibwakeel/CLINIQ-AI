@@ -61,3 +61,21 @@ export const taskCreateSchema = z.object({
   description: z.string().optional(),
   dueAt: z.string().datetime().optional()
 });
+
+export const taskUpdateSchema = z.object({
+  status: z.enum(["OPEN", "IN_PROGRESS", "DONE", "CANCELLED"]).optional(),
+  assigneeId: z.string().optional().nullable(),
+  dueAt: z.string().datetime().optional().nullable()
+});
+
+export const followUpCreateSchema = z.object({
+  patientId: z.string().min(1),
+  consultationId: z.string().optional(),
+  title: z.string().min(2),
+  instructions: z.string().min(5),
+  scheduledFor: z.string().datetime()
+});
+
+export const followUpUpdateSchema = z.object({
+  status: z.enum(["SCHEDULED", "COMPLETED", "MISSED", "CANCELLED"])
+});

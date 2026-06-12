@@ -1,5 +1,6 @@
 import { AppShell } from "@/components/app-shell";
 import { ClinicalAiComposer } from "@/components/clinical-ai-composer";
+import { TaskStatusActions } from "@/components/task-status-actions";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/security/session";
 
@@ -24,7 +25,7 @@ export default async function TasksPage() {
           </div>
           <div className="table-wrap">
             <table>
-              <thead><tr><th>Task</th><th>Patient</th><th>Assignee</th><th>Due</th><th>Source</th></tr></thead>
+              <thead><tr><th>Task</th><th>Patient</th><th>Assignee</th><th>Due</th><th>Status</th><th>Source</th><th>Actions</th></tr></thead>
               <tbody>
                 {tasks.map((task) => (
                   <tr key={task.id}>
@@ -32,7 +33,9 @@ export default async function TasksPage() {
                     <td>{task.patient ? `${task.patient.firstName} ${task.patient.lastName}` : "Clinic"}</td>
                     <td>{task.assignee?.name ?? "Unassigned"}</td>
                     <td>{task.dueAt ? task.dueAt.toLocaleDateString() : "No due date"}</td>
+                    <td><span className={task.status === "DONE" ? "badge good" : task.status === "CANCELLED" ? "badge warn" : "badge"}>{task.status.replace("_", " ")}</span></td>
                     <td><span className={task.source.includes("ai") ? "badge warn" : "badge"}>{task.source}</span></td>
+                    <td><TaskStatusActions taskId={task.id} status={task.status} /></td>
                   </tr>
                 ))}
               </tbody>

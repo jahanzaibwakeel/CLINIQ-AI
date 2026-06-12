@@ -68,6 +68,41 @@ Lists clinic task queue.
 
 Creates a manual task.
 
+### `PATCH /api/tasks/:id`
+
+Updates task status, assignee, or due date.
+
+```json
+{ "status": "DONE" }
+```
+
+## Follow-ups
+
+### `GET /api/follow-ups`
+
+Lists clinic follow-ups.
+
+### `POST /api/follow-ups`
+
+Schedules a patient follow-up.
+
+```json
+{
+  "patientId": "patient-id",
+  "title": "Lab review",
+  "instructions": "Review HbA1c and urine ACR.",
+  "scheduledFor": "2026-06-20T10:00:00.000Z"
+}
+```
+
+### `PATCH /api/follow-ups/:id`
+
+Updates follow-up status.
+
+```json
+{ "status": "COMPLETED" }
+```
+
 ## AI
 
 ### `POST /api/ai/generate`
