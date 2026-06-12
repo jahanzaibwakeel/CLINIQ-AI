@@ -1,4 +1,13 @@
-import { AlertTriangle, Bot, ClipboardList, FileText, Stethoscope, Users } from "lucide-react";
+import {
+  AlertTriangle,
+  Bot,
+  CalendarClock,
+  ClipboardList,
+  FileText,
+  ShieldCheck,
+  Stethoscope,
+  Users
+} from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { ClinicalAiComposer } from "@/components/clinical-ai-composer";
 import { SafetyBanner } from "@/components/safety-banner";
@@ -8,24 +17,62 @@ import { getSession } from "@/lib/security/session";
 export default async function DashboardPage() {
   const user = await getSession();
   const clinicId = user?.clinicId ?? "";
-  const [patientCount, consultCount, docCount, tasks, aiGenerations, highRiskPatients] = await Promise.all([
+  const [
+    patientCount,
+    consultCount,
+    docCount,
+    tasks,
+    aiGenerations,
+    pendingAiReviews,
+    highRiskPatients,
+    followUps,
+    recentDocuments,
+    signedConsultations
+  ] = await Promise.all([
     prisma.patient.count({ where: { clinicId } }),
     prisma.consultation.count({ where: { clinicId } }),
     prisma.document.count({ where: { clinicId } }),
     prisma.task.findMany({ where: { clinicId, status: { in: ["OPEN", "IN_PROGRESS"] } }, include: { patient: true }, take: 6, orderBy: { dueAt: "asc" } }),
     prisma.aiGeneration.findMany({ where: { clinicId }, orderBy: { createdAt: "desc" }, take: 5 }),
-    prisma.patient.findMany({ where: { clinicId, riskScore: { gte: 50 } }, orderBy: { riskScore: "desc" }, take: 5 })
+    prisma.aiGeneration.count({ where: { clinicId, reviewStatus: "DRAFT" } }),
+    prisma.patient.findMany({ where: { clinicId, riskScore: { gte: 50 } }, orderBy: { riskScore: "desc" }, take: 5 }),
+    prisma.followUp.findMany({ where: { clinicId, status: "SCHEDULED" }, include: { patient: true }, take: 5, orderBy: { scheduledFor: "asc" } }),
+    prisma.document.findMany({ where: { clinicId }, include: { patient: true, chunks: true }, take: 4, orderBy: { createdAt: "desc" } }),
+    prisma.consultation.count({ where: { clinicId, status: "SIGNED" } })
   ]);
+  const signedRate = consultCount ? Math.round((signedConsultations / consultCount) * 100) : 0;
 
   return (
     <AppShell active="/">
       <div className="grid" style={{ gap: 18 }}>
         <SafetyBanner />
+        <section className="command-band">
+          <div>
+            <p className="eyebrow">Today&apos;s clinic command center</p>
+            <h2>AI-assisted workflow, still doctor-led.</h2>
+            <p>Track operational load, pending AI review, follow-ups, documents, and risk signals from one working surface.</p>
+          </div>
+          <div className="command-actions">
+            <a className="button" href="/consultations">
+              <Stethoscope size={18} />
+              New consult
+            </a>
+            <a className="button secondary" href="/ai-review">
+              <ShieldCheck size={18} />
+              Review AI drafts
+            </a>
+          </div>
+        </section>
         <div className="grid stats-grid">
           <Stat title="Active patients" value={patientCount} icon={<Users size={19} />} />
           <Stat title="Consultations" value={consultCount} icon={<Stethoscope size={19} />} />
           <Stat title="Documents parsed" value={docCount} icon={<FileText size={19} />} />
-          <Stat title="AI drafts" value={aiGenerations.length} icon={<Bot size={19} />} />
+          <Stat title="Pending AI review" value={pendingAiReviews} icon={<Bot size={19} />} />
+        </div>
+        <div className="grid dashboard-metrics">
+          <MetricPanel title="Clinic load" label="open tasks" value={tasks.length} tone="blue" detail={`${followUps.length} scheduled follow-ups visible`} />
+          <MetricPanel title="Documentation" label="signed consults" value={`${signedRate}%`} tone="green" detail={`${signedConsultations} signed of ${consultCount} total`} />
+          <MetricPanel title="AI governance" label="draft queue" value={pendingAiReviews} tone={pendingAiReviews ? "orange" : "green"} detail="Every AI output requires approval or rejection" />
         </div>
         <ClinicalAiComposer
           compact
@@ -103,6 +150,71 @@ export default async function DashboardPage() {
             })}
           </div>
         </section>
+        <div className="grid two-column">
+          <section className="card card-pad">
+            <div className="section-head">
+              <h2 className="section-title">Follow-up radar</h2>
+              <CalendarClock size={19} />
+            </div>
+            <div className="timeline-list">
+              {followUps.length ? (
+                followUps.map((followUp) => (
+                  <div className="timeline-item" key={followUp.id}>
+                    <div>
+                      <strong>{followUp.title}</strong>
+                      <p className="muted">{followUp.patient.firstName} {followUp.patient.lastName} | {followUp.instructions}</p>
+                    </div>
+                    <span className="badge">{followUp.scheduledFor.toLocaleDateString()}</span>
+                  </div>
+                ))
+              ) : (
+                <div className="empty">No scheduled follow-ups.</div>
+              )}
+            </div>
+          </section>
+          <section className="card card-pad">
+            <div className="section-head">
+              <h2 className="section-title">Document pipeline</h2>
+              <FileText size={19} />
+            </div>
+            <div className="timeline-list">
+              {recentDocuments.length ? (
+                recentDocuments.map((document) => (
+                  <div className="timeline-item" key={document.id}>
+                    <div>
+                      <strong>{document.fileName}</strong>
+                      <p className="muted">{document.patient.firstName} {document.patient.lastName} | {document.chunks.length} searchable chunks</p>
+                    </div>
+                    <span className={document.status === "PROCESSED" ? "badge good" : "badge warn"}>{document.status}</span>
+                  </div>
+                ))
+              ) : (
+                <div className="empty">Uploaded reports will appear here after processing.</div>
+              )}
+            </div>
+          </section>
+        </div>
+        <section className="card card-pad">
+          <div className="section-head">
+            <h2 className="section-title">Recent AI drafts</h2>
+            <span className="badge good">Review queue linked</span>
+          </div>
+          <div className="timeline-list">
+            {aiGenerations.length ? (
+              aiGenerations.map((generation) => (
+                <div className="timeline-item" key={generation.id}>
+                  <div>
+                    <strong>{generation.type.replaceAll("_", " ").toLowerCase()}</strong>
+                    <p className="muted">{generation.provider} | {generation.model}</p>
+                  </div>
+                  <span className={generation.reviewStatus === "DRAFT" ? "badge warn" : "badge good"}>{generation.reviewStatus}</span>
+                </div>
+              ))
+            ) : (
+              <div className="empty">AI drafts will appear here after generation.</div>
+            )}
+          </div>
+        </section>
       </div>
     </AppShell>
   );
@@ -116,6 +228,31 @@ function Stat({ title, value, icon }: { title: string; value: number; icon: Reac
         <div className="stat-number">{value}</div>
         <div className="muted">{title}</div>
       </div>
+    </section>
+  );
+}
+
+function MetricPanel({
+  title,
+  label,
+  value,
+  detail,
+  tone
+}: {
+  title: string;
+  label: string;
+  value: number | string;
+  detail: string;
+  tone: "blue" | "green" | "orange";
+}) {
+  return (
+    <section className={`metric-panel ${tone}`}>
+      <p>{title}</p>
+      <div>
+        <strong>{value}</strong>
+        <span>{label}</span>
+      </div>
+      <small>{detail}</small>
     </section>
   );
 }

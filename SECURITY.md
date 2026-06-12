@@ -9,6 +9,7 @@
 - Per-IP and per-email login throttling.
 - AI rate limiting.
 - Security headers through middleware: CSP, frame denial, content sniffing protection, referrer policy, and permissions policy.
+- Production origin allow-listing for mutating API requests through `NEXT_PUBLIC_APP_URL` or `TRUSTED_ORIGINS`.
 - Audit logs for clinical writes and AI generations.
 - Audit logs for successful and failed known-user login attempts.
 - External AI disabled by default.
