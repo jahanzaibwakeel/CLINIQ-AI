@@ -13,6 +13,7 @@ export default async function PatientDetailPage({ params }: { params: { id: stri
       consultations: { orderBy: { startedAt: "desc" } },
       documents: { orderBy: { createdAt: "desc" } },
       followUps: { orderBy: { scheduledFor: "desc" } },
+      appointments: { orderBy: { startsAt: "desc" } },
       aiGenerations: { orderBy: { createdAt: "desc" }, take: 5 }
     }
   });
@@ -45,11 +46,15 @@ export default async function PatientDetailPage({ params }: { params: { id: stri
                 <h2 className="section-title">{patient.firstName} {patient.lastName}</h2>
                 <p className="muted">MRN {patient.mrn} | {patient.sex} | born {patient.dateOfBirth.toLocaleDateString()}</p>
               </div>
-              <span className={`badge ${patient.riskScore >= 60 ? "warn" : "good"}`}>Risk {patient.riskScore}</span>
+              <div className="command-actions">
+                <a className="button secondary" href={`/api/patients/${patient.id}/export`}>Export chart</a>
+                <span className={`badge ${patient.riskScore >= 60 ? "warn" : "good"}`}>Risk {patient.riskScore}</span>
+              </div>
             </div>
             <p><strong>Conditions:</strong> {patient.conditions.join(", ") || "None listed"}</p>
             <p><strong>Medications:</strong> {patient.medications.join(", ") || "None listed"}</p>
             <p><strong>Allergies:</strong> {patient.allergies.join(", ") || "None listed"}</p>
+            <p><strong>Appointments:</strong> {patient.appointments.length} scheduled or historical visits</p>
           </section>
         <PatientChartTabs
           patientId={patient.id}

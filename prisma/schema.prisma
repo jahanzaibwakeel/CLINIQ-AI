@@ -60,6 +60,14 @@ enum FollowUpStatus {
   CANCELLED
 }
 
+enum AppointmentStatus {
+  SCHEDULED
+  CHECKED_IN
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
 model Clinic {
   id        String   @id @default(cuid())
   name      String
@@ -96,6 +104,7 @@ model User {
   tasksAssigned Task[]         @relation("TaskAssignee")
   tasksCreated  Task[]         @relation("TaskCreator")
   followUps     FollowUp[]
+  appointments  Appointment[]
   auditLogs     AuditLog[]
   aiReviews     AiGeneration[] @relation("AiReviewer")
 }
@@ -125,6 +134,7 @@ model Patient {
   documents     Document[]
   tasks         Task[]
   followUps     FollowUp[]
+  appointments  Appointment[]
   aiGenerations AiGeneration[]
   auditLogs     AuditLog[]
 
@@ -295,6 +305,28 @@ model FollowUp {
   patient      Patient       @relation(fields: [patientId], references: [id])
   consultation Consultation? @relation(fields: [consultationId], references: [id])
   owner        User          @relation(fields: [ownerId], references: [id])
+}
+
+model Appointment {
+  id          String            @id @default(cuid())
+  clinicId    String
+  patientId   String
+  clinicianId String
+  title       String
+  reason      String?
+  startsAt    DateTime
+  endsAt      DateTime
+  status      AppointmentStatus @default(SCHEDULED)
+  location    String?
+  notes       String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  patient   Patient @relation(fields: [patientId], references: [id])
+  clinician User    @relation(fields: [clinicianId], references: [id])
+
+  @@index([clinicId, startsAt, status])
+  @@index([clinicId, patientId])
 }
 
 model AuditLog {

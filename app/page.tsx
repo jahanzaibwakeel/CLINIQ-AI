@@ -29,7 +29,8 @@ export default async function DashboardPage() {
     highRiskPatients,
     followUps,
     recentDocuments,
-    signedConsultations
+    signedConsultations,
+    todayAppointments
   ] = await Promise.all([
     prisma.patient.count({ where: { clinicId } }),
     prisma.consultation.count({ where: { clinicId } }),
@@ -40,7 +41,17 @@ export default async function DashboardPage() {
     prisma.patient.findMany({ where: { clinicId, riskScore: { gte: 50 } }, orderBy: { riskScore: "desc" }, take: 5 }),
     prisma.followUp.findMany({ where: { clinicId, status: "SCHEDULED" }, include: { patient: true }, take: 5, orderBy: { scheduledFor: "asc" } }),
     prisma.document.findMany({ where: { clinicId }, include: { patient: true, chunks: true }, take: 4, orderBy: { createdAt: "desc" } }),
-    prisma.consultation.count({ where: { clinicId, status: "SIGNED" } })
+    prisma.consultation.count({ where: { clinicId, status: "SIGNED" } }),
+    prisma.appointment.count({
+      where: {
+        clinicId,
+        status: "SCHEDULED",
+        startsAt: {
+          gte: new Date(new Date().setHours(0, 0, 0, 0)),
+          lt: new Date(new Date().setHours(24, 0, 0, 0))
+        }
+      }
+    })
   ]);
   const signedRate = consultCount ? Math.round((signedConsultations / consultCount) * 100) : 0;
 
@@ -70,7 +81,7 @@ export default async function DashboardPage() {
           <Stat title="Pending AI review" value={pendingAiReviews} icon={<Bot size={19} />} />
         </div>
         <div className="grid dashboard-metrics">
-          <MetricPanel title="Clinic load" label="open tasks" value={tasks.length} tone="blue" detail={`${followUps.length} scheduled follow-ups visible`} />
+          <MetricPanel title="Clinic load" label="open tasks" value={tasks.length} tone="blue" detail={`${followUps.length} follow-ups, ${todayAppointments} appointments today`} />
           <MetricPanel title="Documentation" label="signed consults" value={`${signedRate}%`} tone="green" detail={`${signedConsultations} signed of ${consultCount} total`} />
           <MetricPanel title="AI governance" label="draft queue" value={pendingAiReviews} tone={pendingAiReviews ? "orange" : "green"} detail="Every AI output requires approval or rejection" />
         </div>
@@ -252,7 +263,8 @@ function getRoleDashboardConfig(role: Role): {
       description: "Keep clinic operations moving while doctors review AI-generated clinical drafts.",
       actions: [
         { href: "/tasks", label: "Open tasks", primary: true, icon: "review" },
-        { href: "/follow-ups", label: "Follow-ups", primary: false, icon: "review" }
+        { href: "/inbox", label: "Open inbox", primary: false, icon: "review" },
+        { href: "/schedule", label: "Schedule", primary: false, icon: "review" }
       ],
       aiTitle: "Assistant task helper",
       aiDescription: "Paste operational notes and extract call tasks, scheduling reminders, and follow-up wording.",
@@ -266,6 +278,7 @@ function getRoleDashboardConfig(role: Role): {
     description: "Track operational load, pending AI review, follow-ups, documents, and risk signals from one working surface.",
     actions: [
       { href: "/consultations", label: "New consult", primary: true, icon: "consult" },
+      { href: "/inbox", label: "Open inbox", primary: false, icon: "review" },
       { href: "/ai-review", label: "Review AI drafts", primary: false, icon: "review" }
     ],
     aiTitle: "Daily AI note assistant",

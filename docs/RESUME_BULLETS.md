@@ -7,6 +7,7 @@
 - Embedded AI directly into dashboard, consultation, patient, document, and task workflows through a reusable clinical AI composer.
 - Added automatic AI document triage that parses uploaded reports, explains risk flags, and extracts task candidates immediately after chunking and embedding.
 - Built role-specific product surfaces for doctors, clinic admins, and assistants, plus an AI draft review workflow that lets clinicians edit and apply reviewed output to records.
+- Added appointment scheduling, a derived notification inbox, and audited patient chart export to broaden the clinical operations surface.
 - Built an admin Ops dashboard with request IDs, AI latency, cache/fallback rates, token estimates, document triage volume, readiness checks, and audit signals.
 - Added admin staff security visibility with role coverage, last-login state, active status, failed-login counters, and temporary account lockout.
 - Added healthcare safety controls including doctor-review disclaimers, AI draft metadata, provider/model traceability, review status, audit logging, and external PHI opt-in controls.

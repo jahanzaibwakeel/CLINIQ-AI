@@ -23,6 +23,7 @@ Core entities:
 - Users also store active state, failed-login count, temporary lockout expiry, and last-login timestamp for admin security review.
 - Patients contain demo-only demographics, conditions, medications, allergies, and risk score.
 - Consultations store raw notes, summaries, SOAP JSON, status, and sign-off fields.
+- Appointments schedule patient visits with clinician ownership, status, time window, location, and notes.
 - Documents store extraction results, chunks, and parsed JSON.
 - Embeddings link searchable note/document content to patients.
 - AI generations store provider/model/prompt metadata, source context, JSON output, raw output, review state, and reviewer details.
@@ -39,6 +40,7 @@ Core entities:
 6. Login attempts apply rate limiting, known-account lockout policy, and audit metadata.
 7. AI routes build patient context, call the AI service, validate output, store draft metadata and telemetry, and return structured JSON.
 8. Document uploads chunk/embed text and automatically create doctor-review-required AI triage drafts for document parsing, risk flags, and task candidates.
+9. Inbox signals are derived from persisted workflow state instead of a separate notification table, keeping demo data explainable and auditable.
 
 ## Deployment Topology
 

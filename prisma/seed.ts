@@ -226,6 +226,32 @@ async function main() {
     }
   });
 
+  await prisma.appointment.createMany({
+    data: [
+      {
+        clinicId: clinic.id,
+        patientId: sara.id,
+        clinicianId: doctor.id,
+        title: "Diabetes lab review",
+        reason: "Review HbA1c, urine ACR, medication adherence, and foot symptoms.",
+        startsAt: new Date("2026-06-17T09:30:00.000Z"),
+        endsAt: new Date("2026-06-17T10:00:00.000Z"),
+        location: "Exam room 2",
+        notes: "Ask patient to bring glucose log."
+      },
+      {
+        clinicId: clinic.id,
+        patientId: patients[1].id,
+        clinicianId: doctor.id,
+        title: "Blood pressure follow-up",
+        reason: "Review home BP log and medication tolerance.",
+        startsAt: new Date("2026-06-18T11:00:00.000Z"),
+        endsAt: new Date("2026-06-18T11:20:00.000Z"),
+        location: "Exam room 1"
+      }
+    ]
+  });
+
   await prisma.aiGeneration.create({
     data: {
       clinicId: clinic.id,

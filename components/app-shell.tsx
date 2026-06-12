@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
   Activity,
+  Bell,
   Bot,
   CalendarClock,
   ClipboardList,
@@ -21,7 +22,9 @@ import { LogoutButton } from "@/components/logout-button";
 
 const nav = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard, roles: [Role.DOCTOR, Role.CLINIC_ADMIN, Role.ASSISTANT] },
+  { href: "/inbox", label: "Inbox", icon: Bell, roles: [Role.DOCTOR, Role.CLINIC_ADMIN, Role.ASSISTANT] },
   { href: "/patients", label: "Patients", icon: Users, roles: [Role.DOCTOR, Role.CLINIC_ADMIN, Role.ASSISTANT] },
+  { href: "/schedule", label: "Schedule", icon: CalendarCheck, roles: [Role.DOCTOR, Role.CLINIC_ADMIN, Role.ASSISTANT] },
   { href: "/consultations", label: "Consultations", icon: Stethoscope, roles: [Role.DOCTOR, Role.CLINIC_ADMIN] },
   { href: "/documents", label: "Documents", icon: FileText, roles: [Role.DOCTOR, Role.CLINIC_ADMIN, Role.ASSISTANT] },
   { href: "/staff", label: "Staff", icon: UserCog, roles: [Role.CLINIC_ADMIN] },

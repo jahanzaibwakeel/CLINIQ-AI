@@ -15,10 +15,13 @@ MediPilot AI is a production-minded, local-first AI clinical workflow assistant 
 - Admin Staff page for role coverage, login lockout state, active users, and last-login visibility.
 - Login security includes rate limiting, known-account lockouts, and request-ID audit metadata.
 - Follow-up operations page and task status quick actions for daily clinic workflow.
+- Appointment scheduling board with audited appointment creation and AI scheduling-note helper.
+- Notification inbox generated from overdue tasks, missed follow-ups, failed documents, pending AI review, and same-day appointments.
 - Role-specific navigation and dashboard emphasis for doctors, clinic admins, and assistants.
 - AI draft review supports doctor-edited output and approve-to-record actions.
 - Document uploads automatically create AI triage drafts for parsing, risk flags, and task candidates.
 - Document processing failures are marked and audited instead of silently disappearing.
+- Patient chart export endpoint for demo-ready JSON chart bundles with audit logging.
 - Valkey/Redis cache support with memory fallback.
 - Docker Compose, GitHub Actions CI, tests, seed data, and deployment docs.
 

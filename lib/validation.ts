@@ -79,3 +79,17 @@ export const followUpCreateSchema = z.object({
 export const followUpUpdateSchema = z.object({
   status: z.enum(["SCHEDULED", "COMPLETED", "MISSED", "CANCELLED"])
 });
+
+export const appointmentCreateSchema = z.object({
+  patientId: z.string().min(1),
+  clinicianId: z.string().optional(),
+  title: z.string().min(2),
+  reason: z.string().optional(),
+  startsAt: z.string().datetime(),
+  endsAt: z.string().datetime(),
+  location: z.string().optional(),
+  notes: z.string().optional()
+}).refine((value) => new Date(value.endsAt) > new Date(value.startsAt), {
+  message: "Appointment end time must be after start time",
+  path: ["endsAt"]
+});

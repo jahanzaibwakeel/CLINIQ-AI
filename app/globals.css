@@ -445,6 +445,12 @@ th {
   margin: 4px 0 0;
 }
 
+.inbox-item strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
 .form-grid {
   display: grid;
   gap: 12px;

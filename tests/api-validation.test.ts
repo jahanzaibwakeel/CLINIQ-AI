@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { aiGenerateSchema, consultationCreateSchema, patientCreateSchema } from "@/lib/validation";
+import { aiGenerateSchema, appointmentCreateSchema, consultationCreateSchema, patientCreateSchema } from "@/lib/validation";
 
 describe("API validation schemas", () => {
   it("accepts a valid patient payload", () => {
@@ -29,5 +29,16 @@ describe("API validation schemas", () => {
       patientId: "patient-id"
     });
     expect(parsed.type).toBe("TASK_EXTRACTION");
+  });
+
+  it("rejects appointments ending before they start", () => {
+    expect(() =>
+      appointmentCreateSchema.parse({
+        patientId: "p1",
+        title: "Visit",
+        startsAt: "2026-06-12T11:00:00.000Z",
+        endsAt: "2026-06-12T10:00:00.000Z"
+      })
+    ).toThrow();
   });
 });

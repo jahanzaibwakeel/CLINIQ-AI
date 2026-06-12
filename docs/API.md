@@ -38,6 +38,10 @@ Creates a patient record.
 
 Returns patient detail, consultations, notes, documents, tasks, follow-ups, and recent AI generations.
 
+### `GET /api/patients/:id/export`
+
+Exports a clinic-scoped patient chart JSON bundle and writes a `PATIENT_CHART_EXPORTED` audit event.
+
 ## Consultations
 
 ### `GET /api/consultations`
@@ -111,6 +115,29 @@ Updates follow-up status.
 
 ```json
 { "status": "COMPLETED" }
+```
+
+## Appointments
+
+### `GET /api/appointments`
+
+Lists clinic appointments with patient and clinician summaries.
+
+### `POST /api/appointments`
+
+Creates an audited appointment.
+
+```json
+{
+  "patientId": "patient-id",
+  "clinicianId": "optional-user-id",
+  "title": "Diabetes lab review",
+  "reason": "Review HbA1c and urine ACR.",
+  "startsAt": "2026-06-20T10:00:00.000Z",
+  "endsAt": "2026-06-20T10:30:00.000Z",
+  "location": "Exam room 1",
+  "notes": "Bring glucose log."
+}
 ```
 
 ## AI
