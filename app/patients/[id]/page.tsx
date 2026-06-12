@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
-import { SemanticSearchBox } from "@/components/ai-workbench";
-import { ClinicalAiComposer } from "@/components/clinical-ai-composer";
+import { PatientChartTabs } from "@/components/patient-chart-tabs";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/security/session";
 
@@ -20,11 +19,26 @@ export default async function PatientDetailPage({ params }: { params: { id: stri
 
   if (!patient) notFound();
   const defaultText = [patient.conditions.join(", "), ...patient.notes.map((note) => note.body), ...patient.consultations.map((consultation) => consultation.rawNotes)].join("\n");
+  const timeline = [
+    ...patient.consultations.map((consultation) => ({
+      id: consultation.id,
+      date: consultation.startedAt.toLocaleDateString(),
+      type: "Consultation",
+      title: consultation.reason,
+      detail: consultation.summary ?? consultation.rawNotes.slice(0, 160)
+    })),
+    ...patient.documents.map((document) => ({
+      id: document.id,
+      date: document.createdAt.toLocaleDateString(),
+      type: "Document",
+      title: document.fileName,
+      detail: document.extractedText?.slice(0, 160) ?? document.status
+    }))
+  ].sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
 
   return (
     <AppShell active="/patients">
-      <div className="grid two-column">
-        <div className="grid">
+      <div className="grid">
           <section className="card card-pad">
             <div className="section-head">
               <div>
@@ -37,30 +51,39 @@ export default async function PatientDetailPage({ params }: { params: { id: stri
             <p><strong>Medications:</strong> {patient.medications.join(", ") || "None listed"}</p>
             <p><strong>Allergies:</strong> {patient.allergies.join(", ") || "None listed"}</p>
           </section>
-          <section className="card card-pad">
-            <h2 className="section-title">Recent timeline</h2>
-            <div className="table-wrap">
-              <table>
-                <thead><tr><th>Date</th><th>Type</th><th>Detail</th></tr></thead>
-                <tbody>
-                  {patient.consultations.map((consultation) => (
-                    <tr key={consultation.id}><td>{consultation.startedAt.toLocaleDateString()}</td><td>Consultation</td><td>{consultation.reason}<br /><span className="muted">{consultation.summary ?? consultation.rawNotes.slice(0, 140)}</span></td></tr>
-                  ))}
-                  {patient.documents.map((document) => (
-                    <tr key={document.id}><td>{document.createdAt.toLocaleDateString()}</td><td>Document</td><td>{document.fileName}<br /><span className="muted">{document.status}</span></td></tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
-          <SemanticSearchBox patientId={patient.id} />
-        </div>
-        <ClinicalAiComposer
-          title="Patient context AI"
-          description="Use selected patient history to create a timeline, explain risks, prepare referral language, or draft patient-friendly wording."
+        <PatientChartTabs
           patientId={patient.id}
           defaultText={defaultText}
-          presets={["HISTORY_TIMELINE", "RISK_FLAG_EXPLAINER", "REFERRAL_LETTER", "VISIT_SUMMARY", "ASSISTANT_RESPONSE"]}
+          timeline={timeline}
+          consultations={patient.consultations.map((consultation) => ({
+            id: consultation.id,
+            date: consultation.startedAt.toLocaleDateString(),
+            reason: consultation.reason,
+            notes: consultation.rawNotes.slice(0, 220),
+            status: consultation.status
+          }))}
+          documents={patient.documents.map((document) => ({
+            id: document.id,
+            date: document.createdAt.toLocaleDateString(),
+            fileName: document.fileName,
+            status: document.status,
+            extractedText: document.extractedText?.slice(0, 220) ?? "No extracted text"
+          }))}
+          followUps={patient.followUps.map((followUp) => ({
+            id: followUp.id,
+            title: followUp.title,
+            date: followUp.scheduledFor.toLocaleDateString(),
+            status: followUp.status,
+            instructions: followUp.instructions
+          }))}
+          aiGenerations={patient.aiGenerations.map((generation) => ({
+            id: generation.id,
+            type: generation.type,
+            provider: generation.provider,
+            model: generation.model,
+            reviewStatus: generation.reviewStatus,
+            createdAt: generation.createdAt.toISOString()
+          }))}
         />
       </div>
     </AppShell>

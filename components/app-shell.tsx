@@ -6,6 +6,7 @@ import {
   FileText,
   LayoutDashboard,
   CheckSquare,
+  ShieldCheck,
   Settings,
   Stethoscope,
   Users,
@@ -22,6 +23,7 @@ const nav = [
   { href: "/assistant", label: "AI Assistant", icon: Bot },
   { href: "/ai-review", label: "AI Review", icon: CheckSquare },
   { href: "/tasks", label: "Tasks", icon: ClipboardList },
+  { href: "/audit", label: "Audit", icon: ShieldCheck },
   { href: "/settings", label: "Settings", icon: Settings }
 ];
 

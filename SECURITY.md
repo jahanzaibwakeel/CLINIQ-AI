@@ -12,6 +12,7 @@
 - Production origin allow-listing for mutating API requests through `NEXT_PUBLIC_APP_URL` or `TRUSTED_ORIGINS`.
 - Audit logs for clinical writes and AI generations.
 - Audit logs for successful and failed known-user login attempts.
+- Clinic-admin audit viewer for recent security and clinical events.
 - External AI disabled by default.
 - AI output stored as draft with review status.
 - No secrets committed; `.env.example` documents expected variables.

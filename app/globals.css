@@ -493,6 +493,37 @@ th {
   background: #f8fafc;
 }
 
+.chart-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.chart-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 38px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  padding: 0 10px;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 760;
+  cursor: pointer;
+}
+
+.chart-tab.active {
+  border-bottom-color: var(--primary);
+  color: var(--primary-strong);
+}
+
+.chart-panel {
+  min-height: 300px;
+}
+
 .segment {
   min-height: 34px;
   border: 0;

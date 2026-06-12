@@ -10,6 +10,7 @@ MediPilot AI is a production-minded, local-first AI clinical workflow assistant 
 - Free local-first AI abstraction with Ollama default, `qwen2.5:7b` configured for no-cost clinical drafting, gated external adapters, structured prompts, JSON validation, fallback responses, and semantic search.
 - AI modules for consultation summaries, SOAP notes, history timelines, document parsing, follow-up instructions, task extraction, risk flag explanation, visit summaries, referral letters, and patient-context Q&A.
 - Doctor-facing AI review queue to approve or reject AI drafts before clinical use.
+- Admin audit viewer for login, AI, document, patient, task, and consultation activity.
 - Valkey/Redis cache support with memory fallback.
 - Docker Compose, GitHub Actions CI, tests, seed data, and deployment docs.
 
