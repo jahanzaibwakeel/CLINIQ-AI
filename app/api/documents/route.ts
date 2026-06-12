@@ -6,6 +6,7 @@ import { documentCreateSchema } from "@/lib/validation";
 import { processDocumentJob } from "@/lib/jobs";
 import { auditLog } from "@/lib/audit";
 import { rateLimit } from "@/lib/rate-limit";
+import { requestIdFrom } from "@/lib/observability";
 
 export async function GET() {
   const auth = await requireUser();
@@ -54,7 +55,9 @@ export async function POST(request: Request) {
       clinicId: auth.user.clinicId,
       patientId: input.patientId,
       documentId: document.id,
-      extractedText: input.extractedText
+      extractedText: input.extractedText,
+      user: auth.user,
+      requestId: requestIdFrom(request)
     });
 
     await auditLog({

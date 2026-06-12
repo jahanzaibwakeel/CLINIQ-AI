@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { parseSafeAiOutput } from "@/lib/ai/guardrails";
 import { prompts } from "@/lib/ai/prompts";
 import { FallbackProvider, hashEmbedding } from "@/lib/ai/providers/fallback";
+import { average, estimateTokens } from "@/lib/observability";
 
 describe("AI guardrails", () => {
   it("forces the doctor review disclaimer", () => {
@@ -35,5 +36,13 @@ describe("Fallback provider", () => {
 
   it("creates deterministic local embeddings", () => {
     expect(hashEmbedding("HbA1c high")).toEqual(hashEmbedding("HbA1c high"));
+  });
+});
+
+describe("Observability helpers", () => {
+  it("estimates tokens and averages latency safely", () => {
+    expect(estimateTokens("12345678")).toBe(2);
+    expect(average([100, 200, 300])).toBe(200);
+    expect(average([])).toBe(0);
   });
 });

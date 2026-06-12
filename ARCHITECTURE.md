@@ -10,6 +10,7 @@ MediPilot AI uses a Next.js monolith: server-rendered dashboard pages, API route
 - `components/`: Reusable UI components and client-side AI workbench.
 - `lib/security`: JWT session cookies and role-based access control.
 - `lib/ai`: provider interface, prompt templates, guardrails, embeddings, semantic search, and AI generation persistence.
+- `lib/observability.ts`: request IDs, token estimates, and small telemetry helpers used by AI and admin operations surfaces.
 - `lib/jobs.ts`: document chunking and embedding worker logic. The current implementation runs inline for demo simplicity but is written as a job boundary.
 - `prisma/`: schema, migration, and seed data.
 
@@ -24,6 +25,7 @@ Core entities:
 - Documents store extraction results, chunks, and parsed JSON.
 - Embeddings link searchable note/document content to patients.
 - AI generations store provider/model/prompt metadata, source context, JSON output, raw output, review state, and reviewer details.
+- AI generations also store latency, cache-hit state, token estimates, and request IDs for production observability.
 - Audit logs capture sensitive actions and AI generation events.
 
 ## Request Flow
@@ -32,7 +34,9 @@ Core entities:
 2. API routes call `requireUser()` and role checks where needed.
 3. Mutating routes validate input with Zod.
 4. Clinical writes create audit log records.
-5. AI routes build patient context, call the AI service, validate output, store draft metadata, and return structured JSON.
+5. Middleware attaches `X-Request-Id` for app/API traceability.
+6. AI routes build patient context, call the AI service, validate output, store draft metadata and telemetry, and return structured JSON.
+7. Document uploads chunk/embed text and automatically create doctor-review-required AI triage drafts for document parsing, risk flags, and task candidates.
 
 ## Deployment Topology
 

@@ -398,6 +398,33 @@ th {
   color: #7c2d12;
 }
 
+.triage-stack {
+  display: grid;
+  min-width: 260px;
+  gap: 8px;
+}
+
+.triage-pill {
+  display: grid;
+  gap: 3px;
+  padding: 9px 10px;
+  border: 1px solid #c7d2fe;
+  border-radius: 8px;
+  background: #f8faff;
+}
+
+.triage-pill strong {
+  color: #1e3a8a;
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.triage-pill span {
+  color: #526273;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
 .timeline-list {
   display: grid;
   gap: 10px;

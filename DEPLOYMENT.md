@@ -98,7 +98,8 @@ On the server, keep a production `.env` beside `docker-compose.prod.yml`. The de
 ## Health Checks
 
 - `/api/health`: app process is alive
-- `/api/ready`: app can reach PostgreSQL
+- `/api/ready`: app can reach PostgreSQL and reports cache state as `ok`, `memory`, or `degraded`
+- `/ops`: admin-only in-app operations dashboard for AI latency, fallback rate, cache hit rate, request IDs, and review backlog
 
 ## Render/Fly.io/Railway
 

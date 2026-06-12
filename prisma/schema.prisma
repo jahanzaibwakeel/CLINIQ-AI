@@ -236,6 +236,10 @@ model AiGeneration {
   sourceContext  Json
   output         Json
   rawOutput      String?
+  latencyMs      Int?
+  cacheHit       Boolean          @default(false)
+  tokenEstimate  Int?
+  requestId      String?
   reviewStatus   ReviewStatus     @default(DRAFT)
   reviewerId     String?
   reviewedAt     DateTime?
@@ -248,6 +252,7 @@ model AiGeneration {
   reviewer     User?         @relation("AiReviewer", fields: [reviewerId], references: [id])
 
   @@index([clinicId, patientId, type, createdAt])
+  @@index([clinicId, requestId])
 }
 
 model Task {

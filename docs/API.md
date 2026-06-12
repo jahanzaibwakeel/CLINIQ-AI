@@ -56,7 +56,13 @@ Lists clinical documents.
 
 ### `POST /api/documents`
 
-Creates an extracted-text document record, chunks it, embeds chunks, and marks processing complete.
+Creates an extracted-text document record, chunks it, embeds chunks, marks processing complete, and creates AI triage drafts for:
+
+- document parsing
+- risk flag explanation
+- task extraction
+
+All generated triage outputs remain AI drafts until reviewed.
 
 ## Tasks
 
@@ -129,6 +135,8 @@ Output includes:
 - `model`
 - `generationId`
 - `usedFallback`
+- `latencyMs`
+- `cacheHit`
 
 ### `PATCH /api/ai/generations/:id/review`
 
@@ -163,4 +171,6 @@ Returns process-level health for load balancers and container health checks.
 
 ### `GET /api/ready`
 
-Checks readiness by validating database connectivity. Returns `503` when the app is not ready.
+Checks readiness by validating database connectivity and cache state. Returns `503` when the app is not ready.
+
+Every app/API response receives an `X-Request-Id` header. AI generations persist that request ID for admin traceability in `/ops`.

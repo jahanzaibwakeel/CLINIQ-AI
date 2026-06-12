@@ -8,7 +8,12 @@ export default async function DocumentsPage() {
   const user = await getSession();
   const documents = await prisma.document.findMany({
     where: { clinicId: user?.clinicId ?? "" },
-    include: { patient: true, uploadedBy: true, chunks: true },
+    include: {
+      patient: true,
+      uploadedBy: true,
+      chunks: true,
+      aiGenerations: { orderBy: { createdAt: "desc" }, take: 3 }
+    },
     orderBy: { createdAt: "desc" }
   });
   const patients = await prisma.patient.findMany({
@@ -29,7 +34,7 @@ export default async function DocumentsPage() {
             </div>
             <div className="table-wrap">
               <table>
-                <thead><tr><th>Document</th><th>Patient</th><th>Status</th><th>Chunks</th></tr></thead>
+                <thead><tr><th>Document</th><th>Patient</th><th>Status</th><th>Chunks</th><th>AI triage</th></tr></thead>
                 <tbody>
                   {documents.map((document) => (
                     <tr key={document.id}>
@@ -37,6 +42,16 @@ export default async function DocumentsPage() {
                       <td>{document.patient.firstName} {document.patient.lastName}</td>
                       <td><span className={document.status === "PROCESSED" ? "badge good" : "badge warn"}>{document.status}</span></td>
                       <td>{document.chunks.length}</td>
+                      <td>
+                        <div className="triage-stack">
+                          {document.aiGenerations.length ? document.aiGenerations.map((generation) => (
+                            <div className="triage-pill" key={generation.id}>
+                              <strong>{generation.type.replaceAll("_", " ").toLowerCase()}</strong>
+                              <span>{previewAiOutput(generation.output)}</span>
+                            </div>
+                          )) : <span className="muted">Pending AI triage</span>}
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -55,4 +70,21 @@ export default async function DocumentsPage() {
       </div>
     </AppShell>
   );
+}
+
+function previewAiOutput(output: unknown) {
+  if (!output || typeof output !== "object") return "AI draft, doctor review required.";
+  const value = output as {
+    summary?: string;
+    explanation?: string;
+    flags?: string[];
+    tasks?: Array<{ title?: string }>;
+    extracted?: Record<string, unknown>;
+  };
+  if (value.summary) return value.summary.slice(0, 96);
+  if (value.explanation) return value.explanation.slice(0, 96);
+  if (value.flags?.length) return value.flags.slice(0, 2).join("; ");
+  if (value.tasks?.length) return value.tasks.map((task) => task.title).filter(Boolean).slice(0, 2).join("; ");
+  if (value.extracted) return Object.keys(value.extracted).slice(0, 3).join(", ");
+  return "AI draft, doctor review required.";
 }

@@ -234,7 +234,8 @@ function getRoleDashboardConfig(role: Role): {
       headline: "Clinic operations, compliance, and AI governance in one view.",
       description: "Monitor audit readiness, pending reviews, follow-up load, documents, and staff work queues before production hosting.",
       actions: [
-        { href: "/audit", label: "Open audit log", primary: true, icon: "review" },
+        { href: "/ops", label: "Open ops", primary: true, icon: "review" },
+        { href: "/audit", label: "Open audit log", primary: false, icon: "review" },
         { href: "/ai-review", label: "Review AI drafts", primary: false, icon: "review" }
       ],
       aiTitle: "Admin workflow AI",

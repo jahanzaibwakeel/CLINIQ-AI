@@ -57,3 +57,14 @@ export async function cacheSet<T>(key: string, value: T, ttlSeconds = 300) {
     expiresAt: Date.now() + ttlSeconds * 1000
   });
 }
+
+export async function cacheHealth() {
+  const client = getRedis();
+  if (!client) return "memory";
+  try {
+    await client.ping();
+    return "ok";
+  } catch {
+    return "degraded";
+  }
+}

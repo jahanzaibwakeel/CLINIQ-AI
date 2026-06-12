@@ -5,6 +5,7 @@ import { requireUser } from "@/lib/security/rbac";
 import { aiGenerateSchema } from "@/lib/validation";
 import { runAiGeneration } from "@/lib/ai/service";
 import { rateLimit } from "@/lib/rate-limit";
+import { requestIdFrom } from "@/lib/observability";
 
 export async function POST(request: Request) {
   const auth = await requireUser();
@@ -41,7 +42,8 @@ export async function POST(request: Request) {
       question: input.question,
       patientId: input.patientId,
       consultationId: input.consultationId,
-      documentId: input.documentId
+      documentId: input.documentId,
+      requestId: requestIdFrom(request)
     });
 
     return NextResponse.json(result);

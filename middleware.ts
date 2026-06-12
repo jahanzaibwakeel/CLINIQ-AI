@@ -70,6 +70,7 @@ function securityHeaders() {
 }
 
 export function middleware(request: NextRequest) {
+  const requestId = request.headers.get("x-request-id") ?? crypto.randomUUID();
   if (request.nextUrl.pathname.startsWith("/api/") && protectedMethods.has(request.method)) {
     if (!originAllowed(request)) {
       return NextResponse.json({ error: "Request origin is not trusted" }, { status: 403 });
@@ -83,7 +84,10 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  const response = NextResponse.next();
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-request-id", requestId);
+  const response = NextResponse.next({ request: { headers: requestHeaders } });
+  response.headers.set("X-Request-Id", requestId);
   for (const [key, value] of Object.entries(securityHeaders())) {
     response.headers.set(key, value);
   }

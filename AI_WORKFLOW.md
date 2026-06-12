@@ -41,6 +41,7 @@ AI is integrated into everyday workflow surfaces:
 - Consultations: encounter notes to SOAP, consultation summary, task extraction, follow-up instructions, and patient-friendly summary.
 - Patient detail: history timeline, risk explanation, referral draft, visit summary, and context Q&A.
 - Documents: report parsing, abnormal-value explanation, follow-up drafting, and patient-friendly document summary.
+- Document upload pipeline: every uploaded extracted-text report is chunked, embedded, then sent through document parse, risk flag explanation, and task extraction drafts for review.
 - Tasks: current queue or pasted notes to extracted tasks, follow-up language, and operational risk review.
 
 Prompt templates live in `lib/ai/prompts.ts` and include stable version IDs.
@@ -72,6 +73,10 @@ Each AI generation records:
 - provider
 - model
 - prompt version
+- request ID
+- latency in milliseconds
+- cache-hit state
+- rough token estimate
 - timestamp
 - source context preview
 - external AI policy state
@@ -80,3 +85,5 @@ Each AI generation records:
 - review status
 
 Creation is also captured in `AuditLog`.
+
+Clinic admins can inspect AI reliability and review pressure from `/ops`, including fallback usage, cache hit rate, document triage volume, and recent request traces.

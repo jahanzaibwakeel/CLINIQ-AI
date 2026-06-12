@@ -13,6 +13,8 @@
 - Audit logs for clinical writes and AI generations.
 - Audit logs for successful and failed known-user login attempts.
 - Clinic-admin audit viewer for recent security and clinical events.
+- Clinic-admin Ops dashboard for AI telemetry, fallback visibility, review backlog, and request trace IDs.
+- Middleware attaches `X-Request-Id` to responses and AI generations for traceability.
 - External AI disabled by default.
 - AI output stored as draft with review status.
 - No secrets committed; `.env.example` documents expected variables.
@@ -23,8 +25,10 @@
 - AI prompt templates prohibit final diagnosis language.
 - Output parser enforces `AI draft, doctor review required.`
 - AI generation metadata includes source context and provider/model.
+- AI generation telemetry includes latency, cache-hit state, token estimate, and request ID.
 - AI drafts require explicit review and can be approved or rejected with audit logging.
 - Reviewed AI drafts can be edited before approval and applied into records with audit metadata.
+- Uploaded documents automatically create AI triage drafts while preserving doctor review before clinical use.
 - External PHI transfer requires explicit `ALLOW_EXTERNAL_AI=true`.
 
 ## Recommended Production Hardening
@@ -33,7 +37,7 @@
 - Use managed secret storage.
 - Add field-level encryption for highly sensitive records.
 - Add object storage virus scanning for document uploads.
-- Add full request tracing and security event monitoring.
+- Connect request tracing and security event monitoring to an external APM/SIEM.
 - Add row-level tenant isolation tests.
 - Add backup restore drills.
 - Add account lockout and password reset workflows.

@@ -1,15 +1,17 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { cacheHealth } from "@/lib/cache";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    await prisma.$queryRaw`SELECT 1`;
+    const [cache] = await Promise.all([cacheHealth(), prisma.$queryRaw`SELECT 1`]);
     return NextResponse.json({
       status: "ready",
       checks: {
-        database: "ok"
+        database: "ok",
+        cache
       },
       timestamp: new Date().toISOString()
     });
@@ -18,7 +20,8 @@ export async function GET() {
       {
         status: "not_ready",
         checks: {
-          database: "failed"
+          database: "failed",
+          cache: "unknown"
         },
         timestamp: new Date().toISOString()
       },

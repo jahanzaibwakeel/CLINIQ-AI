@@ -11,6 +11,7 @@ import { cacheGet, cacheSet } from "@/lib/cache";
 import { prisma } from "@/lib/db";
 import type { SessionUser } from "@/lib/security/session";
 import { auditLog } from "@/lib/audit";
+import { estimateTokens } from "@/lib/observability";
 
 export function getAiProvider(): AiProvider {
   if (env.AI_PROVIDER === "groq") return new GroqProvider();
@@ -28,13 +29,17 @@ export async function runAiGeneration(input: {
   patientId?: string;
   consultationId?: string;
   documentId?: string;
+  requestId?: string;
 }): Promise<{
   output: SafeAiOutput;
   provider: string;
   model: string;
   generationId: string;
   usedFallback: boolean;
+  latencyMs: number;
+  cacheHit: boolean;
 }> {
+  const startedAt = Date.now();
   const prompt = prompts[input.type];
   const userPrompt = prompt.buildUserPrompt({
     patientContext: trimContext(input.patientContext ?? "", 6000),
@@ -51,11 +56,13 @@ export async function runAiGeneration(input: {
   let output: SafeAiOutput;
   let rawOutput: string | undefined;
   let usedFallback = false;
+  let cacheHit = false;
 
   if (cached) {
     output = cached.output;
     providerName = cached.provider;
     model = cached.model;
+    cacheHit = true;
   } else {
     const provider = getAiProvider();
     const fallback = new FallbackProvider();
@@ -85,6 +92,8 @@ export async function runAiGeneration(input: {
     }
     await cacheSet(cacheKey, { output, provider: providerName, model }, 600);
   }
+  const latencyMs = Date.now() - startedAt;
+  const tokenEstimate = estimateTokens(prompt.system, userPrompt, rawOutput);
 
   const generation = await prisma.aiGeneration.create({
     data: {
@@ -100,10 +109,15 @@ export async function runAiGeneration(input: {
         sourceTextPreview: input.sourceText.slice(0, 500),
         question: input.question,
         containsPhi: true,
-        externalAiAllowed: env.ALLOW_EXTERNAL_AI === "true"
+        externalAiAllowed: env.ALLOW_EXTERNAL_AI === "true",
+        requestId: input.requestId
       },
       output: JSON.parse(JSON.stringify(output)) as Prisma.InputJsonValue,
       rawOutput,
+      latencyMs,
+      cacheHit,
+      tokenEstimate,
+      requestId: input.requestId,
       reviewStatus: "DRAFT"
     }
   });
@@ -115,8 +129,8 @@ export async function runAiGeneration(input: {
     entityId: generation.id,
     patientId: input.patientId,
     consultationId: input.consultationId,
-    metadata: { type: input.type, provider: providerName, model, promptVersion: prompt.version }
+    metadata: { type: input.type, provider: providerName, model, promptVersion: prompt.version, latencyMs, cacheHit, tokenEstimate, requestId: input.requestId }
   });
 
-  return { output, provider: providerName, model, generationId: generation.id, usedFallback };
+  return { output, provider: providerName, model, generationId: generation.id, usedFallback, latencyMs, cacheHit };
 }
