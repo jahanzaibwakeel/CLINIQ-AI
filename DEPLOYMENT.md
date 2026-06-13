@@ -111,7 +111,7 @@ On the server, keep a production `.env` beside `docker-compose.prod.yml`. The de
 
 Development and single-server deployments use `DOCUMENT_STORAGE_DIR` for local file storage. Keep this directory outside Git, include it in encrypted server backups when clinically appropriate, and place it on encrypted disk for clinic deployments.
 
-The app stores checksum, size, provider, and scan-status metadata on each document row. The built-in scanner is a safety placeholder that blocks suspicious executable extensions; production deployments should add object-storage malware scanning or an approved security gateway.
+The app stores checksum, size, provider, and scan-status metadata on each document row. The built-in scanner is a safety placeholder that blocks suspicious executable extensions; production deployments should add object-storage malware scanning or an approved security gateway. For PDFs/images, connect an approved OCR worker or document gateway, then pass extracted text into the existing document processing job.
 
 ## Render/Fly.io/Railway
 

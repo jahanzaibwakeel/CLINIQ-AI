@@ -1,5 +1,6 @@
 import { AppShell } from "@/components/app-shell";
 import { ClinicalAiComposer } from "@/components/clinical-ai-composer";
+import { DocumentIntelligenceBoard } from "@/components/document-intelligence-board";
 import { DocumentUploadPanel } from "@/components/document-upload-panel";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/security/session";
@@ -27,6 +28,7 @@ export default async function DocumentsPage() {
       <div className="grid two-column">
         <div className="grid">
           <DocumentUploadPanel patients={patients} />
+          <DocumentIntelligenceBoard documents={documents} />
           <section className="card card-pad">
             <div className="section-head">
               <h2 className="section-title">Clinical documents</h2>

@@ -425,6 +425,40 @@ th {
   line-height: 1.35;
 }
 
+.document-intel-card {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fbfcfd;
+}
+
+.document-ai-details {
+  display: grid;
+  gap: 10px;
+}
+
+.document-ai-details summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  min-height: 34px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0 10px;
+  background: white;
+  color: var(--primary-strong);
+  font-size: 13px;
+  font-weight: 760;
+  cursor: pointer;
+}
+
+.document-ai-details[open] summary {
+  margin-bottom: 10px;
+}
+
 .timeline-list {
   display: grid;
   gap: 10px;

@@ -99,6 +99,10 @@ export function DocumentUploadPanel({ patients }: { patients: PatientOption[] })
         <h2 className="section-title">Upload clinical document</h2>
         <span className="badge warn">Local text extraction</span>
       </div>
+      <div className="ai-banner" style={{ marginBottom: 12 }}>
+        <ShieldCheck size={18} />
+        <span>Text reports are parsed locally. PDF/image OCR is architecture-ready; paste extracted text for AI triage in this local demo.</span>
+      </div>
       <div className="form-grid">
         <label className="field">
           <span className="label">Patient</span>

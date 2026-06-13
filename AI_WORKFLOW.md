@@ -43,6 +43,7 @@ AI is integrated into everyday workflow surfaces:
 - Patient detail: history timeline, risk explanation, referral draft, visit summary, and context Q&A.
 - Documents: report parsing, abnormal-value explanation, follow-up drafting, and patient-friendly document summary.
 - Document upload pipeline: every uploaded extracted-text report is chunked, embedded, then sent through document parse, risk flag explanation, and task extraction drafts for review.
+- Document intelligence: reviewed parsed JSON, AI document-parse drafts, and lightweight text-scanned lab values are normalized into a parsed-value review board for clinician approval.
 - Tasks: current queue or pasted notes to extracted tasks, follow-up language, and operational risk review.
 
 Prompt templates live in `lib/ai/prompts.ts` and include stable version IDs.
