@@ -3,6 +3,7 @@ import { parseSafeAiOutput } from "@/lib/ai/guardrails";
 import { prompts } from "@/lib/ai/prompts";
 import { OllamaProvider } from "@/lib/ai/providers/ollama";
 import { FallbackProvider, hashEmbedding } from "@/lib/ai/providers/fallback";
+import { getAiRuntimeStatus } from "@/lib/ai/status";
 import { average, estimateTokens } from "@/lib/observability";
 
 afterEach(() => {
@@ -57,6 +58,30 @@ describe("Ollama provider", () => {
     expect(body.format).toBe("json");
     expect(body.options.num_predict).toBe(128);
     expect(body.options.temperature).toBe(0.2);
+  });
+});
+
+describe("AI runtime status", () => {
+  it("reports local Ollama ready when the configured model is installed", async () => {
+    vi.spyOn(global, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ models: [{ name: "qwen2.5:7b" }] }), { status: 200 })
+    );
+
+    const status = await getAiRuntimeStatus();
+    expect(status.provider).toBe("ollama");
+    expect(status.status).toBe("ready");
+    expect(status.modelAvailable).toBe(true);
+  });
+
+  it("reports model_missing when Ollama is reachable without the configured model", async () => {
+    vi.spyOn(global, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ models: [{ name: "qwen2.5:1.5b" }] }), { status: 200 })
+    );
+
+    const status = await getAiRuntimeStatus();
+    expect(status.provider).toBe("ollama");
+    expect(status.status).toBe("model_missing");
+    expect(status.modelAvailable).toBe(false);
   });
 });
 

@@ -33,6 +33,7 @@ Recommended:
 - `OLLAMA_BASE_URL`
 - `OLLAMA_MODEL`
 - `OLLAMA_EMBEDDING_MODEL`
+- `OLLAMA_NUM_PREDICT`
 - `ALLOW_EXTERNAL_AI`
 
 Do not commit `.env`.
@@ -61,6 +62,8 @@ docker compose --profile ollama up -d ollama
 ollama pull qwen2.5:7b
 ollama pull nomic-embed-text
 ```
+
+Use `OLLAMA_NUM_PREDICT` to tune local generation length. Smaller values are faster on CPU-only clinic hardware; larger values give longer drafts.
 
 ## VPS Docker Compose
 
@@ -153,7 +156,7 @@ Recommended when PHI should remain on premises:
 
 ## Troubleshooting
 
-- AI returns fallback: verify Ollama is running and model is pulled.
+- AI returns fallback: verify Ollama is running, the model is pulled, and `/api/ai/status` reports `ready`.
 - Login fails: run seed and check demo credentials.
 - Migrations fail: verify `DATABASE_URL`.
 - Semantic search empty: upload/process documents or seed demo data.

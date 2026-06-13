@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Bot, ClipboardCheck, FileText, Loader2, Sparkles } from "lucide-react";
+import { AiRuntimeBadge } from "@/components/ai-runtime-badge";
 import { csrfHeaders } from "@/lib/client/csrf";
 
 export type AiType =
@@ -147,7 +148,7 @@ export function ClinicalAiComposer({
           <h2 className="section-title">{title}</h2>
           <p className="muted" style={{ marginBottom: 0 }}>{description}</p>
         </div>
-        <span className="badge good">Free local AI first</span>
+        <AiRuntimeBadge />
       </div>
       <div className="ai-banner" style={{ marginBottom: 14 }}>
         <Bot size={20} />

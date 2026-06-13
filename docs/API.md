@@ -197,6 +197,22 @@ Output includes:
 - `latencyMs`
 - `cacheHit`
 
+### `GET /api/ai/status`
+
+Returns the configured AI runtime posture for signed-in users without sending patient data to a model.
+
+Output includes:
+
+- `provider`
+- `mode`
+- `status`
+- `model`
+- `embeddingModel`
+- `numPredict`
+- `modelAvailable`
+- `availableModels`
+- `message`
+
 ### `PATCH /api/ai/generations/:id/review`
 
 Allowed roles: doctor, clinic admin.

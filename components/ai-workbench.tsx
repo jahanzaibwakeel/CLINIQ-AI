@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Bot, FileSearch, Sparkles } from "lucide-react";
+import { AiRuntimeBadge } from "@/components/ai-runtime-badge";
 import { csrfHeaders } from "@/lib/client/csrf";
 
 type AiType =
@@ -74,7 +75,7 @@ export function AiWorkbench({ patientId, defaultText = "" }: { patientId?: strin
     <section className="card card-pad">
       <div className="section-head">
         <h2 className="section-title">AI drafting workbench</h2>
-        <span className="badge warn">AI draft, doctor review required</span>
+        <AiRuntimeBadge />
       </div>
       <div className="form-grid">
         <label className="field">

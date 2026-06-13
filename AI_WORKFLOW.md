@@ -10,6 +10,7 @@ OLLAMA_HOST=localhost
 OLLAMA_HOST_PORT=11434
 OLLAMA_MODEL=qwen2.5:7b
 OLLAMA_EMBEDDING_MODEL=nomic-embed-text
+OLLAMA_NUM_PREDICT=220
 ALLOW_EXTERNAL_AI=false
 ```
 
@@ -61,6 +62,10 @@ All prompts instruct the model to:
 ## Fallbacks
 
 If the configured AI provider is unavailable, MediPilot returns a conservative structured fallback. It does not infer clinical conclusions. This makes demos reliable and prevents broken workflows.
+
+## Runtime Status
+
+Signed-in users can call `/api/ai/status` or open Settings to confirm whether the configured runtime is ready. For Ollama, MediPilot checks `/api/tags`, confirms the configured model is installed, and reports whether the app is using local AI, a missing local model, an unreachable local service, an external provider, or safe fallback mode.
 
 ## Semantic Search
 

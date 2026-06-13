@@ -1,6 +1,7 @@
 import { Bot, Cpu, Database, GlobeLock, LockKeyhole, Server, ShieldCheck } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { env, ollamaBaseUrl } from "@/lib/env";
+import { getAiRuntimeStatus } from "@/lib/ai/status";
 import { cacheHealth } from "@/lib/cache";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/security/session";
@@ -8,8 +9,9 @@ import { getSession } from "@/lib/security/session";
 export default async function SettingsPage() {
   const user = await getSession();
   const clinicId = user?.clinicId ?? "";
-  const [cache, aiDrafts, auditEvents] = await Promise.all([
+  const [cache, aiRuntime, aiDrafts, auditEvents] = await Promise.all([
     cacheHealth(),
+    getAiRuntimeStatus(),
     prisma.aiGeneration.count({ where: { clinicId, reviewStatus: "DRAFT" } }),
     prisma.auditLog.count({ where: { clinicId } })
   ]);
@@ -21,6 +23,7 @@ export default async function SettingsPage() {
       <div className="grid" style={{ gap: 16 }}>
         <div className="grid stats-grid">
           <Setting icon={<Cpu size={20} />} title="AI provider" value={env.AI_PROVIDER} note="Default mode is local Ollama. No paid API is required." />
+          <Setting icon={<Bot size={20} />} title="AI runtime" value={runtimeLabel(aiRuntime.status)} note={aiRuntime.message} />
           <Setting icon={<Bot size={20} />} title="Free model" value={env.OLLAMA_MODEL} note={`Configured endpoint: ${ollamaBaseUrl}`} />
           <Setting icon={<ShieldCheck size={20} />} title="Safety mode" value="Doctor review" note="Every generation is stored as a draft until reviewed." />
           <Setting icon={<LockKeyhole size={20} />} title="PHI policy" value={externalAiEnabled ? "External AI enabled" : "Local-first"} note="Private patient data is not sent externally by default." />
@@ -53,6 +56,21 @@ export default async function SettingsPage() {
           </p>
           <div className="chart-bars">
             <div className="bar-row">
+              <span>Runtime</span>
+              <span className="bar-track"><span className="bar-fill" style={{ width: aiRuntime.status === "ready" ? "100%" : aiRuntime.status === "model_missing" ? "45%" : "20%" }} /></span>
+              <strong>{runtimeLabel(aiRuntime.status)}</strong>
+            </div>
+            <div className="bar-row">
+              <span>Model</span>
+              <span className="bar-track"><span className="bar-fill" style={{ width: aiRuntime.modelAvailable ? "100%" : "35%" }} /></span>
+              <strong>{aiRuntime.model}</strong>
+            </div>
+            <div className="bar-row">
+              <span>Output cap</span>
+              <span className="bar-track"><span className="bar-fill" style={{ width: `${Math.min(100, Math.max(20, aiRuntime.numPredict / 4))}%` }} /></span>
+              <strong>{aiRuntime.numPredict}</strong>
+            </div>
+            <div className="bar-row">
               <span>Summaries</span>
               <span className="bar-track"><span className="bar-fill" style={{ width: "86%" }} /></span>
               <strong>Local</strong>
@@ -79,6 +97,7 @@ export default async function SettingsPage() {
               <ReadinessCheck title="PostgreSQL" detail="Stores clinical records, AI metadata, audit logs, chunks, and embeddings." state="Configured" good />
               <ReadinessCheck title="Valkey/Redis" detail={cache === "ok" ? "Network cache is reachable." : cache === "memory" ? "Using safe in-memory fallback for local demos." : "Cache check failed; inspect VALKEY_URL."} state={cache} good={cache !== "degraded"} />
               <ReadinessCheck title="Migrations" detail="Prisma migrations are committed for deploy-time database setup." state="Versioned" good />
+              <ReadinessCheck title="AI model" detail={aiRuntime.message} state={runtimeLabel(aiRuntime.status)} good={aiRuntime.status === "ready" || aiRuntime.status === "configured"} />
             </div>
           </section>
           <section className="card card-pad">
@@ -96,6 +115,10 @@ export default async function SettingsPage() {
       </div>
     </AppShell>
   );
+}
+
+function runtimeLabel(status: string) {
+  return status.replaceAll("_", " ");
 }
 
 function Setting({ icon, title, value, note }: { icon: React.ReactNode; title: string; value: string; note: string }) {

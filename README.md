@@ -7,7 +7,7 @@ MediPilot AI is a production-minded, local-first AI clinical workflow assistant 
 - Next.js App Router with TypeScript, API route handlers, and polished dashboard UI.
 - PostgreSQL database with Prisma models for clinics, users, patients, consultations, notes, documents, chunks, embeddings, AI generations, tasks, follow-ups, and audit logs.
 - Role-based access for doctors, clinic admins, and assistants.
-- Free local-first AI abstraction with Ollama default, `qwen2.5:7b` configured for no-cost clinical drafting, gated external adapters, structured prompts, JSON validation, fallback responses, and semantic search.
+- Free local-first AI abstraction with Ollama default, `qwen2.5:7b` configured for no-cost clinical drafting, runtime status checks, gated external adapters, structured prompts, JSON validation, fallback responses, and semantic search.
 - AI modules for consultation summaries, SOAP notes, history timelines, document parsing, follow-up instructions, task extraction, risk flag explanation, visit summaries, referral letters, and patient-context Q&A.
 - Doctor-facing AI review queue to approve or reject AI drafts before clinical use.
 - Admin audit viewer for login, AI, document, patient, task, and consultation activity.
