@@ -648,6 +648,95 @@ th {
   line-height: 1.55;
 }
 
+.ai-output {
+  display: grid;
+  gap: 14px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fbfcfd;
+}
+
+.ai-output-shell {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: white;
+}
+
+.ai-output-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ai-output-section {
+  display: grid;
+  gap: 8px;
+}
+
+.ai-output-section h4 {
+  margin: 0;
+  color: #243447;
+  font-size: 14px;
+}
+
+.ai-output-section p {
+  margin: 0;
+  color: #334155;
+  line-height: 1.58;
+}
+
+.ai-output-list {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding-left: 20px;
+  color: #334155;
+  line-height: 1.5;
+}
+
+.ai-soap-grid,
+.ai-extracted-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.ai-soap-item,
+.ai-extracted-item,
+.ai-task-item {
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: white;
+}
+
+.ai-soap-item strong,
+.ai-extracted-item strong {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--primary-strong);
+}
+
+.ai-task-list {
+  display: grid;
+  gap: 10px;
+}
+
+.ai-task-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ai-task-item p {
+  margin-top: 4px;
+}
+
 .empty {
   padding: 22px;
   border: 1px dashed var(--border);
@@ -759,6 +848,8 @@ th {
   .dashboard-metrics,
   .two-column,
   .inline-grid,
+  .ai-soap-grid,
+  .ai-extracted-grid,
   .login-screen {
     grid-template-columns: 1fr;
   }

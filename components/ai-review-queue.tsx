@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, Filter, Loader2, ShieldAlert, XCircle } from "lucide-react";
+import { AiOutputRenderer } from "@/components/ai-output-renderer";
 import { csrfHeaders } from "@/lib/client/csrf";
 
 type ReviewItem = {
@@ -246,11 +247,17 @@ export function AiReviewQueue({ items }: { items: ReviewItem[] }) {
                   </div>
                 </div>
               ) : null}
-              <pre className="result-box" style={{ overflowX: "auto" }}>
-                {JSON.stringify(item.output, null, 2)}
-              </pre>
+              <AiOutputRenderer
+                output={item.output}
+                metadata={{
+                  provider: item.provider,
+                  model: item.model,
+                  usedFallback: item.provider === "fallback",
+                  reviewStatus: item.reviewStatus
+                }}
+              />
               <label className="field">
-                <span className="label">Editable reviewed output</span>
+                <span className="label">Editable reviewed output JSON</span>
                 <textarea
                   className="textarea"
                   value={draftText}

@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Bot, ClipboardCheck, FileText, Loader2, Sparkles } from "lucide-react";
+import { AiOutputRenderer } from "@/components/ai-output-renderer";
 import { AiRuntimeBadge } from "@/components/ai-runtime-badge";
 import { csrfHeaders } from "@/lib/client/csrf";
 
@@ -47,6 +48,18 @@ type ClinicalAiComposerProps = {
   compact?: boolean;
 };
 
+type AiResult = {
+  type: AiType;
+  label: string;
+  output: unknown;
+  metadata: {
+    provider: string;
+    model: string;
+    usedFallback: boolean;
+    reviewStatus: string;
+  };
+};
+
 export function ClinicalAiComposer({
   title,
   description,
@@ -65,7 +78,7 @@ export function ClinicalAiComposer({
   const [input, setInput] = useState(defaultText);
   const [question, setQuestion] = useState("What should I review before using this draft?");
   const [loading, setLoading] = useState<"single" | "bundle" | null>(null);
-  const [results, setResults] = useState<Array<{ type: AiType; label: string; payload: unknown }>>([]);
+  const [results, setResults] = useState<AiResult[]>([]);
   const [error, setError] = useState("");
 
   async function generate(type: AiType) {
@@ -97,14 +110,12 @@ export function ClinicalAiComposer({
     return {
       type,
       label: preset?.label ?? type,
-      payload: {
-        metadata: {
-          provider: data.provider,
-          model: data.model,
-          usedFallback: data.usedFallback,
-          reviewStatus: "DRAFT"
-        },
-        output: data.output
+      output: data.output,
+      metadata: {
+        provider: data.provider,
+        model: data.model,
+        usedFallback: data.usedFallback,
+        reviewStatus: "DRAFT"
       }
     };
   }
@@ -200,13 +211,13 @@ export function ClinicalAiComposer({
         <div className="grid">
           {results.length ? (
             results.map((result) => (
-              <article className="result-box" key={result.type}>
+              <article className="ai-output-shell" key={result.type}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
                   <FileText size={17} />
                   <strong>{result.label}</strong>
                   <span className="badge warn">AI draft</span>
                 </div>
-                {JSON.stringify(result.payload, null, 2)}
+                <AiOutputRenderer output={result.output} metadata={result.metadata} />
               </article>
             ))
           ) : (

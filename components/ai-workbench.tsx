@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Bot, FileSearch, Sparkles } from "lucide-react";
+import { AiOutputRenderer } from "@/components/ai-output-renderer";
 import { AiRuntimeBadge } from "@/components/ai-runtime-badge";
 import { csrfHeaders } from "@/lib/client/csrf";
 
@@ -30,15 +31,23 @@ const aiOptions: Array<{ value: AiType; label: string }> = [
   { value: "ASSISTANT_RESPONSE", label: "Ask patient context" }
 ];
 
+type AiWorkbenchResult = {
+  output: Record<string, unknown>;
+  metadata: {
+    provider: string;
+    model: string;
+    usedFallback: boolean;
+    reviewStatus: string;
+  };
+};
+
 export function AiWorkbench({ patientId, defaultText = "" }: { patientId?: string; defaultText?: string }) {
   const [type, setType] = useState<AiType>("SOAP_NOTE");
   const [input, setInput] = useState(defaultText);
   const [question, setQuestion] = useState("What should I review before finalizing this note?");
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<Record<string, unknown> | null>(null);
+  const [result, setResult] = useState<AiWorkbenchResult | null>(null);
   const [error, setError] = useState("");
-
-  const output = useMemo(() => (result ? JSON.stringify(result, null, 2) : ""), [result]);
 
   async function generate() {
     setLoading(true);
@@ -61,13 +70,13 @@ export function AiWorkbench({ patientId, defaultText = "" }: { patientId?: strin
     }
     const data = (await response.json()) as { output: Record<string, unknown>; provider: string; model: string; usedFallback: boolean };
     setResult({
+      output: data.output,
       metadata: {
         provider: data.provider,
         model: data.model,
         usedFallback: data.usedFallback,
         reviewStatus: "DRAFT"
-      },
-      output: data.output
+      }
     });
   }
 
@@ -101,8 +110,10 @@ export function AiWorkbench({ patientId, defaultText = "" }: { patientId?: strin
           {loading ? "Drafting..." : "Generate AI draft"}
         </button>
         {error ? <div className="badge warn">{error}</div> : null}
-        <div className="result-box">
-          {output || (
+        <div>
+          {result ? (
+            <AiOutputRenderer output={result.output} metadata={result.metadata} />
+          ) : (
             <span className="muted">
               AI output will appear here with provider/model metadata and review status.
             </span>

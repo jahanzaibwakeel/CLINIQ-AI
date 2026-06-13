@@ -47,6 +47,8 @@ AI is integrated into everyday workflow surfaces:
 
 Prompt templates live in `lib/ai/prompts.ts` and include stable version IDs.
 
+Structured AI JSON is rendered back to clinicians as readable summaries, SOAP sections, task lists, patient instructions, flags, referral text, and extracted document details. Raw JSON is kept for validation, storage, audit, and controlled review edits rather than being the default display format.
+
 ## Guardrails
 
 All prompts instruct the model to:
