@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { aiGenerateSchema, aiReviewSchema, appointmentCreateSchema, consultationCreateSchema, patientCreateSchema, patientExportSchema, staffUpdateSchema } from "@/lib/validation";
+import { aiGenerateSchema, aiReviewSchema, appointmentCreateSchema, consultationCreateSchema, patientCreateSchema, patientExportSchema, passwordResetSchema, staffInviteSchema, staffUpdateSchema } from "@/lib/validation";
 
 describe("API validation schemas", () => {
   it("accepts a valid patient payload", () => {
@@ -59,5 +59,24 @@ describe("API validation schemas", () => {
   it("requires at least one staff update action", () => {
     expect(staffUpdateSchema.parse({ resetLockout: true }).resetLockout).toBe(true);
     expect(() => staffUpdateSchema.parse({})).toThrow();
+  });
+
+  it("validates staff invitations and strong account passwords", () => {
+    expect(staffInviteSchema.parse({
+      email: "new.doctor@example.com",
+      name: "Dr. New Doctor",
+      role: "DOCTOR",
+      title: "Physician"
+    }).role).toBe("DOCTOR");
+
+    expect(passwordResetSchema.parse({
+      token: "abcdefghijklmnopqrstuvwxyz",
+      password: "NewPassword1234"
+    }).password).toBe("NewPassword1234");
+
+    expect(() => passwordResetSchema.parse({
+      token: "abcdefghijklmnopqrstuvwxyz",
+      password: "weakpass"
+    })).toThrow();
   });
 });

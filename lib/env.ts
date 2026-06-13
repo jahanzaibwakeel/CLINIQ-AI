@@ -2,6 +2,7 @@ import { z } from "zod";
 
 const envSchema = z.object({
   DATABASE_URL: z.string().optional(),
+  NEXT_PUBLIC_APP_URL: z.string().url().optional(),
   SESSION_SECRET: z.string().min(32).default("development-only-secret-change-me-32"),
   VALKEY_URL: z.string().optional(),
   AI_PROVIDER: z.string().default("ollama"),
@@ -24,7 +25,14 @@ const envSchema = z.object({
   METRICS_BEARER_TOKEN: z.preprocess(
     (value) => (value === "" ? undefined : value),
     z.string().min(24).optional()
-  )
+  ),
+  SMTP_URL: z.preprocess((value) => (value === "" ? undefined : value), z.string().url().optional()),
+  SMTP_HOST: z.preprocess((value) => (value === "" ? undefined : value), z.string().optional()),
+  SMTP_PORT: z.coerce.number().int().positive().default(587),
+  SMTP_SECURE: z.enum(["true", "false"]).default("false"),
+  SMTP_USER: z.preprocess((value) => (value === "" ? undefined : value), z.string().optional()),
+  SMTP_PASS: z.preprocess((value) => (value === "" ? undefined : value), z.string().optional()),
+  SMTP_FROM: z.string().default("MediPilot AI <no-reply@medipilot.local>")
 });
 
 export const env = envSchema.parse(process.env);

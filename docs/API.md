@@ -22,6 +22,30 @@ Clears the session.
 
 Returns the current user or `null`.
 
+### `POST /api/auth/request-password-reset`
+
+Public route that sends a time-limited reset link when the account exists. The response is intentionally generic to avoid email enumeration.
+
+```json
+{ "email": "doctor@medipilot.local" }
+```
+
+### `POST /api/auth/reset-password`
+
+Completes password reset with a single-use token.
+
+```json
+{ "token": "reset-token", "password": "NewPassword1234" }
+```
+
+### `POST /api/auth/accept-invite`
+
+Completes staff invitation setup with a single-use invite token and activates the user account.
+
+```json
+{ "token": "invite-token", "password": "NewPassword1234" }
+```
+
 ## Patients
 
 ### `GET /api/patients`
@@ -157,6 +181,21 @@ Updates appointment workflow status.
 Supported statuses: `SCHEDULED`, `CHECKED_IN`, `COMPLETED`, `CANCELLED`, `NO_SHOW`.
 
 ## Staff
+
+### `POST /api/staff/invitations`
+
+Allowed role: clinic admin.
+
+Creates or re-sends a clinic-scoped staff invitation using hashed, single-use account tokens and the configured email provider.
+
+```json
+{
+  "email": "new.doctor@example.com",
+  "name": "Dr. New Clinician",
+  "role": "DOCTOR",
+  "title": "Family physician"
+}
+```
 
 ### `PATCH /api/staff/:id`
 

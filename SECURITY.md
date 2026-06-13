@@ -8,6 +8,7 @@
 - Zod validation on API input.
 - Per-IP and per-email login throttling.
 - Known-user account lockout after repeated failed password attempts.
+- Password reset and staff invite flows use hashed, single-use, time-limited account tokens.
 - AI rate limiting.
 - Security headers through middleware: CSP, frame denial, content sniffing protection, referrer policy, and permissions policy.
 - Production origin allow-listing for mutating API requests through `NEXT_PUBLIC_APP_URL` or `TRUSTED_ORIGINS`.
@@ -22,6 +23,7 @@
 - External AI disabled by default.
 - AI output stored as draft with review status.
 - No secrets committed; `.env.example` documents expected variables.
+- Email delivery uses environment-configured SMTP/Nodemailer settings or development log previews.
 
 ## Healthcare Safety Controls
 
@@ -42,14 +44,14 @@
 
 - Add SSO or MFA for clinic users.
 - Use managed secret storage.
+- Use an approved SMTP provider and rotate SMTP credentials through secret management.
 - Rotate `METRICS_BEARER_TOKEN` like an operational secret when bearer-token monitoring is enabled.
 - Add field-level encryption for highly sensitive records.
 - Replace the local scan placeholder with approved object-storage malware scanning for document uploads.
 - Connect request tracing and security event monitoring to an external APM/SIEM.
 - Add row-level tenant isolation tests.
 - Add backup restore drills.
-- Add account lockout and password reset workflows.
-- Add self-service password reset and admin user invitation workflows.
+- Add token cleanup jobs for expired account reset and invitation tokens.
 - Add formal HIPAA/GDPR/legal review before real clinical use.
 
 ## Known Limitations

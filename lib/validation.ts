@@ -6,6 +6,28 @@ export const loginSchema = z.object({
   password: z.string().min(8)
 });
 
+export const accountPasswordSchema = z.string()
+  .min(12, "Password must be at least 12 characters")
+  .regex(/[A-Z]/, "Password must include an uppercase letter")
+  .regex(/[a-z]/, "Password must include a lowercase letter")
+  .regex(/[0-9]/, "Password must include a number");
+
+export const passwordResetRequestSchema = z.object({
+  email: z.string().email()
+});
+
+export const passwordResetSchema = z.object({
+  token: z.string().min(20),
+  password: accountPasswordSchema
+});
+
+export const staffInviteSchema = z.object({
+  email: z.string().email(),
+  name: z.string().min(2),
+  role: z.enum(["DOCTOR", "CLINIC_ADMIN", "ASSISTANT"]),
+  title: z.string().max(80).optional()
+});
+
 export const patientCreateSchema = z.object({
   firstName: z.string().min(1),
   lastName: z.string().min(1),

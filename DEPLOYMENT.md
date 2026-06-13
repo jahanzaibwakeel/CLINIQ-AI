@@ -36,6 +36,7 @@ Recommended:
 - `OLLAMA_NUM_PREDICT`
 - `ALLOW_EXTERNAL_AI`
 - `METRICS_BEARER_TOKEN` for uptime or metrics collectors that cannot use a browser admin session
+- `SMTP_URL` or `SMTP_HOST`/`SMTP_PORT`/`SMTP_USER`/`SMTP_PASS`/`SMTP_FROM` for password reset and staff invitation email
 
 Do not commit `.env`.
 
@@ -140,6 +141,20 @@ Recommended when PHI should remain on premises:
 - Encrypt backup files.
 - Keep separate retention windows for operational and compliance needs.
 - Back up `.env` secrets through a password manager, not plain files.
+
+Run an on-demand backup with:
+
+```bash
+BACKUP_DIR=/secure/backups npm run db:backup
+```
+
+Restore requires an explicit confirmation flag because it can replace live data:
+
+```bash
+CONFIRM_RESTORE=true npm run db:restore -- /secure/backups/medipilot-ai-2026-06-13T10-00-00Z.dump
+```
+
+Both commands use `DATABASE_URL`, so they work with any configured host and port.
 
 ## Production Readiness Checklist
 

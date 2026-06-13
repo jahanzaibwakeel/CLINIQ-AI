@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { LockKeyhole, ShieldCheck, UserCog, Users } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { StaffAccountActions } from "@/components/staff-account-actions";
+import { StaffInviteForm } from "@/components/staff-invite-form";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/security/session";
 import { isAccountLocked } from "@/lib/security/login-policy";
@@ -49,6 +50,10 @@ export default async function StaffPage() {
 
         <div className="grid two-column">
           <section className="card card-pad">
+            <StaffInviteForm />
+          </section>
+
+          <section className="card card-pad">
             <div className="section-head">
               <h2 className="section-title">Role coverage</h2>
               <Users size={19} />
@@ -76,6 +81,7 @@ export default async function StaffPage() {
               <SecurityPosture title="Least privilege" detail="Navigation and server routes are role scoped." good />
               <SecurityPosture title="Login lockout" detail="Five failed attempts temporarily lock a known account." good />
               <SecurityPosture title="Session expiry" detail="Signed HTTP-only sessions expire after eight hours." good />
+              <SecurityPosture title="Email workflows" detail="Password reset and staff invitations use hashed, single-use tokens." good />
             </div>
           </section>
         </div>
@@ -120,7 +126,7 @@ export default async function StaffPage() {
 
         <section className="ai-banner">
           <UserCog size={18} />
-          <span>Staff management is intentionally audit-first in this portfolio build. Production deployments should add invite flows, password reset, and MFA before real clinic use.</span>
+          <span>Staff management is audit-first. Production deployments should add MFA or SSO before real clinic use.</span>
         </section>
       </div>
     </AppShell>

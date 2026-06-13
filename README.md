@@ -16,6 +16,7 @@ MediPilot AI is a production-minded, local-first AI clinical workflow assistant 
 - Machine-readable `/api/metrics` endpoint for aggregate AI reliability, workflow, document, and security monitoring.
 - Admin Staff page for role coverage, login lockout state, active users, and last-login visibility.
 - Staff management actions for role changes, activation/deactivation, and lockout reset with admin guardrails.
+- Nodemailer-backed SMTP abstraction for password resets and staff invitation setup links, with safe development log fallback.
 - Login security includes rate limiting, known-account lockouts, and request-ID audit metadata.
 - Follow-up operations page and task status quick actions for daily clinic workflow.
 - Appointment scheduling board with audited appointment creation and AI scheduling-note helper.
@@ -47,6 +48,7 @@ cp .env.example .env
 npm install
 npm run db:migrate
 npm run db:seed
+npm run db:backup
 npm run dev
 ```
 
@@ -87,6 +89,7 @@ npm run test
 npm run test:e2e
 npm run build
 npm run db:studio
+npm run db:backup
 ```
 
 ## CI/CD

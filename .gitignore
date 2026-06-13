@@ -10,5 +10,8 @@ dev-server*.log
 tsconfig.tsbuildinfo
 prisma/dev.db
 uploads
+backups
+*.dump
+*.dump.sha256
 playwright-report
 test-results

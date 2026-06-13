@@ -46,6 +46,11 @@ enum ReviewStatus {
   REJECTED
 }
 
+enum AccountTokenType {
+  PASSWORD_RESET
+  STAFF_INVITE
+}
+
 enum TaskStatus {
   OPEN
   IN_PROGRESS
@@ -79,6 +84,7 @@ model Clinic {
   patients      Patient[]
   auditLogs     AuditLog[]
   aiGenerations AiGeneration[]
+  accountTokens AccountToken[]
 }
 
 model User {
@@ -107,6 +113,7 @@ model User {
   appointments  Appointment[]
   auditLogs     AuditLog[]
   aiReviews     AiGeneration[] @relation("AiReviewer")
+  accountTokens AccountToken[]
 }
 
 model Patient {
@@ -351,4 +358,20 @@ model AuditLog {
   consultation Consultation? @relation(fields: [consultationId], references: [id])
 
   @@index([clinicId, createdAt])
+}
+
+model AccountToken {
+  id        String           @id @default(cuid())
+  clinicId  String
+  userId    String
+  type      AccountTokenType
+  tokenHash String           @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  clinic Clinic @relation(fields: [clinicId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@index([clinicId, userId, type, expiresAt])
 }

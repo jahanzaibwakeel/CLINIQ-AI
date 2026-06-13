@@ -523,6 +523,12 @@ th {
   gap: 12px;
 }
 
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
 .inline-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -877,11 +883,12 @@ th {
     flex-direction: column;
   }
 
-  .nav-list,
-  .stats-grid,
-  .dashboard-metrics,
-  .two-column,
-  .inline-grid,
+    .nav-list,
+    .stats-grid,
+    .dashboard-metrics,
+    .two-column,
+    .form-row,
+    .inline-grid,
   .ai-soap-grid,
   .ai-extracted-grid,
   .login-screen {

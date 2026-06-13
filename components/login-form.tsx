@@ -11,7 +11,9 @@ export function LoginForm() {
   const [password, setPassword] = useState("DemoPassword123!");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [resetMessage, setResetMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
@@ -30,6 +32,20 @@ export function LoginForm() {
     }
     router.push("/");
     router.refresh();
+  }
+
+  async function requestReset() {
+    setResetLoading(true);
+    setError("");
+    setResetMessage("");
+    const response = await fetch("/api/auth/request-password-reset", {
+      method: "POST",
+      headers: csrfHeaders({ "Content-Type": "application/json" }),
+      body: JSON.stringify({ email })
+    });
+    setResetLoading(false);
+    const payload = await response.json().catch(() => null) as { message?: string } | null;
+    setResetMessage(payload?.message ?? "If that account exists, password reset instructions have been sent.");
   }
 
   return (
@@ -57,9 +73,13 @@ export function LoginForm() {
         </div>
       </label>
       {error ? <div className="badge warn">{error}</div> : null}
+      {resetMessage ? <div className="badge good">{resetMessage}</div> : null}
       <button className="button" disabled={loading} type="submit">
         <LogIn size={18} />
         {loading ? "Signing in..." : "Sign in"}
+      </button>
+      <button className="button secondary" disabled={resetLoading || !email} onClick={requestReset} type="button">
+        {resetLoading ? "Sending..." : "Forgot password"}
       </button>
       <p className="muted" style={{ fontSize: 13 }}>
         Demo password: DemoPassword123!

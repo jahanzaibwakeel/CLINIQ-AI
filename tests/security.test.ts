@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { hashAccountToken } from "@/lib/security/account-tokens";
 import { isAccountLocked, nextFailedLoginState } from "@/lib/security/login-policy";
 
 describe("Login security policy", () => {
@@ -14,5 +15,11 @@ describe("Login security policy", () => {
     expect(isAccountLocked(new Date("2026-06-12T12:01:00.000Z"), now)).toBe(true);
     expect(isAccountLocked(new Date("2026-06-12T11:59:00.000Z"), now)).toBe(false);
     expect(isAccountLocked(null, now)).toBe(false);
+  });
+
+  it("hashes account tokens deterministically without storing raw tokens", () => {
+    expect(hashAccountToken("reset-token")).toBe(hashAccountToken("reset-token"));
+    expect(hashAccountToken("reset-token")).not.toBe("reset-token");
+    expect(hashAccountToken("reset-token")).not.toBe(hashAccountToken("other-token"));
   });
 });
