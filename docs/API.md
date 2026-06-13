@@ -66,7 +66,7 @@ Lists clinical documents.
 
 ### `POST /api/documents`
 
-Creates an extracted-text document record, chunks it, embeds chunks, marks processing complete, and creates AI triage drafts for:
+Creates an extracted-text document record, stores the uploaded file payload with checksum and scan metadata, chunks extracted text, embeds chunks, marks processing complete, and creates AI triage drafts for:
 
 - document parsing
 - risk flag explanation
@@ -75,6 +75,8 @@ Creates an extracted-text document record, chunks it, embeds chunks, marks proce
 All generated triage outputs remain AI drafts until reviewed.
 
 If processing fails, the document status is set to `FAILED` and a `DOCUMENT_PROCESSING_FAILED` audit event is created.
+
+Optional `fileBase64` may be provided as a browser data URL or raw base64 payload. `extractedText` is still required because it powers local AI parsing and semantic search.
 
 ## Tasks
 

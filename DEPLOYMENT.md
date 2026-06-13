@@ -24,6 +24,8 @@ Recommended:
 
 - `APP_HOST_PORT`
 - `APP_CONTAINER_PORT`
+- `DOCUMENT_STORAGE_DIR`
+- `DOCUMENT_MAX_UPLOAD_BYTES`
 - `VALKEY_URL`
 - `POSTGRES_HOST_PORT`
 - `VALKEY_HOST_PORT`
@@ -101,6 +103,12 @@ On the server, keep a production `.env` beside `docker-compose.prod.yml`. The de
 - `/api/ready`: app can reach PostgreSQL and reports cache state as `ok`, `memory`, or `degraded`
 - `/ops`: admin-only in-app operations dashboard for AI latency, fallback rate, cache hit rate, request IDs, and review backlog
 - `/staff`: admin-only role and login-security dashboard for active users, lockouts, and last-login state
+
+## Document Storage
+
+Development and single-server deployments use `DOCUMENT_STORAGE_DIR` for local file storage. Keep this directory outside Git, include it in encrypted server backups when clinically appropriate, and place it on encrypted disk for clinic deployments.
+
+The app stores checksum, size, provider, and scan-status metadata on each document row. The built-in scanner is a safety placeholder that blocks suspicious executable extensions; production deployments should add object-storage malware scanning or an approved security gateway.
 
 ## Render/Fly.io/Railway
 

@@ -192,6 +192,10 @@ model Document {
   fileName       String
   mimeType       String
   storageKey     String
+  storageProvider String        @default("local")
+  fileSizeBytes   Int?
+  checksumSha256  String?
+  virusScanStatus String        @default("not_scanned")
   extractedText  String?
   parsedJson     Json?
   status         DocumentStatus @default(UPLOADED)

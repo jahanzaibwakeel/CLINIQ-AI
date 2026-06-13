@@ -7,6 +7,7 @@ import { processDocumentJob } from "@/lib/jobs";
 import { auditLog } from "@/lib/audit";
 import { rateLimit } from "@/lib/rate-limit";
 import { requestIdFrom } from "@/lib/observability";
+import { saveDocumentFile } from "@/lib/storage";
 
 export async function GET() {
   const auth = await requireUser();
@@ -37,6 +38,12 @@ export async function POST(request: Request) {
       where: { id: input.patientId, clinicId: auth.user.clinicId }
     });
     if (!patient) return NextResponse.json({ error: "Patient not found" }, { status: 404 });
+    const storedFile = await saveDocumentFile({
+      clinicId: auth.user.clinicId,
+      fileName: input.fileName,
+      fileBase64: input.fileBase64,
+      extractedText: input.extractedText
+    });
 
     const document = await prisma.document.create({
       data: {
@@ -45,7 +52,11 @@ export async function POST(request: Request) {
         uploadedById: auth.user.id,
         fileName: input.fileName,
         mimeType: input.mimeType,
-        storageKey: `inline/${Date.now()}-${input.fileName}`,
+        storageKey: storedFile.storageKey,
+        storageProvider: storedFile.storageProvider,
+        fileSizeBytes: storedFile.fileSizeBytes,
+        checksumSha256: storedFile.checksumSha256,
+        virusScanStatus: storedFile.virusScanStatus,
         extractedText: input.extractedText,
         status: "UPLOADED"
       }
@@ -65,7 +76,13 @@ export async function POST(request: Request) {
       action: "DOCUMENT_UPLOADED",
       entityType: "Document",
       entityId: document.id,
-      patientId: input.patientId
+      patientId: input.patientId,
+      metadata: {
+        storageProvider: storedFile.storageProvider,
+        fileSizeBytes: storedFile.fileSizeBytes,
+        checksumSha256: storedFile.checksumSha256,
+        virusScanStatus: storedFile.virusScanStatus
+      }
     });
 
     const processedDocument = await prisma.document.findUnique({

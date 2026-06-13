@@ -9,6 +9,7 @@
 - Built role-specific product surfaces for doctors, clinic admins, and assistants, plus an AI draft review workflow that lets clinicians edit and apply reviewed output to records.
 - Added appointment scheduling, a derived notification inbox, and audited patient chart export to broaden the clinical operations surface.
 - Implemented appointment workflow actions, staff role/account controls, and privacy-gated patient export with redaction and audit reasons.
+- Added local document storage with checksum/scan metadata and Playwright smoke tests for recruiter-ready workflow validation.
 - Built an admin Ops dashboard with request IDs, AI latency, cache/fallback rates, token estimates, document triage volume, readiness checks, and audit signals.
 - Added admin staff security visibility with role coverage, last-login state, active status, failed-login counters, and temporary account lockout.
 - Added healthcare safety controls including doctor-review disclaimers, AI draft metadata, provider/model traceability, review status, audit logging, and external PHI opt-in controls.

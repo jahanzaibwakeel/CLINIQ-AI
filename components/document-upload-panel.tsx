@@ -28,6 +28,7 @@ export function DocumentUploadPanel({ patients }: { patients: PatientOption[] })
   const [patientId, setPatientId] = useState(patients[0]?.id ?? "");
   const [fileName, setFileName] = useState("");
   const [mimeType, setMimeType] = useState("text/plain");
+  const [fileBase64, setFileBase64] = useState("");
   const [extractedText, setExtractedText] = useState("");
   const [state, setState] = useState<UploadState>("idle");
   const [message, setMessage] = useState("");
@@ -43,15 +44,19 @@ export function DocumentUploadPanel({ patients }: { patients: PatientOption[] })
     setFileName(file.name);
     setMimeType(file.type || "text/plain");
 
-    if (file.size > 1024 * 1024) {
+    if (file.size > 2 * 1024 * 1024) {
       setState("error");
-      setMessage("For this demo workflow, upload text reports under 1 MB.");
+      setMessage("For this demo workflow, upload reports under 2 MB.");
       return;
     }
 
+    const dataUrl = await readAsDataUrl(file);
+    setFileBase64(dataUrl);
+
     if (file.type && !readableMimeTypes.has(file.type)) {
-      setState("error");
-      setMessage("This local demo reads text-based reports. Paste extracted text for PDFs or images.");
+      setExtractedText("");
+      setState("idle");
+      setMessage("File will be stored locally. Paste extracted text so AI parsing and semantic search can run.");
       return;
     }
 
@@ -71,7 +76,8 @@ export function DocumentUploadPanel({ patients }: { patients: PatientOption[] })
         patientId,
         fileName: fileName.trim(),
         mimeType,
-        extractedText
+        extractedText,
+        fileBase64
       })
     });
 
@@ -82,7 +88,7 @@ export function DocumentUploadPanel({ patients }: { patients: PatientOption[] })
     }
 
     setState("processing");
-    setMessage("Document processed, chunked, embedded, and added to semantic search.");
+    setMessage("Document stored, scanned, chunked, embedded, and added to AI triage.");
     setState("complete");
     router.refresh();
   }
@@ -142,4 +148,13 @@ export function DocumentUploadPanel({ patients }: { patients: PatientOption[] })
       </div>
     </section>
   );
+}
+
+function readAsDataUrl(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result ?? ""));
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
 }

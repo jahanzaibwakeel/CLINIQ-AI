@@ -33,6 +33,7 @@
 - Reviewed AI drafts can be edited before approval and applied into records with audit metadata.
 - Uploaded documents automatically create AI triage drafts while preserving doctor review before clinical use.
 - Document processing failures mark the document as failed and write an audit event.
+- Uploaded document payloads are stored with provider, byte size, checksum, and scan-status metadata.
 - Patient chart exports require a stated reason, default to redacted contact details, and write audit metadata.
 - External PHI transfer requires explicit `ALLOW_EXTERNAL_AI=true`.
 
@@ -41,7 +42,7 @@
 - Add SSO or MFA for clinic users.
 - Use managed secret storage.
 - Add field-level encryption for highly sensitive records.
-- Add object storage virus scanning for document uploads.
+- Replace the local scan placeholder with approved object-storage malware scanning for document uploads.
 - Connect request tracing and security event monitoring to an external APM/SIEM.
 - Add row-level tenant isolation tests.
 - Add backup restore drills.

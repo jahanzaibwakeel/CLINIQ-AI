@@ -34,13 +34,18 @@ export default async function DocumentsPage() {
             </div>
             <div className="table-wrap">
               <table>
-                <thead><tr><th>Document</th><th>Patient</th><th>Status</th><th>Chunks</th><th>AI triage</th></tr></thead>
+                <thead><tr><th>Document</th><th>Patient</th><th>Status</th><th>Storage</th><th>Chunks</th><th>AI triage</th></tr></thead>
                 <tbody>
                   {documents.map((document) => (
                     <tr key={document.id}>
                       <td><strong>{document.fileName}</strong><br /><span className="muted">{document.extractedText?.slice(0, 160)}</span></td>
                       <td>{document.patient.firstName} {document.patient.lastName}</td>
                       <td><span className={document.status === "PROCESSED" ? "badge good" : "badge warn"}>{document.status}</span></td>
+                      <td>
+                        <span className={document.virusScanStatus === "clean" ? "badge good" : "badge warn"}>{document.virusScanStatus}</span>
+                        <br />
+                        <span className="muted">{document.storageProvider} | {formatBytes(document.fileSizeBytes)}</span>
+                      </td>
                       <td>{document.chunks.length}</td>
                       <td>
                         <div className="triage-stack">
@@ -70,6 +75,13 @@ export default async function DocumentsPage() {
       </div>
     </AppShell>
   );
+}
+
+function formatBytes(value: number | null) {
+  if (!value) return "size n/a";
+  if (value < 1024) return `${value} B`;
+  if (value < 1024 * 1024) return `${Math.round(value / 1024)} KB`;
+  return `${(value / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 function previewAiOutput(output: unknown) {

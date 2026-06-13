@@ -22,6 +22,7 @@ MediPilot AI is a production-minded, local-first AI clinical workflow assistant 
 - Role-specific navigation and dashboard emphasis for doctors, clinic admins, and assistants.
 - AI draft review supports doctor-edited output and approve-to-record actions.
 - Document uploads automatically create AI triage drafts for parsing, risk flags, and task candidates.
+- Uploaded report files are stored through a local storage adapter with file size, checksum, and scan-status metadata.
 - Document processing failures are marked and audited instead of silently disappearing.
 - Patient chart export requires an export reason, supports redacted mode, and writes audit logs.
 - Valkey/Redis cache support with memory fallback.
@@ -80,6 +81,7 @@ MediPilot AI is designed for workflow productivity, not autonomous diagnosis. Ev
 npm run lint
 npm run typecheck
 npm run test
+npm run test:e2e
 npm run build
 npm run db:studio
 ```

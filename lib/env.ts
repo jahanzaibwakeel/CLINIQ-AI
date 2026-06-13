@@ -17,7 +17,9 @@ const envSchema = z.object({
   GROQ_API_KEY: z.string().optional(),
   GROQ_MODEL: z.string().default("llama-3.1-70b-versatile"),
   GEMINI_API_KEY: z.string().optional(),
-  GEMINI_MODEL: z.string().default("gemini-1.5-flash")
+  GEMINI_MODEL: z.string().default("gemini-1.5-flash"),
+  DOCUMENT_STORAGE_DIR: z.string().default("uploads"),
+  DOCUMENT_MAX_UPLOAD_BYTES: z.coerce.number().int().positive().default(2_000_000)
 });
 
 export const env = envSchema.parse(process.env);

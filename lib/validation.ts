@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { env } from "@/lib/env";
 
 export const loginSchema = z.object({
   email: z.string().email(),
@@ -29,7 +30,15 @@ export const documentCreateSchema = z.object({
   patientId: z.string().min(1),
   fileName: z.string().min(1),
   mimeType: z.string().min(1),
-  extractedText: z.string().min(5).max(250_000)
+  extractedText: z.string().min(5).max(250_000),
+  fileBase64: z.string().optional()
+}).refine((value) => {
+  if (!value.fileBase64) return true;
+  const payload = value.fileBase64.includes(",") ? value.fileBase64.split(",").pop() ?? "" : value.fileBase64;
+  return Math.ceil((payload.length * 3) / 4) <= env.DOCUMENT_MAX_UPLOAD_BYTES;
+}, {
+  message: "Uploaded file exceeds configured size limit",
+  path: ["fileBase64"]
 });
 
 export const aiGenerateSchema = z.object({

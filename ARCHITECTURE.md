@@ -26,6 +26,7 @@ Core entities:
 - Appointments schedule patient visits with clinician ownership, status, time window, location, and notes.
 - Staff account changes and appointment status updates are handled through audited route handlers with role checks.
 - Documents store extraction results, chunks, and parsed JSON.
+- Documents also store storage provider, local storage key, file size, checksum, and scan status.
 - Embeddings link searchable note/document content to patients.
 - AI generations store provider/model/prompt metadata, source context, JSON output, raw output, review state, and reviewer details.
 - AI generations also store latency, cache-hit state, token estimates, and request IDs for production observability.
@@ -43,6 +44,11 @@ Core entities:
 8. Document uploads chunk/embed text and automatically create doctor-review-required AI triage drafts for document parsing, risk flags, and task candidates.
 9. Inbox signals are derived from persisted workflow state instead of a separate notification table, keeping demo data explainable and auditable.
 10. Patient chart exports require a reason, can redact direct contact details, and are recorded in the audit log.
+
+## Testing Shape
+
+- Unit and component tests cover AI guardrails, validation, security policy, storage helpers, and shared UI.
+- Playwright smoke tests cover seeded login, dashboard navigation, patient export privacy, documents, schedule, inbox, and staff surfaces.
 
 ## Deployment Topology
 
