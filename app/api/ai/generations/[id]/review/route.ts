@@ -1,17 +1,10 @@
 import { Role, type AiGeneration, type Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
-import { z } from "zod";
 import { auditLog } from "@/lib/audit";
 import { prisma } from "@/lib/db";
 import { apiError, parseJson } from "@/lib/http";
 import { requireUser } from "@/lib/security/rbac";
-
-const reviewSchema = z.object({
-  reviewStatus: z.enum(["REVIEWED", "REJECTED"]),
-  reviewerNote: z.string().max(1000).optional(),
-  output: z.unknown().optional(),
-  applyToRecord: z.boolean().default(false)
-});
+import { aiReviewSchema } from "@/lib/validation";
 
 function asRecord(value: unknown): Record<string, unknown> {
   return typeof value === "object" && value !== null ? (value as Record<string, unknown>) : {};
@@ -140,7 +133,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   if (auth.response) return auth.response;
 
   try {
-    const input = await parseJson(request, reviewSchema);
+    const input = await parseJson(request, aiReviewSchema);
     const generation = await prisma.aiGeneration.findFirst({
       where: {
         id: params.id,

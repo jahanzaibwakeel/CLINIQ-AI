@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { aiGenerateSchema, appointmentCreateSchema, consultationCreateSchema, patientCreateSchema, patientExportSchema, staffUpdateSchema } from "@/lib/validation";
+import { aiGenerateSchema, aiReviewSchema, appointmentCreateSchema, consultationCreateSchema, patientCreateSchema, patientExportSchema, staffUpdateSchema } from "@/lib/validation";
 
 describe("API validation schemas", () => {
   it("accepts a valid patient payload", () => {
@@ -29,6 +29,14 @@ describe("API validation schemas", () => {
       patientId: "patient-id"
     });
     expect(parsed.type).toBe("TASK_EXTRACTION");
+  });
+
+  it("defaults AI review apply-to-record to false", () => {
+    const parsed = aiReviewSchema.parse({
+      reviewStatus: "REVIEWED",
+      reviewerNote: "Edited wording before approval."
+    });
+    expect(parsed.applyToRecord).toBe(false);
   });
 
   it("rejects appointments ending before they start", () => {

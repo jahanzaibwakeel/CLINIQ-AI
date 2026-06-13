@@ -62,6 +62,13 @@ export const aiGenerateSchema = z.object({
   question: z.string().optional()
 });
 
+export const aiReviewSchema = z.object({
+  reviewStatus: z.enum(["REVIEWED", "REJECTED"]),
+  reviewerNote: z.string().max(1000).optional(),
+  output: z.unknown().optional(),
+  applyToRecord: z.boolean().default(false)
+});
+
 export const taskCreateSchema = z.object({
   patientId: z.string().optional(),
   consultationId: z.string().optional(),

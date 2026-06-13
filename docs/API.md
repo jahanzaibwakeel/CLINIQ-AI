@@ -218,6 +218,7 @@ Output includes:
 Allowed roles: doctor, clinic admin.
 
 Marks an AI draft as reviewed or rejected and writes an audit log.
+Reviewed approvals require doctor/admin role; `reviewerNote` is copied into the generation source context and audit metadata. When edited output is supplied, the route stores that reviewed JSON before optional record application.
 
 ```json
 {
