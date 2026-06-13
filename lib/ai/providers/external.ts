@@ -19,6 +19,7 @@ export class GroqProvider implements AiProvider {
       body: JSON.stringify({
         model: this.model,
         temperature: request.temperature ?? 0.2,
+        max_tokens: request.maxTokens,
         response_format: request.json ? { type: "json_object" } : undefined,
         messages: [
           { role: "system", content: request.system },
@@ -50,6 +51,7 @@ export class GeminiProvider implements AiProvider {
         body: JSON.stringify({
           generationConfig: {
             temperature: request.temperature ?? 0.2,
+            maxOutputTokens: request.maxTokens,
             responseMimeType: request.json ? "application/json" : "text/plain"
           },
           contents: [

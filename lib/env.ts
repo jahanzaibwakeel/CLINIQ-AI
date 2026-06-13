@@ -13,6 +13,7 @@ const envSchema = z.object({
   OLLAMA_HOST_PORT: z.string().default("11434"),
   OLLAMA_MODEL: z.string().default("qwen2.5:7b"),
   OLLAMA_EMBEDDING_MODEL: z.string().default("nomic-embed-text"),
+  OLLAMA_NUM_PREDICT: z.coerce.number().int().positive().default(220),
   ALLOW_EXTERNAL_AI: z.enum(["true", "false"]).default("false"),
   GROQ_API_KEY: z.string().optional(),
   GROQ_MODEL: z.string().default("llama-3.1-70b-versatile"),

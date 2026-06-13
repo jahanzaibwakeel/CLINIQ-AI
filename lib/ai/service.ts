@@ -71,7 +71,8 @@ export async function runAiGeneration(input: {
         system: prompt.system,
         user: userPrompt,
         json: true,
-        temperature: 0.2
+        temperature: 0.2,
+        maxTokens: env.OLLAMA_NUM_PREDICT
       });
       providerName = response.provider;
       model = response.model;

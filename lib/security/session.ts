@@ -6,6 +6,22 @@ import { env } from "@/lib/env";
 const cookieName = "medipilot_session";
 const secret = new TextEncoder().encode(env.SESSION_SECRET);
 
+function isLocalHttpUrl(value: string | undefined) {
+  if (!value) return false;
+
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" && ["localhost", "127.0.0.1", "::1"].includes(url.hostname);
+  } catch {
+    return false;
+  }
+}
+
+function shouldUseSecureCookies() {
+  if (process.env.NODE_ENV !== "production") return false;
+  return !isLocalHttpUrl(process.env.NEXT_PUBLIC_APP_URL);
+}
+
 export type SessionUser = {
   id: string;
   clinicId: string;
@@ -26,7 +42,7 @@ export async function setSessionCookie(user: SessionUser) {
   const token = await createSessionToken(user);
   cookies().set(cookieName, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: shouldUseSecureCookies(),
     sameSite: "lax",
     maxAge: 60 * 60 * 8,
     path: "/"

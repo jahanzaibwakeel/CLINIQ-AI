@@ -1,8 +1,13 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { parseSafeAiOutput } from "@/lib/ai/guardrails";
 import { prompts } from "@/lib/ai/prompts";
+import { OllamaProvider } from "@/lib/ai/providers/ollama";
 import { FallbackProvider, hashEmbedding } from "@/lib/ai/providers/fallback";
 import { average, estimateTokens } from "@/lib/observability";
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe("AI guardrails", () => {
   it("forces the doctor review disclaimer", () => {
@@ -36,6 +41,22 @@ describe("Fallback provider", () => {
 
   it("creates deterministic local embeddings", () => {
     expect(hashEmbedding("HbA1c high")).toEqual(hashEmbedding("HbA1c high"));
+  });
+});
+
+describe("Ollama provider", () => {
+  it("sends bounded local generation options", async () => {
+    const fetchMock = vi.spyOn(global, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ message: { content: "{\"summary\":\"ok\"}" } }), { status: 200 })
+    );
+
+    const provider = new OllamaProvider();
+    await provider.complete({ system: "safe", user: "source context", json: true, maxTokens: 128 });
+
+    const body = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body));
+    expect(body.format).toBe("json");
+    expect(body.options.num_predict).toBe(128);
+    expect(body.options.temperature).toBe(0.2);
   });
 });
 

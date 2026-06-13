@@ -14,7 +14,10 @@ export class OllamaProvider implements AiProvider {
         model: this.model,
         stream: false,
         format: request.json ? "json" : undefined,
-        options: { temperature: request.temperature ?? 0.2 },
+        options: {
+          temperature: request.temperature ?? 0.2,
+          num_predict: request.maxTokens ?? env.OLLAMA_NUM_PREDICT
+        },
         messages: [
           { role: "system", content: request.system },
           { role: "user", content: request.user }

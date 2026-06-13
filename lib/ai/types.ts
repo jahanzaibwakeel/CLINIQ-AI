@@ -7,6 +7,7 @@ export type AiCompletionRequest = {
   user: string;
   json?: boolean;
   temperature?: number;
+  maxTokens?: number;
 };
 
 export type AiCompletionResponse = {
