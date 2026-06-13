@@ -451,6 +451,39 @@ th {
   gap: 7px;
 }
 
+.export-control {
+  position: relative;
+}
+
+.export-panel {
+  position: absolute;
+  right: 0;
+  z-index: 10;
+  display: grid;
+  width: min(360px, 86vw);
+  gap: 10px;
+  margin-top: 8px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #354454;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.disabled-link {
+  pointer-events: none;
+  opacity: 0.56;
+}
+
 .form-grid {
   display: grid;
   gap: 12px;

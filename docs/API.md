@@ -40,7 +40,11 @@ Returns patient detail, consultations, notes, documents, tasks, follow-ups, and 
 
 ### `GET /api/patients/:id/export`
 
-Exports a clinic-scoped patient chart JSON bundle and writes a `PATIENT_CHART_EXPORTED` audit event.
+Exports a clinic-scoped patient chart JSON bundle and writes a `PATIENT_CHART_EXPORTED` audit event. Requires query params:
+
+```text
+?reason=Care%20coordination%20review&redacted=true
+```
 
 ## Consultations
 
@@ -138,6 +142,28 @@ Creates an audited appointment.
   "location": "Exam room 1",
   "notes": "Bring glucose log."
 }
+```
+
+### `PATCH /api/appointments/:id`
+
+Updates appointment workflow status.
+
+```json
+{ "status": "CHECKED_IN" }
+```
+
+Supported statuses: `SCHEDULED`, `CHECKED_IN`, `COMPLETED`, `CANCELLED`, `NO_SHOW`.
+
+## Staff
+
+### `PATCH /api/staff/:id`
+
+Allowed role: clinic admin.
+
+Updates staff role, active status, or lockout state with guardrails that preserve at least one active admin and prevent self-deactivation/self-demotion.
+
+```json
+{ "role": "DOCTOR", "isActive": true, "resetLockout": true }
 ```
 
 ## AI

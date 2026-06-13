@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { aiGenerateSchema, appointmentCreateSchema, consultationCreateSchema, patientCreateSchema } from "@/lib/validation";
+import { aiGenerateSchema, appointmentCreateSchema, consultationCreateSchema, patientCreateSchema, patientExportSchema, staffUpdateSchema } from "@/lib/validation";
 
 describe("API validation schemas", () => {
   it("accepts a valid patient payload", () => {
@@ -40,5 +40,16 @@ describe("API validation schemas", () => {
         endsAt: "2026-06-12T10:00:00.000Z"
       })
     ).toThrow();
+  });
+
+  it("requires an export reason for patient chart downloads", () => {
+    const parsed = patientExportSchema.parse({ reason: "Care coordination review", redacted: "true" });
+    expect(parsed.reason).toContain("Care");
+    expect(() => patientExportSchema.parse({ reason: "demo", redacted: "true" })).toThrow();
+  });
+
+  it("requires at least one staff update action", () => {
+    expect(staffUpdateSchema.parse({ resetLockout: true }).resetLockout).toBe(true);
+    expect(() => staffUpdateSchema.parse({})).toThrow();
   });
 });

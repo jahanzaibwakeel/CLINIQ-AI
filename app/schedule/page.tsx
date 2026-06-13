@@ -2,6 +2,7 @@ import { CalendarDays } from "lucide-react";
 import { Role } from "@prisma/client";
 import { AppShell } from "@/components/app-shell";
 import { AppointmentCreateForm } from "@/components/appointment-create-form";
+import { AppointmentStatusActions } from "@/components/appointment-status-actions";
 import { ClinicalAiComposer } from "@/components/clinical-ai-composer";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/security/session";
@@ -66,7 +67,7 @@ export default async function SchedulePage() {
             {appointments.length ? (
               <div className="table-wrap">
                 <table>
-                  <thead><tr><th>When</th><th>Patient</th><th>Clinician</th><th>Visit</th><th>Status</th></tr></thead>
+                  <thead><tr><th>When</th><th>Patient</th><th>Clinician</th><th>Visit</th><th>Status</th><th>Actions</th></tr></thead>
                   <tbody>
                     {appointments.map((appointment) => (
                       <tr key={appointment.id}>
@@ -75,6 +76,7 @@ export default async function SchedulePage() {
                         <td>{appointment.clinician.name}</td>
                         <td><strong>{appointment.title}</strong><br /><span className="muted">{appointment.reason || appointment.location || "No reason recorded"}</span></td>
                         <td><span className={appointment.status === "SCHEDULED" ? "badge good" : appointment.status === "CANCELLED" || appointment.status === "NO_SHOW" ? "badge warn" : "badge"}>{appointment.status.replace("_", " ")}</span></td>
+                        <td><AppointmentStatusActions appointmentId={appointment.id} status={appointment.status} /></td>
                       </tr>
                     ))}
                   </tbody>

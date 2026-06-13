@@ -2,10 +2,20 @@ import { NextResponse } from "next/server";
 import { auditLog } from "@/lib/audit";
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/security/rbac";
+import { patientExportSchema } from "@/lib/validation";
 
-export async function GET(_request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: { id: string } }) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
+  const search = new URL(request.url).searchParams;
+  const parsed = patientExportSchema.safeParse({
+    reason: search.get("reason") ?? "",
+    redacted: search.get("redacted") ?? "true"
+  });
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Export reason is required", issues: parsed.error.flatten() }, { status: 400 });
+  }
+  const redacted = parsed.data.redacted === "true";
 
   const patient = await prisma.patient.findFirst({
     where: { id: params.id, clinicId: auth.user.clinicId },
@@ -40,13 +50,23 @@ export async function GET(_request: Request, { params }: { params: { id: string 
     entityType: "Patient",
     entityId: patient.id,
     patientId: patient.id,
-    metadata: { format: "json", generatedAt: new Date().toISOString() }
+    metadata: { format: "json", generatedAt: new Date().toISOString(), reason: parsed.data.reason, redacted }
   });
+
+  const exportedPatient = redacted
+    ? {
+        ...patient,
+        phone: patient.phone ? "[redacted]" : null,
+        email: patient.email ? "[redacted]" : null
+      }
+    : patient;
 
   const payload = {
     exportedAt: new Date().toISOString(),
+    reason: parsed.data.reason,
+    redacted,
     disclaimer: "Demo export. Validate legal/compliance requirements before using with real patient data.",
-    patient
+    patient: exportedPatient
   };
 
   return new NextResponse(JSON.stringify(payload, null, 2), {

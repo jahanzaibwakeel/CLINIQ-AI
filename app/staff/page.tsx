@@ -2,6 +2,7 @@ import { Role } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { LockKeyhole, ShieldCheck, UserCog, Users } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
+import { StaffAccountActions } from "@/components/staff-account-actions";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/security/session";
 import { isAccountLocked } from "@/lib/security/login-policy";
@@ -94,6 +95,7 @@ export default async function StaffPage() {
                   <th>Failed logins</th>
                   <th>Last login</th>
                   <th>Lock state</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -107,6 +109,7 @@ export default async function StaffPage() {
                       <td>{member.failedLoginCount}</td>
                       <td>{member.lastLoginAt ? member.lastLoginAt.toLocaleString() : "No login recorded"}</td>
                       <td><span className={locked ? "badge warn" : "badge good"}>{locked ? `Locked until ${member.lockedUntil?.toLocaleTimeString()}` : "Clear"}</span></td>
+                      <td><StaffAccountActions userId={member.id} role={member.role} isActive={member.isActive} locked={locked} /></td>
                     </tr>
                   );
                 })}

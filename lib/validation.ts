@@ -93,3 +93,20 @@ export const appointmentCreateSchema = z.object({
   message: "Appointment end time must be after start time",
   path: ["endsAt"]
 });
+
+export const appointmentUpdateSchema = z.object({
+  status: z.enum(["SCHEDULED", "CHECKED_IN", "COMPLETED", "CANCELLED", "NO_SHOW"])
+});
+
+export const staffUpdateSchema = z.object({
+  role: z.enum(["DOCTOR", "CLINIC_ADMIN", "ASSISTANT"]).optional(),
+  isActive: z.boolean().optional(),
+  resetLockout: z.boolean().optional()
+}).refine((value) => value.role !== undefined || value.isActive !== undefined || value.resetLockout === true, {
+  message: "At least one staff update action is required"
+});
+
+export const patientExportSchema = z.object({
+  reason: z.string().min(8).max(240),
+  redacted: z.enum(["true", "false"]).default("true")
+});

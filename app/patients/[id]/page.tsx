@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
+import { PatientExportButton } from "@/components/patient-export-button";
 import { PatientChartTabs } from "@/components/patient-chart-tabs";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/security/session";
@@ -47,7 +48,7 @@ export default async function PatientDetailPage({ params }: { params: { id: stri
                 <p className="muted">MRN {patient.mrn} | {patient.sex} | born {patient.dateOfBirth.toLocaleDateString()}</p>
               </div>
               <div className="command-actions">
-                <a className="button secondary" href={`/api/patients/${patient.id}/export`}>Export chart</a>
+                <PatientExportButton patientId={patient.id} />
                 <span className={`badge ${patient.riskScore >= 60 ? "warn" : "good"}`}>Risk {patient.riskScore}</span>
               </div>
             </div>

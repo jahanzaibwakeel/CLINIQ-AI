@@ -16,6 +16,7 @@
 - Clinic-admin audit viewer for recent security and clinical events.
 - Clinic-admin Ops dashboard for AI telemetry, fallback visibility, review backlog, and request trace IDs.
 - Clinic-admin Staff page for role coverage, active status, lockout state, and last login review.
+- Staff role changes, activation/deactivation, and lockout resets require clinic admin privileges and audit logging.
 - Middleware attaches `X-Request-Id` to responses and AI generations for traceability.
 - External AI disabled by default.
 - AI output stored as draft with review status.
@@ -32,6 +33,7 @@
 - Reviewed AI drafts can be edited before approval and applied into records with audit metadata.
 - Uploaded documents automatically create AI triage drafts while preserving doctor review before clinical use.
 - Document processing failures mark the document as failed and write an audit event.
+- Patient chart exports require a stated reason, default to redacted contact details, and write audit metadata.
 - External PHI transfer requires explicit `ALLOW_EXTERNAL_AI=true`.
 
 ## Recommended Production Hardening
