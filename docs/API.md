@@ -250,3 +250,18 @@ Returns process-level health for load balancers and container health checks.
 Checks readiness by validating database connectivity and cache state. Returns `503` when the app is not ready.
 
 Every app/API response receives an `X-Request-Id` header. AI generations persist that request ID for admin traceability in `/ops`.
+
+### `GET /api/metrics`
+
+Returns aggregate production metrics for monitoring without exposing patient content. Access is allowed by either:
+
+- clinic admin session cookie
+- `Authorization: Bearer <METRICS_BEARER_TOKEN>` when configured
+
+Optional query:
+
+```text
+?windowHours=24
+```
+
+The window is clamped between 1 and 168 hours. Output includes AI provider mix, fallback/cache rates, average and p95 latency, pending review counts, document failure counts, open/overdue workflow counts, active/locked user counts, and recent audit-event volume.

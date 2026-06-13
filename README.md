@@ -13,6 +13,7 @@ MediPilot AI is a production-minded, local-first AI clinical workflow assistant 
 - Human-readable AI output rendering for summaries, SOAP notes, tasks, flags, patient instructions, referrals, and extracted document data.
 - Admin audit viewer for login, AI, document, patient, task, and consultation activity.
 - Admin Ops dashboard for AI latency, cache/fallback rate, request IDs, document triage, and readiness signals.
+- Machine-readable `/api/metrics` endpoint for aggregate AI reliability, workflow, document, and security monitoring.
 - Admin Staff page for role coverage, login lockout state, active users, and last-login visibility.
 - Staff management actions for role changes, activation/deactivation, and lockout reset with admin guardrails.
 - Login security includes rate limiting, known-account lockouts, and request-ID audit metadata.

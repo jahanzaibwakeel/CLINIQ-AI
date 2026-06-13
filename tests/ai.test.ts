@@ -4,7 +4,7 @@ import { prompts } from "@/lib/ai/prompts";
 import { OllamaProvider } from "@/lib/ai/providers/ollama";
 import { FallbackProvider, hashEmbedding } from "@/lib/ai/providers/fallback";
 import { getAiRuntimeStatus } from "@/lib/ai/status";
-import { average, estimateTokens } from "@/lib/observability";
+import { average, estimateTokens, percentile, ratePercent, summarizeAiMetrics } from "@/lib/observability";
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -90,5 +90,28 @@ describe("Observability helpers", () => {
     expect(estimateTokens("12345678")).toBe(2);
     expect(average([100, 200, 300])).toBe(200);
     expect(average([])).toBe(0);
+  });
+
+  it("summarizes AI reliability metrics without patient data", () => {
+    const metrics = summarizeAiMetrics([
+      { provider: "ollama", latencyMs: 100, cacheHit: false, tokenEstimate: 20, reviewStatus: "DRAFT", createdAt: new Date() },
+      { provider: "ollama", latencyMs: 200, cacheHit: true, tokenEstimate: 30, reviewStatus: "REVIEWED", createdAt: new Date() },
+      { provider: "fallback", latencyMs: 900, cacheHit: false, tokenEstimate: 10, reviewStatus: "DRAFT", createdAt: new Date() }
+    ]);
+
+    expect(metrics.totalRuns).toBe(3);
+    expect(metrics.providerCounts).toEqual({ ollama: 2, fallback: 1 });
+    expect(metrics.fallbackRate).toBe(33);
+    expect(metrics.cacheHitRate).toBe(33);
+    expect(metrics.draftRuns).toBe(2);
+    expect(metrics.averageLatencyMs).toBe(400);
+    expect(metrics.p95LatencyMs).toBe(900);
+    expect(metrics.tokenEstimate).toBe(60);
+  });
+
+  it("calculates percentiles and rates for empty samples", () => {
+    expect(percentile([], 95)).toBe(0);
+    expect(ratePercent(1, 4)).toBe(25);
+    expect(ratePercent(0, 0)).toBe(0);
   });
 });

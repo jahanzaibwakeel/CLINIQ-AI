@@ -15,6 +15,7 @@
 - Audit logs for successful and failed known-user login attempts.
 - Clinic-admin audit viewer for recent security and clinical events.
 - Clinic-admin Ops dashboard for AI telemetry, fallback visibility, review backlog, and request trace IDs.
+- Aggregate `/api/metrics` endpoint requires clinic-admin session access or an optional bearer token for trusted monitors.
 - Clinic-admin Staff page for role coverage, active status, lockout state, and last login review.
 - Staff role changes, activation/deactivation, and lockout resets require clinic admin privileges and audit logging.
 - Middleware attaches `X-Request-Id` to responses and AI generations for traceability.
@@ -41,6 +42,7 @@
 
 - Add SSO or MFA for clinic users.
 - Use managed secret storage.
+- Rotate `METRICS_BEARER_TOKEN` like an operational secret when bearer-token monitoring is enabled.
 - Add field-level encryption for highly sensitive records.
 - Replace the local scan placeholder with approved object-storage malware scanning for document uploads.
 - Connect request tracing and security event monitoring to an external APM/SIEM.

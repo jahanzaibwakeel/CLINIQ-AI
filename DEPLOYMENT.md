@@ -35,6 +35,7 @@ Recommended:
 - `OLLAMA_EMBEDDING_MODEL`
 - `OLLAMA_NUM_PREDICT`
 - `ALLOW_EXTERNAL_AI`
+- `METRICS_BEARER_TOKEN` for uptime or metrics collectors that cannot use a browser admin session
 
 Do not commit `.env`.
 
@@ -104,6 +105,7 @@ On the server, keep a production `.env` beside `docker-compose.prod.yml`. The de
 
 - `/api/health`: app process is alive
 - `/api/ready`: app can reach PostgreSQL and reports cache state as `ok`, `memory`, or `degraded`
+- `/api/metrics`: aggregate AI, document, workflow, and security metrics for clinic admins or bearer-token monitors
 - `/ops`: admin-only in-app operations dashboard for AI latency, fallback rate, cache hit rate, request IDs, and review backlog
 - `/staff`: admin-only role and login-security dashboard for active users, lockouts, and last-login state
 

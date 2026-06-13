@@ -20,7 +20,11 @@ const envSchema = z.object({
   GEMINI_API_KEY: z.string().optional(),
   GEMINI_MODEL: z.string().default("gemini-1.5-flash"),
   DOCUMENT_STORAGE_DIR: z.string().default("uploads"),
-  DOCUMENT_MAX_UPLOAD_BYTES: z.coerce.number().int().positive().default(2_000_000)
+  DOCUMENT_MAX_UPLOAD_BYTES: z.coerce.number().int().positive().default(2_000_000),
+  METRICS_BEARER_TOKEN: z.preprocess(
+    (value) => (value === "" ? undefined : value),
+    z.string().min(24).optional()
+  )
 });
 
 export const env = envSchema.parse(process.env);
