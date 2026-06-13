@@ -1,12 +1,5 @@
-import { expect, test, type Page } from "@playwright/test";
-
-async function login(page: Page, email = "doctor@medipilot.local") {
-  await page.goto("/login");
-  await page.getByLabel("Email").fill(email);
-  await page.getByLabel("Password").fill("DemoPassword123!");
-  await page.getByRole("button", { name: "Sign in" }).click();
-  await expect(page.getByRole("heading", { name: /dashboard/i })).toBeVisible();
-}
+import { expect, test } from "@playwright/test";
+import { login } from "./helpers";
 
 test("doctor can reach core clinical workflow pages", async ({ page }) => {
   await login(page);
