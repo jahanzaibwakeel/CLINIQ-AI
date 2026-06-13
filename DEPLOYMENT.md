@@ -37,6 +37,7 @@ Recommended:
 - `ALLOW_EXTERNAL_AI`
 - `METRICS_BEARER_TOKEN` for uptime or metrics collectors that cannot use a browser admin session
 - `SMTP_URL` or `SMTP_HOST`/`SMTP_PORT`/`SMTP_USER`/`SMTP_PASS`/`SMTP_FROM` for password reset and staff invitation email
+- `ACCOUNT_TOKEN_RETENTION_DAYS` for used reset/invite token retention before cleanup
 
 Do not commit `.env`.
 
@@ -88,6 +89,7 @@ The GitHub Actions workflow in `.github/workflows/ci.yml` performs:
 - lint
 - type check
 - unit/component tests
+- dependency audit report upload
 - production build
 - Docker image build
 - GHCR publish on `main`
@@ -156,6 +158,24 @@ CONFIRM_RESTORE=true npm run db:restore -- /secure/backups/medipilot-ai-2026-06-
 
 Both commands use `DATABASE_URL`, so they work with any configured host and port.
 
+## Security Maintenance Jobs
+
+Clean expired password reset and staff invite tokens with:
+
+```bash
+npm run security:cleanup-tokens
+```
+
+Run it daily from cron, a VPS scheduler, or a managed job runner. Expired tokens are deleted immediately; used tokens are retained for `ACCOUNT_TOKEN_RETENTION_DAYS` before cleanup.
+
+Generate a dependency audit locally with:
+
+```bash
+npm run security:audit
+```
+
+The CI pipeline uploads `npm-audit.json` as an artifact so dependency risks can be reviewed without blocking unrelated portfolio/demo work.
+
 ## Production Readiness Checklist
 
 - Strong `SESSION_SECRET`.
@@ -164,6 +184,7 @@ Both commands use `DATABASE_URL`, so they work with any configured host and port
 - `/api/health` and `/api/ready` monitored.
 - Database backups configured and tested.
 - Audit log retention policy defined.
+- Account-token cleanup scheduled.
 - Seed/demo data removed or isolated.
 - Rate limits reviewed.
 - Role permissions verified.

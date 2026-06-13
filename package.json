@@ -20,11 +20,12 @@
     "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio",
     "db:backup": "tsx scripts/db-backup.ts",
-    "db:restore": "tsx scripts/db-restore.ts"
+    "db:restore": "tsx scripts/db-restore.ts",
+    "security:cleanup-tokens": "tsx scripts/account-token-cleanup.ts",
+    "security:audit": "npm audit --audit-level=high --omit=optional"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
-    "@types/nodemailer": "^8.0.1",
     "bcryptjs": "^2.4.3",
     "date-fns": "^4.1.0",
     "ioredis": "^5.4.1",
@@ -43,6 +44,7 @@
     "@testing-library/react": "^16.1.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^22.10.2",
+    "@types/nodemailer": "^8.0.1",
     "@types/react": "^18.3.17",
     "@types/react-dom": "^18.3.5",
     "eslint": "^8.57.1",

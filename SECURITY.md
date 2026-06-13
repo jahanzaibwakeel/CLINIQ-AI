@@ -9,6 +9,7 @@
 - Per-IP and per-email login throttling.
 - Known-user account lockout after repeated failed password attempts.
 - Password reset and staff invite flows use hashed, single-use, time-limited account tokens.
+- Expired account tokens can be cleaned with `npm run security:cleanup-tokens`.
 - AI rate limiting.
 - Security headers through middleware: CSP, frame denial, content sniffing protection, referrer policy, and permissions policy.
 - Production origin allow-listing for mutating API requests through `NEXT_PUBLIC_APP_URL` or `TRUSTED_ORIGINS`.
@@ -51,7 +52,7 @@
 - Connect request tracing and security event monitoring to an external APM/SIEM.
 - Add row-level tenant isolation tests.
 - Add backup restore drills.
-- Add token cleanup jobs for expired account reset and invitation tokens.
+- Schedule `npm run security:cleanup-tokens` in production.
 - Add formal HIPAA/GDPR/legal review before real clinical use.
 
 ## Known Limitations

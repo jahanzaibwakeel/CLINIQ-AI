@@ -1,5 +1,5 @@
 import { createHash, randomBytes } from "crypto";
-import type { AccountTokenType } from "@prisma/client";
+import type { AccountTokenType, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 
 export function hashAccountToken(token: string) {
@@ -38,4 +38,30 @@ export async function findValidAccountToken(token: string, type: AccountTokenTyp
     },
     include: { user: true }
   });
+}
+
+export function accountTokenCleanupWhere(now: Date, retentionDays: number): Prisma.AccountTokenWhereInput {
+  const usedTokenCutoff = new Date(now.getTime() - retentionDays * 24 * 60 * 60 * 1000);
+  return {
+    OR: [
+      { expiresAt: { lt: now } },
+      { usedAt: { lt: usedTokenCutoff } }
+    ]
+  };
+}
+
+export async function cleanupAccountTokens(input: { now?: Date; retentionDays: number }) {
+  const now = input.now ?? new Date();
+  const where = accountTokenCleanupWhere(now, input.retentionDays);
+  const [candidateCount, result] = await prisma.$transaction([
+    prisma.accountToken.count({ where }),
+    prisma.accountToken.deleteMany({ where })
+  ]);
+
+  return {
+    candidateCount,
+    deletedCount: result.count,
+    retentionDays: input.retentionDays,
+    cleanedAt: now
+  };
 }

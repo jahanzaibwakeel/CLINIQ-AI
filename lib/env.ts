@@ -32,7 +32,8 @@ const envSchema = z.object({
   SMTP_SECURE: z.enum(["true", "false"]).default("false"),
   SMTP_USER: z.preprocess((value) => (value === "" ? undefined : value), z.string().optional()),
   SMTP_PASS: z.preprocess((value) => (value === "" ? undefined : value), z.string().optional()),
-  SMTP_FROM: z.string().default("MediPilot AI <no-reply@medipilot.local>")
+  SMTP_FROM: z.string().default("MediPilot AI <no-reply@medipilot.local>"),
+  ACCOUNT_TOKEN_RETENTION_DAYS: z.coerce.number().int().min(1).max(90).default(7)
 });
 
 export const env = envSchema.parse(process.env);

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { hashAccountToken } from "@/lib/security/account-tokens";
+import { accountTokenCleanupWhere, hashAccountToken } from "@/lib/security/account-tokens";
 import { isAccountLocked, nextFailedLoginState } from "@/lib/security/login-policy";
 
 describe("Login security policy", () => {
@@ -21,5 +21,16 @@ describe("Login security policy", () => {
     expect(hashAccountToken("reset-token")).toBe(hashAccountToken("reset-token"));
     expect(hashAccountToken("reset-token")).not.toBe("reset-token");
     expect(hashAccountToken("reset-token")).not.toBe(hashAccountToken("other-token"));
+  });
+
+  it("builds cleanup filters for expired and old used account tokens", () => {
+    const now = new Date("2026-06-13T12:00:00.000Z");
+    const where = accountTokenCleanupWhere(now, 7);
+    expect(where).toEqual({
+      OR: [
+        { expiresAt: { lt: now } },
+        { usedAt: { lt: new Date("2026-06-06T12:00:00.000Z") } }
+      ]
+    });
   });
 });

@@ -12,7 +12,8 @@ export default async function OpsPage() {
   if (user.role !== Role.CLINIC_ADMIN) redirect("/");
 
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
-  const [aiGenerations, recentAudit, pendingReviews, documentTriageCount, failedDocuments] = await Promise.all([
+  const now = new Date();
+  const [aiGenerations, recentAudit, pendingReviews, documentTriageCount, failedDocuments, expiredAccountTokens, usedAccountTokens] = await Promise.all([
     prisma.aiGeneration.findMany({
       where: { clinicId: user.clinicId, createdAt: { gte: since } },
       orderBy: { createdAt: "desc" },
@@ -34,7 +35,9 @@ export default async function OpsPage() {
         createdAt: { gte: since }
       }
     }),
-    prisma.document.count({ where: { clinicId: user.clinicId, status: "FAILED" } })
+    prisma.document.count({ where: { clinicId: user.clinicId, status: "FAILED" } }),
+    prisma.accountToken.count({ where: { clinicId: user.clinicId, expiresAt: { lt: now } } }),
+    prisma.accountToken.count({ where: { clinicId: user.clinicId, usedAt: { not: null } } })
   ]);
 
   const latencies = aiGenerations.map((generation) => generation.latencyMs).filter((value): value is number => typeof value === "number");
@@ -75,6 +78,7 @@ export default async function OpsPage() {
           <OpsMetric title="Cache hit rate" value={`${rate(cacheHits, aiGenerations.length)}%`} label="cached" tone="green" detail={`${cacheHits} reused responses in 24h`} />
           <OpsMetric title="Fallback rate" value={`${rate(fallbackRuns, aiGenerations.length)}%`} label="local fallback" tone={fallbackRuns ? "orange" : "green"} detail="Shows Ollama or external provider outages" />
           <OpsMetric title="Token estimate" value={tokenEstimate} label="tokens" tone="blue" detail="Rough prompt plus output estimate" />
+          <OpsMetric title="Account token cleanup" value={expiredAccountTokens} label="expired" tone={expiredAccountTokens ? "orange" : "green"} detail={`${usedAccountTokens} used reset or invite tokens retained`} />
         </div>
 
         <div className="grid two-column">
@@ -103,6 +107,7 @@ export default async function OpsPage() {
               <OpsCheck title="Database" status="Healthy" detail="Prisma query path is active for this page." good />
               <OpsCheck title="Document processing" status={failedDocuments ? "Needs review" : "Healthy"} detail={`${failedDocuments} failed documents currently recorded.`} good={!failedDocuments} />
               <OpsCheck title="Request tracing" status="Enabled" detail="Middleware attaches X-Request-Id to app and API requests." good />
+              <OpsCheck title="Account-token cleanup" status={expiredAccountTokens ? "Run cleanup" : "Healthy"} detail="Use npm run security:cleanup-tokens on a schedule." good={!expiredAccountTokens} />
             </div>
           </section>
         </div>
