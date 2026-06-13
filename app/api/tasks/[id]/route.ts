@@ -5,14 +5,15 @@ import { apiError, parseJson } from "@/lib/http";
 import { requireUser } from "@/lib/security/rbac";
 import { taskUpdateSchema } from "@/lib/validation";
 
-export async function PATCH(request: Request, { params }: { params: { id: string } }) {
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
   try {
+    const routeParams = await params;
     const input = await parseJson(request, taskUpdateSchema);
     const task = await prisma.task.findFirst({
-      where: { id: params.id, clinicId: auth.user.clinicId }
+      where: { id: routeParams.id, clinicId: auth.user.clinicId }
     });
 
     if (!task) {

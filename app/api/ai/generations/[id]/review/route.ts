@@ -128,15 +128,16 @@ async function applyReviewedOutput(input: {
   return applied;
 }
 
-export async function PATCH(request: Request, { params }: { params: { id: string } }) {
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const auth = await requireUser([Role.DOCTOR, Role.CLINIC_ADMIN]);
   if (auth.response) return auth.response;
 
   try {
+    const routeParams = await params;
     const input = await parseJson(request, aiReviewSchema);
     const generation = await prisma.aiGeneration.findFirst({
       where: {
-        id: params.id,
+        id: routeParams.id,
         clinicId: auth.user.clinicId
       }
     });

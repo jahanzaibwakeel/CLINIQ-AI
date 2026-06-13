@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint . --ext .ts,.tsx",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -31,7 +31,7 @@
     "ioredis": "^5.4.1",
     "jose": "^5.9.6",
     "lucide-react": "^0.468.0",
-    "next": "^14.2.23",
+    "next": "^15.5.18",
     "nodemailer": "^8.0.11",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -47,13 +47,18 @@
     "@types/nodemailer": "^8.0.1",
     "@types/react": "^18.3.17",
     "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^6.0.2",
     "eslint": "^8.57.1",
-    "eslint-config-next": "^14.2.23",
+    "eslint-config-next": "^15.5.18",
     "jsdom": "^25.0.1",
     "prisma": "^5.22.0",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
-    "vitest": "^2.1.8"
+    "vitest": "^4.1.8"
+  },
+  "overrides": {
+    "esbuild": "^0.28.1",
+    "postcss": "^8.5.15"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

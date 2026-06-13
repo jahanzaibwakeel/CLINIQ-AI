@@ -2,12 +2,13 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/security/rbac";
 
-export async function GET(_request: Request, { params }: { params: { id: string } }) {
+export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
 
+  const routeParams = await params;
   const patient = await prisma.patient.findFirst({
-    where: { id: params.id, clinicId: auth.user.clinicId },
+    where: { id: routeParams.id, clinicId: auth.user.clinicId },
     include: {
       primaryDoctor: { select: { name: true } },
       consultations: { orderBy: { startedAt: "desc" }, take: 10 },

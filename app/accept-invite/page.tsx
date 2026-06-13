@@ -1,6 +1,8 @@
 import { SetPasswordForm } from "@/components/set-password-form";
 
-export default function AcceptInvitePage({ searchParams }: { searchParams: { token?: string } }) {
+export default async function AcceptInvitePage({ searchParams }: { searchParams: Promise<{ token?: string }> }) {
+  const params = await searchParams;
+
   return (
     <div className="login-screen">
       <section className="login-panel">
@@ -17,7 +19,7 @@ export default function AcceptInvitePage({ searchParams }: { searchParams: { tok
         </p>
       </section>
       <section className="login-card">
-        <SetPasswordForm mode="invite" token={searchParams.token ?? ""} />
+        <SetPasswordForm mode="invite" token={params.token ?? ""} />
       </section>
     </div>
   );

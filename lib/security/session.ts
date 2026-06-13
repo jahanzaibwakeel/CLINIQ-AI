@@ -40,7 +40,8 @@ export async function createSessionToken(user: SessionUser) {
 
 export async function setSessionCookie(user: SessionUser) {
   const token = await createSessionToken(user);
-  cookies().set(cookieName, token, {
+  const cookieStore = await cookies();
+  cookieStore.set(cookieName, token, {
     httpOnly: true,
     secure: shouldUseSecureCookies(),
     sameSite: "lax",
@@ -49,12 +50,14 @@ export async function setSessionCookie(user: SessionUser) {
   });
 }
 
-export function clearSessionCookie() {
-  cookies().delete(cookieName);
+export async function clearSessionCookie() {
+  const cookieStore = await cookies();
+  cookieStore.delete(cookieName);
 }
 
 export async function getSession(): Promise<SessionUser | null> {
-  const token = cookies().get(cookieName)?.value;
+  const cookieStore = await cookies();
+  const token = cookieStore.get(cookieName)?.value;
   if (!token) return null;
 
   try {

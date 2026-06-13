@@ -6,14 +6,15 @@ import { apiError, parseJson } from "@/lib/http";
 import { requireUser } from "@/lib/security/rbac";
 import { staffUpdateSchema } from "@/lib/validation";
 
-export async function PATCH(request: Request, { params }: { params: { id: string } }) {
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const auth = await requireUser([Role.CLINIC_ADMIN]);
   if (auth.response) return auth.response;
 
   try {
+    const routeParams = await params;
     const input = await parseJson(request, staffUpdateSchema);
     const member = await prisma.user.findFirst({
-      where: { id: params.id, clinicId: auth.user.clinicId }
+      where: { id: routeParams.id, clinicId: auth.user.clinicId }
     });
 
     if (!member) return NextResponse.json({ error: "Staff member not found" }, { status: 404 });

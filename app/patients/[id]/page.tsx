@@ -5,10 +5,11 @@ import { PatientChartTabs } from "@/components/patient-chart-tabs";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/security/session";
 
-export default async function PatientDetailPage({ params }: { params: { id: string } }) {
+export default async function PatientDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const user = await getSession();
+  const routeParams = await params;
   const patient = await prisma.patient.findFirst({
-    where: { id: params.id, clinicId: user?.clinicId ?? "" },
+    where: { id: routeParams.id, clinicId: user?.clinicId ?? "" },
     include: {
       notes: { orderBy: { createdAt: "desc" } },
       consultations: { orderBy: { startedAt: "desc" } },

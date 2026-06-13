@@ -4,9 +4,10 @@ import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/security/rbac";
 import { patientExportSchema } from "@/lib/validation";
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
+  const routeParams = await params;
   const search = new URL(request.url).searchParams;
   const parsed = patientExportSchema.safeParse({
     reason: search.get("reason") ?? "",
@@ -18,7 +19,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
   const redacted = parsed.data.redacted === "true";
 
   const patient = await prisma.patient.findFirst({
-    where: { id: params.id, clinicId: auth.user.clinicId },
+    where: { id: routeParams.id, clinicId: auth.user.clinicId },
     include: {
       consultations: { orderBy: { startedAt: "desc" } },
       notes: { orderBy: { createdAt: "desc" } },
