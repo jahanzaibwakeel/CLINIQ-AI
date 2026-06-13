@@ -25,10 +25,14 @@ function isLocalOrigin(origin: string) {
   return /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/.test(origin);
 }
 
+function isLocalRequest(request: NextRequest) {
+  return isLocalOrigin(request.nextUrl.origin);
+}
+
 function originAllowed(request: NextRequest) {
   const origin = request.headers.get("origin");
   if (!origin) return true;
-  if (process.env.NODE_ENV !== "production" && isLocalOrigin(origin)) return true;
+  if (isLocalRequest(request) && isLocalOrigin(origin)) return true;
 
   const allowed = configuredOrigins();
   if (allowed.size === 0) return process.env.NODE_ENV !== "production";
@@ -36,7 +40,7 @@ function originAllowed(request: NextRequest) {
   return allowed.has(origin);
 }
 
-function securityHeaders() {
+function securityHeaders(request: NextRequest) {
   const appOrigin = process.env.NEXT_PUBLIC_APP_URL
     ? (() => {
         try {
@@ -52,7 +56,7 @@ function securityHeaders() {
   "X-Frame-Options": "DENY",
   "Referrer-Policy": "strict-origin-when-cross-origin",
   "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=()",
-  ...(process.env.NODE_ENV === "production"
+  ...(process.env.NODE_ENV === "production" && !isLocalRequest(request)
     ? { "Strict-Transport-Security": "max-age=31536000; includeSubDomains" }
     : {}),
   "Content-Security-Policy": [
@@ -88,7 +92,7 @@ export function middleware(request: NextRequest) {
   requestHeaders.set("x-request-id", requestId);
   const response = NextResponse.next({ request: { headers: requestHeaders } });
   response.headers.set("X-Request-Id", requestId);
-  for (const [key, value] of Object.entries(securityHeaders())) {
+  for (const [key, value] of Object.entries(securityHeaders(request))) {
     response.headers.set(key, value);
   }
 
@@ -96,7 +100,7 @@ export function middleware(request: NextRequest) {
     response.cookies.set(csrfCookieName, crypto.randomUUID(), {
       httpOnly: false,
       sameSite: "strict",
-      secure: process.env.NODE_ENV === "production",
+      secure: process.env.NODE_ENV === "production" && !isLocalRequest(request),
       path: "/"
     });
   }

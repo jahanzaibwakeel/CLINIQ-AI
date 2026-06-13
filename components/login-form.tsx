@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { LogIn } from "lucide-react";
+import { Eye, EyeOff, LogIn } from "lucide-react";
 import { csrfHeaders } from "@/lib/client/csrf";
 
 export function LoginForm() {
   const router = useRouter();
   const [email, setEmail] = useState("doctor@medipilot.local");
   const [password, setPassword] = useState("DemoPassword123!");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -23,7 +24,8 @@ export function LoginForm() {
     });
     setLoading(false);
     if (!response.ok) {
-      setError("Unable to sign in. Check the demo credentials or seeded users.");
+      const payload = await response.json().catch(() => null) as { error?: string } | null;
+      setError(payload?.error ?? "Unable to sign in. Check the demo credentials or seeded users.");
       return;
     }
     router.push("/");
@@ -42,7 +44,17 @@ export function LoginForm() {
       </label>
       <label className="field">
         <span className="label">Password</span>
-        <input className="input" value={password} onChange={(event) => setPassword(event.target.value)} type="password" required />
+        <div className="password-field">
+          <input className="input" value={password} onChange={(event) => setPassword(event.target.value)} type={showPassword ? "text" : "password"} required />
+          <button
+            aria-label={showPassword ? "Hide password" : "Show password"}
+            className="icon-button"
+            onClick={() => setShowPassword((value) => !value)}
+            type="button"
+          >
+            {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+          </button>
+        </div>
       </label>
       {error ? <div className="badge warn">{error}</div> : null}
       <button className="button" disabled={loading} type="submit">
