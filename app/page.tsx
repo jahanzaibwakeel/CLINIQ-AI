@@ -12,6 +12,7 @@ import { Role } from "@prisma/client";
 import { AppShell } from "@/components/app-shell";
 import { ClinicalAiComposer, type AiType } from "@/components/clinical-ai-composer";
 import { SafetyBanner } from "@/components/safety-banner";
+import { getAiTaskCopy } from "@/lib/ai/catalog";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/security/session";
 
@@ -149,7 +150,7 @@ export default async function DashboardPage() {
             <span className="badge good">Doctor review required</span>
           </div>
           <div className="chart-bars">
-            {["Summaries", "SOAP notes", "Document parsing", "Follow-ups", "Search"].map((label, index) => {
+            {["Consult summaries", "SOAP notes", "Document parsing", "Follow-up plans", "Search summaries"].map((label, index) => {
               const values = [78, 64, 52, 46, 38];
               return (
                 <div className="bar-row" key={label}>
@@ -215,7 +216,7 @@ export default async function DashboardPage() {
               aiGenerations.map((generation) => (
                 <div className="timeline-item" key={generation.id}>
                   <div>
-                    <strong>{generation.type.replaceAll("_", " ").toLowerCase()}</strong>
+                    <strong>{getAiTaskCopy(generation.type).draftTitle}</strong>
                     <p className="muted">{generation.provider} | {generation.model}</p>
                   </div>
                   <span className={generation.reviewStatus === "DRAFT" ? "badge warn" : "badge good"}>{generation.reviewStatus}</span>

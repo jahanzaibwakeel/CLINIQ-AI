@@ -35,6 +35,8 @@ MediPilot AI implements these generation types:
 - `ASSISTANT_RESPONSE`
 - `SEMANTIC_SEARCH`
 
+The user-facing names, output purposes, and review behavior are documented in [docs/AI_TASK_CATALOG.md](docs/AI_TASK_CATALOG.md).
+
 ## Embedded AI Flows
 
 AI is integrated into everyday workflow surfaces:

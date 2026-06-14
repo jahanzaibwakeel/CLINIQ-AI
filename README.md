@@ -125,6 +125,7 @@ The VPS should contain `docker-compose.prod.yml` and a production `.env`.
 - [AI_WORKFLOW.md](AI_WORKFLOW.md)
 - [DEPLOYMENT.md](DEPLOYMENT.md)
 - [SECURITY.md](SECURITY.md)
+- [docs/AI_TASK_CATALOG.md](docs/AI_TASK_CATALOG.md)
 - [docs/API.md](docs/API.md)
 - [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md)
 - [docs/PRODUCTION_REVIEW.md](docs/PRODUCTION_REVIEW.md)

@@ -1,6 +1,8 @@
 import React from "react";
+import { getAiTaskCopy } from "@/lib/ai/catalog";
 
 type Metadata = {
+  type?: string;
   provider?: string;
   model?: string;
   usedFallback?: boolean;
@@ -127,12 +129,12 @@ function renderSoap(value: unknown) {
   );
 }
 
-function renderTasks(value: unknown) {
+function renderTasks(title: string, value: unknown) {
   if (!Array.isArray(value) || !value.length) return null;
 
   return (
     <section className="ai-output-section">
-      <h4>Tasks</h4>
+      <h4>{title}</h4>
       <div className="ai-task-list">
         {value.map((task, index) => {
           const record = asRecord(task);
@@ -222,6 +224,7 @@ function renderFallback(record: Record<string, unknown>) {
 export function AiOutputRenderer({ output, metadata }: AiOutputRendererProps) {
   const record = normalizeOutput(output);
   const hasContent = Object.keys(record).length > 0;
+  const copy = getAiTaskCopy(metadata?.type);
 
   if (!hasContent) {
     return <div className="empty">No AI draft content available yet.</div>;
@@ -236,10 +239,10 @@ export function AiOutputRenderer({ output, metadata }: AiOutputRendererProps) {
         {metadata?.usedFallback ? <span className="badge warn">fallback</span> : null}
         {metadata?.reviewStatus ? <span className="badge">{metadata.reviewStatus}</span> : null}
       </div>
-      {renderTextSection("Summary", record.summary)}
+      {renderTextSection(copy.primarySectionTitle, record.summary)}
       {renderSoap(record.soap)}
       {renderListSection("Patient instructions", record.patientInstructions)}
-      {renderTasks(record.tasks)}
+      {renderTasks(metadata?.type === "TASK_EXTRACTION" ? "Extracted clinic tasks" : "Tasks", record.tasks)}
       {renderListSection("Flags for doctor review", record.flags)}
       {renderTextSection("Explanation", record.explanation)}
       {renderTextSection("Referral letter", record.referralLetter)}

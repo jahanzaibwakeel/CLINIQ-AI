@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Bell, Bot, CalendarClock, CheckSquare, FileWarning } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
+import { getAiTaskCopy } from "@/lib/ai/catalog";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/security/session";
 
@@ -74,7 +75,7 @@ export default async function InboxPage() {
     })),
     ...pendingAi.map((generation) => ({
       id: `ai-${generation.id}`,
-      title: `AI draft pending review: ${generation.type.replaceAll("_", " ")}`,
+      title: `Pending review: ${getAiTaskCopy(generation.type).draftTitle}`,
       detail: `${generation.patient ? `${generation.patient.firstName} ${generation.patient.lastName}` : "Clinic draft"} | ${generation.provider}/${generation.model}`,
       href: "/ai-review",
       severity: "medium" as const,

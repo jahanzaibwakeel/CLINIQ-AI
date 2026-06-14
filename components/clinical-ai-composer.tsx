@@ -5,37 +5,20 @@ import { Bot, ClipboardCheck, FileText, Loader2, Sparkles } from "lucide-react";
 import { AiOutputRenderer } from "@/components/ai-output-renderer";
 import { AiRuntimeBadge } from "@/components/ai-runtime-badge";
 import { csrfHeaders } from "@/lib/client/csrf";
+import { aiTaskCatalog, aiTaskOrder, getAiTaskCopy, type AiTaskType } from "@/lib/ai/catalog";
 
-export type AiType =
-  | "CONSULTATION_SUMMARY"
-  | "SOAP_NOTE"
-  | "HISTORY_TIMELINE"
-  | "DOCUMENT_PARSE"
-  | "FOLLOW_UP_INSTRUCTIONS"
-  | "TASK_EXTRACTION"
-  | "RISK_FLAG_EXPLAINER"
-  | "VISIT_SUMMARY"
-  | "REFERRAL_LETTER"
-  | "ASSISTANT_RESPONSE";
+export type AiType = Exclude<
+  AiTaskType,
+  "SEMANTIC_SEARCH"
+>;
 
 type Preset = {
   type: AiType;
-  label: string;
-  help: string;
 };
 
-const allPresets: Preset[] = [
-  { type: "CONSULTATION_SUMMARY", label: "Summary", help: "Turn bullets into a clean clinical summary." },
-  { type: "SOAP_NOTE", label: "SOAP", help: "Draft Subjective, Objective, Assessment, and Plan." },
-  { type: "TASK_EXTRACTION", label: "Tasks", help: "Find clinic work for assistants or doctors." },
-  { type: "FOLLOW_UP_INSTRUCTIONS", label: "Follow-up", help: "Draft next-step instructions." },
-  { type: "VISIT_SUMMARY", label: "Patient summary", help: "Convert notes into patient-friendly wording." },
-  { type: "RISK_FLAG_EXPLAINER", label: "Risk flags", help: "Explain missed follow-up, abnormal values, or key terms." },
-  { type: "DOCUMENT_PARSE", label: "Parse report", help: "Extract labs, values, dates, and abnormal findings." },
-  { type: "HISTORY_TIMELINE", label: "Timeline", help: "Summarize patient history chronologically." },
-  { type: "REFERRAL_LETTER", label: "Referral", help: "Draft a specialist referral letter." },
-  { type: "ASSISTANT_RESPONSE", label: "Ask context", help: "Ask a question about selected patient context." }
-];
+const allPresets: Preset[] = aiTaskOrder
+  .filter((type): type is AiType => type !== "SEMANTIC_SEARCH")
+  .map((type) => ({ type }));
 
 type ClinicalAiComposerProps = {
   title: string;
@@ -50,7 +33,7 @@ type ClinicalAiComposerProps = {
 
 type AiResult = {
   type: AiType;
-  label: string;
+  title: string;
   output: unknown;
   metadata: {
     provider: string;
@@ -82,7 +65,7 @@ export function ClinicalAiComposer({
   const [error, setError] = useState("");
 
   async function generate(type: AiType) {
-    const preset = allPresets.find((item) => item.type === type);
+    const copy = getAiTaskCopy(type);
     const response = await fetch("/api/ai/generate", {
       method: "POST",
       headers: csrfHeaders({ "Content-Type": "application/json" }),
@@ -109,7 +92,7 @@ export function ClinicalAiComposer({
 
     return {
       type,
-      label: preset?.label ?? type,
+      title: copy.draftTitle,
       output: data.output,
       metadata: {
         provider: data.provider,
@@ -150,7 +133,7 @@ export function ClinicalAiComposer({
     }
   }
 
-  const selectedPreset = allPresets.find((preset) => preset.type === selected);
+  const selectedCopy = getAiTaskCopy(selected);
 
   return (
     <section className="card card-pad">
@@ -176,11 +159,11 @@ export function ClinicalAiComposer({
               onClick={() => setSelected(preset.type)}
               type="button"
             >
-              {preset.label}
+              {aiTaskCatalog[preset.type].shortLabel}
             </button>
           ))}
         </div>
-        <p className="muted" style={{ margin: 0 }}>{selectedPreset?.help}</p>
+        <p className="muted" style={{ margin: 0 }}>{selectedCopy.help}</p>
         {selected === "ASSISTANT_RESPONSE" ? (
           <label className="field">
             <span className="label">Question</span>
@@ -200,7 +183,7 @@ export function ClinicalAiComposer({
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           <button className="button" disabled={Boolean(loading) || input.trim().length < 5} onClick={runSingle} type="button">
             {loading === "single" ? <Loader2 size={18} /> : <Sparkles size={18} />}
-            Generate {selectedPreset?.label}
+            Generate {selectedCopy.actionLabel}
           </button>
           <button className="button secondary" disabled={Boolean(loading) || input.trim().length < 5} onClick={runBundle} type="button">
             {loading === "bundle" ? <Loader2 size={18} /> : <ClipboardCheck size={18} />}
@@ -214,10 +197,10 @@ export function ClinicalAiComposer({
               <article className="ai-output-shell" key={result.type}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
                   <FileText size={17} />
-                  <strong>{result.label}</strong>
-                  <span className="badge warn">AI draft</span>
+                  <strong>{result.title}</strong>
+                  <span className="badge warn">doctor review required</span>
                 </div>
-                <AiOutputRenderer output={result.output} metadata={result.metadata} />
+                <AiOutputRenderer output={result.output} metadata={{ ...result.metadata, type: result.type }} />
               </article>
             ))
           ) : (

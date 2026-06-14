@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { CheckCircle2, Filter, Loader2, ShieldAlert, XCircle } from "lucide-react";
 import { AiOutputRenderer } from "@/components/ai-output-renderer";
 import { csrfHeaders } from "@/lib/client/csrf";
+import { getAiTaskCopy } from "@/lib/ai/catalog";
 
 type ReviewItem = {
   id: string;
@@ -37,10 +38,6 @@ const applyableTypes = new Set([
   "HISTORY_TIMELINE",
   "RISK_FLAG_EXPLAINER"
 ]);
-
-function prettyType(type: string) {
-  return type.replaceAll("_", " ").toLowerCase();
-}
 
 function isExternalProvider(provider: string) {
   return provider !== "ollama" && provider !== "fallback" && provider !== "cache";
@@ -211,7 +208,7 @@ export function AiReviewQueue({ items }: { items: ReviewItem[] }) {
             <article className="card card-pad" key={item.id}>
               <div className="section-head">
                 <div>
-                  <h3 className="section-title">{prettyType(item.type)}</h3>
+                  <h3 className="section-title">{getAiTaskCopy(item.type).reviewTitle}</h3>
                   <p className="muted" style={{ marginBottom: 0 }}>
                     {item.patient ? `${item.patient.firstName} ${item.patient.lastName} (${item.patient.mrn})` : "Clinic-wide draft"}
                     {item.consultation ? ` | ${item.consultation.reason}` : ""}
@@ -253,11 +250,12 @@ export function AiReviewQueue({ items }: { items: ReviewItem[] }) {
                   provider: item.provider,
                   model: item.model,
                   usedFallback: item.provider === "fallback",
+                  type: item.type,
                   reviewStatus: item.reviewStatus
                 }}
               />
               <label className="field">
-                <span className="label">Editable reviewed output JSON</span>
+                <span className="label">Corrected AI draft JSON</span>
                 <textarea
                   className="textarea"
                   value={draftText}

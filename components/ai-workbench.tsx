@@ -5,33 +5,16 @@ import { Bot, FileSearch, Sparkles } from "lucide-react";
 import { AiOutputRenderer } from "@/components/ai-output-renderer";
 import { AiRuntimeBadge } from "@/components/ai-runtime-badge";
 import { csrfHeaders } from "@/lib/client/csrf";
+import { aiTaskOrder, getAiTaskCopy, type AiTaskType } from "@/lib/ai/catalog";
 
-type AiType =
-  | "CONSULTATION_SUMMARY"
-  | "SOAP_NOTE"
-  | "HISTORY_TIMELINE"
-  | "DOCUMENT_PARSE"
-  | "FOLLOW_UP_INSTRUCTIONS"
-  | "TASK_EXTRACTION"
-  | "RISK_FLAG_EXPLAINER"
-  | "VISIT_SUMMARY"
-  | "REFERRAL_LETTER"
-  | "ASSISTANT_RESPONSE";
+type AiType = Exclude<AiTaskType, "SEMANTIC_SEARCH">;
 
-const aiOptions: Array<{ value: AiType; label: string }> = [
-  { value: "CONSULTATION_SUMMARY", label: "Consult summary" },
-  { value: "SOAP_NOTE", label: "SOAP note" },
-  { value: "HISTORY_TIMELINE", label: "History timeline" },
-  { value: "DOCUMENT_PARSE", label: "Document parser" },
-  { value: "FOLLOW_UP_INSTRUCTIONS", label: "Follow-up instructions" },
-  { value: "TASK_EXTRACTION", label: "Task extraction" },
-  { value: "RISK_FLAG_EXPLAINER", label: "Risk flag explainer" },
-  { value: "VISIT_SUMMARY", label: "Patient visit summary" },
-  { value: "REFERRAL_LETTER", label: "Referral letter" },
-  { value: "ASSISTANT_RESPONSE", label: "Ask patient context" }
-];
+const aiOptions = aiTaskOrder
+  .filter((type): type is AiType => type !== "SEMANTIC_SEARCH")
+  .map((type) => ({ value: type, label: getAiTaskCopy(type).shortLabel }));
 
 type AiWorkbenchResult = {
+  type: AiType;
   output: Record<string, unknown>;
   metadata: {
     provider: string;
@@ -48,6 +31,7 @@ export function AiWorkbench({ patientId, defaultText = "" }: { patientId?: strin
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AiWorkbenchResult | null>(null);
   const [error, setError] = useState("");
+  const selectedCopy = getAiTaskCopy(type);
 
   async function generate() {
     setLoading(true);
@@ -70,6 +54,7 @@ export function AiWorkbench({ patientId, defaultText = "" }: { patientId?: strin
     }
     const data = (await response.json()) as { output: Record<string, unknown>; provider: string; model: string; usedFallback: boolean };
     setResult({
+      type,
       output: data.output,
       metadata: {
         provider: data.provider,
@@ -107,12 +92,19 @@ export function AiWorkbench({ patientId, defaultText = "" }: { patientId?: strin
         </label>
         <button className="button" disabled={loading || input.length < 5} onClick={generate} type="button">
           <Sparkles size={18} />
-          {loading ? "Drafting..." : "Generate AI draft"}
+          {loading ? "Drafting..." : `Generate ${selectedCopy.actionLabel}`}
         </button>
         {error ? <div className="badge warn">{error}</div> : null}
         <div>
           {result ? (
-            <AiOutputRenderer output={result.output} metadata={result.metadata} />
+            <div className="ai-output-shell">
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                <Sparkles size={17} />
+                <strong>{getAiTaskCopy(result.type).draftTitle}</strong>
+                <span className="badge warn">doctor review required</span>
+              </div>
+              <AiOutputRenderer output={result.output} metadata={{ ...result.metadata, type: result.type }} />
+            </div>
           ) : (
             <span className="muted">
               AI output will appear here with provider/model metadata and review status.

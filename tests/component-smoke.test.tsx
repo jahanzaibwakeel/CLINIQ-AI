@@ -35,10 +35,11 @@ describe("AiOutputRenderer", () => {
           disclaimer: "AI draft, doctor review required.",
           tasks: [{ title: "Call patient about eye exam", priority: "medium", rationale: "Missed follow-up noted." }]
         }}
+        metadata={{ type: "TASK_EXTRACTION" }}
       />
     );
 
-    expect(screen.getByText("Tasks")).toBeInTheDocument();
+    expect(screen.getByText("Extracted clinic tasks")).toBeInTheDocument();
     expect(screen.getByText("Call patient about eye exam")).toBeInTheDocument();
     expect(screen.getByText("medium")).toBeInTheDocument();
   });
