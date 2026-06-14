@@ -1,4 +1,4 @@
-name: CI/CD
+name: MediPilot AI CI/CD
 
 on:
   pull_request:
@@ -7,14 +7,14 @@ on:
   workflow_dispatch:
     inputs:
       deploy:
-        description: "Deploy to VPS when deployment secrets are configured"
+        description: "Deploy to VPS when production secrets are configured"
         required: false
         default: "false"
         type: choice
         options: ["false", "true"]
 
 concurrency:
-  group: medipilot-${{ github.ref }}
+  group: medipilot-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -24,17 +24,76 @@ permissions:
 
 env:
   NODE_VERSION: "20"
-  DATABASE_URL: postgresql://medipilot:medipilot@localhost:5432/medipilot_ai?schema=public
-  VALKEY_URL: redis://localhost:6379
+  NEXT_TELEMETRY_DISABLED: "1"
   SESSION_SECRET: ci-secret-ci-secret-ci-secret-ci-secret
   AI_PROVIDER: fallback
   ALLOW_EXTERNAL_AI: "false"
-  NEXT_TELEMETRY_DISABLED: "1"
+  NEXT_PUBLIC_APP_URL: http://127.0.0.1:3000
+  TRUSTED_ORIGINS: http://127.0.0.1:3000,http://localhost:3000
+  DATABASE_URL: postgresql://medipilot:medipilot@127.0.0.1:5432/medipilot_ai?schema=public
+  VALKEY_URL: redis://127.0.0.1:6379
 
 jobs:
   quality:
-    name: Quality, Tests, Build
+    name: Quality Gate
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate Prisma schema
+        run: npx prisma validate
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Unit and component tests
+        run: npm run test -- --reporter=default --reporter=json --outputFile=vitest-report.json
+
+      - name: Production configuration check
+        run: npm run release:check
+
+      - name: Dependency audit report
+        run: npm audit --audit-level=high --omit=optional --json > npm-audit.json
+        continue-on-error: true
+
+      - name: Production build
+        run: npm run build
+
+      - name: Upload quality reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-reports
+          path: |
+            vitest-report.json
+            npm-audit.json
+          if-no-files-found: ignore
+          retention-days: 14
+
+  integration:
+    name: Database Integration
+    runs-on: ubuntu-latest
+    needs: quality
+    timeout-minutes: 20
+
     services:
       postgres:
         image: postgres:16-alpine
@@ -43,7 +102,7 @@ jobs:
           POSTGRES_PASSWORD: medipilot
           POSTGRES_DB: medipilot_ai
         ports:
-          - 5432:5432
+          - 5432/tcp
         options: >-
           --health-cmd "pg_isready -U medipilot -d medipilot_ai"
           --health-interval 10s
@@ -52,18 +111,23 @@ jobs:
       valkey:
         image: valkey/valkey:8-alpine
         ports:
-          - 6379:6379
+          - 6379/tcp
         options: >-
           --health-cmd "valkey-cli ping"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
 
+    env:
+      DATABASE_URL: postgresql://medipilot:medipilot@127.0.0.1:${{ job.services.postgres.ports[5432] }}/medipilot_ai?schema=public
+      VALKEY_URL: redis://127.0.0.1:${{ job.services.valkey.ports[6379] }}
+      RUN_INTEGRATION_TESTS: "1"
+
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -75,63 +139,104 @@ jobs:
       - name: Generate Prisma client
         run: npx prisma generate
 
-      - name: Apply database migrations
+      - name: Apply migrations
+        run: npx prisma migrate deploy
+
+      - name: Run tenant-isolation integration tests
+        run: npm run test:integration
+
+  browser-smoke:
+    name: Browser Smoke
+    runs-on: ubuntu-latest
+    needs: quality
+    timeout-minutes: 25
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: medipilot
+          POSTGRES_PASSWORD: medipilot
+          POSTGRES_DB: medipilot_ai
+        ports:
+          - 5432/tcp
+        options: >-
+          --health-cmd "pg_isready -U medipilot -d medipilot_ai"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      valkey:
+        image: valkey/valkey:8-alpine
+        ports:
+          - 6379/tcp
+        options: >-
+          --health-cmd "valkey-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://medipilot:medipilot@127.0.0.1:${{ job.services.postgres.ports[5432] }}/medipilot_ai?schema=public
+      VALKEY_URL: redis://127.0.0.1:${{ job.services.valkey.ports[6379] }}
+      PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
+      PORT: "3000"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Apply migrations
         run: npx prisma migrate deploy
 
       - name: Seed demo data
         run: npm run db:seed
 
-      - name: Lint
-        run: npm run lint
-
-      - name: Type check
-        run: npm run typecheck
-
-      - name: Unit and component tests
-        run: npm run test
-
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 
-      - name: Playwright smoke tests
+      - name: Run desktop browser smoke suite
         run: npm run test:e2e -- --project=desktop-chrome
 
-      - name: Dependency audit report
-        run: npm audit --audit-level=high --omit=optional --json > npm-audit.json
-        continue-on-error: true
-
-      - name: Upload dependency audit report
+      - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: npm-audit-report
-          path: npm-audit.json
+          name: playwright-report
+          path: |
+            playwright-report
+            test-results
+          if-no-files-found: ignore
           retention-days: 14
-
-      - name: Production build
-        run: npm run build
-
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: next-build
-          path: .next
-          retention-days: 7
 
   docker:
     name: Docker Image
     runs-on: ubuntu-latest
-    needs: quality
+    needs: [quality, integration, browser-smoke]
+    timeout-minutes: 30
     outputs:
       image: ${{ steps.image.outputs.image }}
+      tags: ${{ steps.meta.outputs.tags }}
+
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Resolve image name
+      - name: Resolve GHCR image name
         id: image
         shell: bash
         run: |
@@ -157,7 +262,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and optionally push
+      - name: Build and optionally push image
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -171,8 +276,10 @@ jobs:
     name: Optional VPS Deploy
     runs-on: ubuntu-latest
     needs: docker
+    timeout-minutes: 20
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && (github.event.inputs.deploy == 'true' || github.event_name == 'push')
     environment: production
+
     steps:
       - name: Check deployment secrets
         id: secrets
@@ -212,5 +319,32 @@ jobs:
             export MEDIPILOT_IMAGE="$IMAGE"
             docker compose -f docker-compose.prod.yml up -d --remove-orphans
             docker compose -f docker-compose.prod.yml exec -T web npm run db:deploy
-            docker compose -f docker-compose.prod.yml exec -T web node -e "fetch('http://localhost:' + (process.env.PORT || 3000) + '/api/ready').then(r => { if (!r.ok) process.exit(1); console.log('ready') })"
-            docker compose -f docker-compose.prod.yml exec -T -e PRODUCTION_CHECK_URL="http://localhost:${APP_CONTAINER_PORT:-3000}" web node scripts/production-check.mjs
+            docker compose -f docker-compose.prod.yml exec -T web node -e "fetch('http://127.0.0.1:' + (process.env.PORT || 3000) + '/api/ready').then(r => { if (!r.ok) process.exit(1); console.log('ready') }).catch(() => process.exit(1))"
+            APP_PORT="$(docker compose -f docker-compose.prod.yml exec -T web node -e "process.stdout.write(process.env.PORT || '3000')")"
+            docker compose -f docker-compose.prod.yml exec -T -e PRODUCTION_CHECK_URL="http://127.0.0.1:${APP_PORT}" web node scripts/production-check.mjs
+
+  pipeline-summary:
+    name: Pipeline Summary
+    runs-on: ubuntu-latest
+    needs: [quality, integration, browser-smoke, docker, deploy-vps]
+    if: always()
+
+    steps:
+      - name: Write run summary
+        shell: bash
+        run: |
+          {
+            echo "## MediPilot AI CI/CD Summary"
+            echo ""
+            echo "| Stage | Result |"
+            echo "| --- | --- |"
+            echo "| Quality gate | ${{ needs.quality.result }} |"
+            echo "| Database integration | ${{ needs.integration.result }} |"
+            echo "| Browser smoke | ${{ needs.browser-smoke.result }} |"
+            echo "| Docker image | ${{ needs.docker.result }} |"
+            echo "| VPS deploy | ${{ needs.deploy-vps.result }} |"
+            echo ""
+            echo "Image target: \`${{ needs.docker.outputs.image || 'not built' }}\`"
+            echo ""
+            echo "Clinical safety posture: local-first AI, external AI disabled by default, doctor review required for AI outputs."
+          } >> "$GITHUB_STEP_SUMMARY"

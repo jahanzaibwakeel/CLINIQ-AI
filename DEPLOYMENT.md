@@ -83,19 +83,25 @@ Use `OLLAMA_NUM_PREDICT` to tune local generation length. Smaller values are fas
 
 ## Automated CI/CD
 
-The GitHub Actions workflow in `.github/workflows/ci.yml` performs:
+The GitHub Actions workflow in `.github/workflows/ci.yml` is split into professional release stages. See [docs/CICD_PIPELINE.md](docs/CICD_PIPELINE.md) for the full pipeline map.
+
+It performs:
 
 - dependency install with `npm ci`
+- Prisma schema validation
 - Prisma client generation
-- migration deployment against CI PostgreSQL
-- demo seed validation
 - lint
 - type check
 - unit/component tests
+- migration deployment against isolated CI PostgreSQL
+- database-backed tenant isolation tests
+- demo seed validation
+- Playwright browser smoke tests
 - dependency audit report upload
 - production build
 - Docker image build
 - GHCR publish on `main`
+- GitHub Actions pipeline summary
 - production release check during VPS deploy
 - optional VPS deploy over SSH
 
