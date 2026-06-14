@@ -3,11 +3,12 @@ import { parseSafeAiOutput } from "@/lib/ai/guardrails";
 import { prompts } from "@/lib/ai/prompts";
 import { OllamaProvider } from "@/lib/ai/providers/ollama";
 import { FallbackProvider, hashEmbedding } from "@/lib/ai/providers/fallback";
-import { getAiRuntimeStatus } from "@/lib/ai/status";
 import { average, estimateTokens, percentile, ratePercent, summarizeAiMetrics } from "@/lib/observability";
 
 afterEach(() => {
   vi.restoreAllMocks();
+  vi.unstubAllEnvs();
+  vi.resetModules();
 });
 
 describe("AI guardrails", () => {
@@ -87,10 +88,12 @@ describe("Ollama provider", () => {
 
 describe("AI runtime status", () => {
   it("reports local Ollama ready when the configured model is installed", async () => {
+    vi.stubEnv("AI_PROVIDER", "ollama");
     vi.spyOn(global, "fetch").mockResolvedValue(
       new Response(JSON.stringify({ models: [{ name: "qwen2.5:7b" }] }), { status: 200 })
     );
 
+    const { getAiRuntimeStatus } = await import("@/lib/ai/status");
     const status = await getAiRuntimeStatus();
     expect(status.provider).toBe("ollama");
     expect(status.status).toBe("ready");
@@ -98,14 +101,26 @@ describe("AI runtime status", () => {
   });
 
   it("reports model_missing when Ollama is reachable without the configured model", async () => {
+    vi.stubEnv("AI_PROVIDER", "ollama");
     vi.spyOn(global, "fetch").mockResolvedValue(
       new Response(JSON.stringify({ models: [{ name: "qwen2.5:1.5b" }] }), { status: 200 })
     );
 
+    const { getAiRuntimeStatus } = await import("@/lib/ai/status");
     const status = await getAiRuntimeStatus();
     expect(status.provider).toBe("ollama");
     expect(status.status).toBe("model_missing");
     expect(status.modelAvailable).toBe(false);
+  });
+
+  it("reports local draft engine when fallback provider is explicitly configured", async () => {
+    vi.stubEnv("AI_PROVIDER", "fallback");
+
+    const { getAiRuntimeStatus } = await import("@/lib/ai/status");
+    const status = await getAiRuntimeStatus();
+    expect(status.provider).toBe("fallback");
+    expect(status.status).toBe("fallback");
+    expect(status.model).toBe("local-clinical-rules-v2");
   });
 });
 

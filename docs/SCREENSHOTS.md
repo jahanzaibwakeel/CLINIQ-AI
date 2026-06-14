@@ -1,29 +1,26 @@
-# Screenshot Instructions
+# Screenshots
 
-Run the app:
+The current portfolio screenshot set lives in `docs/screenshots`:
+
+- `01-login.png`: branded login and demo credential entry.
+- `02-dashboard.png`: doctor dashboard with workload, tasks, AI safety, and runtime posture.
+- `03-patients.png`: patient registry.
+- `04-patient-detail.png`: patient chart, history, and embedded AI workbench.
+- `05-documents.png`: document upload, parsed values, and document AI intelligence.
+- `06-ai-review.png`: AI draft review queue.
+- `07-settings.png`: production readiness and local-first AI settings.
+- `08-tablet-dashboard.png`: tablet dashboard responsiveness.
+
+## Recapture
+
+Run the app, then use Playwright or browser screenshots to refresh the set:
 
 ```bash
-docker compose up -d postgres valkey
-npm run db:migrate
-npm run db:seed
-npm run dev
+docker compose up -d postgres valkey web
+PLAYWRIGHT_BASE_URL=http://127.0.0.1:${APP_HOST_PORT:-3000} npm run test:e2e
 ```
 
-Capture these portfolio screenshots:
-
-- Login screen with MediPilot branding.
-- Doctor dashboard showing safety banner, task queue, risk flags, and AI workload mix.
-- Patient detail page with timeline, semantic search, and AI workbench.
-- Patient export privacy panel showing export reason and redaction toggle.
-- Consultations page with SOAP note generator.
-- Documents page with stored-file metadata, parsed report, and document AI parser.
-- Inbox page showing generated operational signals.
-- Schedule page showing appointment board and workflow actions.
-- Staff page showing role/security controls.
-- Ops page showing AI telemetry and request traces.
-- Settings page showing local-first AI policy.
-
-Use tablet and desktop widths to demonstrate responsive dashboard behavior.
+Keep desktop and tablet captures in the set to demonstrate responsive dashboard behavior.
 
 ## Playwright Smoke Tests
 

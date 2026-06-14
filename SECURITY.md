@@ -23,6 +23,7 @@
 - Staff role changes, activation/deactivation, and lockout resets require clinic admin privileges and audit logging.
 - Middleware attaches `X-Request-Id` to responses and AI generations for traceability.
 - External AI disabled by default.
+- Local deterministic AI draft engine is available when Ollama is unavailable, avoiding paid APIs and external PHI transfer for demos.
 - AI output stored as draft with review status.
 - No secrets committed; `.env.example` documents expected variables.
 - Email delivery uses environment-configured SMTP/Nodemailer settings or development log previews.
@@ -52,7 +53,7 @@
 - Add field-level encryption for highly sensitive records.
 - Replace the local scan placeholder with approved object-storage malware scanning for document uploads.
 - Connect request tracing and security event monitoring to an external APM/SIEM.
-- Add row-level tenant isolation tests.
+- Expand tenant isolation coverage from database integration tests to API-level and UI-level cross-clinic access tests.
 - Add backup restore drills.
 - Schedule `npm run security:cleanup-tokens` in production.
 - Add formal HIPAA/GDPR/legal review before real clinical use.

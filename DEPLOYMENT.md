@@ -201,7 +201,7 @@ The CI pipeline uploads `npm-audit.json` as an artifact so dependency risks can 
 
 ## Troubleshooting
 
-- AI returns fallback: verify Ollama is running, the model is pulled, and `/api/ai/status` reports `ready`.
+- AI badge shows local draft engine: Ollama is missing or unreachable, so MediPilot is using the no-cost deterministic local draft engine. Verify Ollama is running, the model is pulled, and `/api/ai/status` reports `ready` if you want LLM-backed drafts.
 - Login fails: run seed and check demo credentials.
 - Migrations fail: verify `DATABASE_URL`.
 - Semantic search empty: upload/process documents or seed demo data.

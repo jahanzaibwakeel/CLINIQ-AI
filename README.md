@@ -7,7 +7,7 @@ MediPilot AI is a production-minded, local-first AI clinical workflow assistant 
 - Next.js App Router with TypeScript, API route handlers, and polished dashboard UI.
 - PostgreSQL database with Prisma models for clinics, users, patients, consultations, notes, documents, chunks, embeddings, AI generations, tasks, follow-ups, and audit logs.
 - Role-based access for doctors, clinic admins, and assistants.
-- Free local-first AI abstraction with Ollama default, `qwen2.5:7b` configured for no-cost clinical drafting, runtime status checks, gated external adapters, structured prompts, JSON validation, fallback responses, and semantic search.
+- Free local-first AI abstraction with Ollama default, `qwen2.5:7b` configured for no-cost clinical drafting, runtime status checks, gated external adapters, structured prompts, JSON validation, semantic search, and a deterministic `local-clinical-rules-v2` draft engine when Ollama is unavailable.
 - AI modules for consultation summaries, SOAP notes, history timelines, document parsing, follow-up instructions, task extraction, risk flag explanation, visit summaries, referral letters, and patient-context Q&A.
 - Doctor-facing AI review queue with filtering, per-draft reviewer notes, JSON/disclaimer checks, apply-to-record actions, and provider safety signals.
 - Human-readable AI output rendering for summaries, SOAP notes, tasks, flags, patient instructions, referrals, and extracted document data.
@@ -81,6 +81,18 @@ ollama pull nomic-embed-text
 
 MediPilot AI is designed for workflow productivity, not autonomous diagnosis. Every generated output is stored with provider, model, prompt version, timestamp, source context, and review status. External AI providers are disabled unless `ALLOW_EXTERNAL_AI=true`.
 
+## Screenshots
+
+| Doctor dashboard | Document intelligence |
+| --- | --- |
+| ![Doctor dashboard](docs/screenshots/02-dashboard.png) | ![Document intelligence](docs/screenshots/05-documents.png) |
+
+| Patient chart | AI review queue |
+| --- | --- |
+| ![Patient detail](docs/screenshots/04-patient-detail.png) | ![AI review queue](docs/screenshots/06-ai-review.png) |
+
+More screenshots are available in [docs/screenshots](docs/screenshots), including login, patients, settings, and tablet dashboard views.
+
 ## Useful Commands
 
 ```bash
@@ -114,5 +126,7 @@ The VPS should contain `docker-compose.prod.yml` and a production `.env`.
 - [DEPLOYMENT.md](DEPLOYMENT.md)
 - [SECURITY.md](SECURITY.md)
 - [docs/API.md](docs/API.md)
+- [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md)
+- [docs/PRODUCTION_REVIEW.md](docs/PRODUCTION_REVIEW.md)
 - [docs/SCREENSHOTS.md](docs/SCREENSHOTS.md)
 - [docs/RESUME_BULLETS.md](docs/RESUME_BULLETS.md)
