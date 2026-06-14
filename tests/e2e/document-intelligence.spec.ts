@@ -14,8 +14,9 @@ test("doctor uploads extracted report text and sees parsed value review", async 
   );
   await page.getByRole("button", { name: "Upload and process" }).click();
 
-  await expect(page.getByText(fileName)).toBeVisible();
+  const uploadedReport = page.locator("article").filter({ has: page.getByRole("heading", { name: fileName }) });
+  await expect(uploadedReport).toBeVisible({ timeout: 20_000 });
   await expect(page.getByRole("heading", { name: "Parsed value review" })).toBeVisible();
-  await expect(page.getByText("HbA1c").or(page.getByText("Glucose"))).toBeVisible();
-  await expect(page.getByText(/reviewed parse|ai draft parse|text scan|needs review/i).first()).toBeVisible();
+  await expect(uploadedReport.getByText("HbA1c").or(uploadedReport.getByText("Glucose")).first()).toBeVisible();
+  await expect(uploadedReport.getByText(/reviewed parse|ai draft parse|text scan|needs review/i).first()).toBeVisible();
 });

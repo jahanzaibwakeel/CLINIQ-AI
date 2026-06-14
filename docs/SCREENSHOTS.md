@@ -34,3 +34,12 @@ npm run test:e2e
 ```
 
 The suite logs in with seeded demo users and checks the main dashboard, patients, schedule, inbox, documents, staff, and export privacy flows. Set `PLAYWRIGHT_BASE_URL` to target a deployed environment, or let the config use `NEXT_PUBLIC_APP_URL`/`APP_HOST_PORT`.
+
+For a Docker-hosted local verification run, keep ports environment-driven:
+
+```bash
+PLAYWRIGHT_SKIP_WEB_SERVER=1 PLAYWRIGHT_BASE_URL=http://127.0.0.1:${APP_HOST_PORT:-3000} npm run test:e2e
+RUN_INTEGRATION_TESTS=1 AI_PROVIDER=fallback npm run test:integration
+```
+
+The E2E suite runs serially because it exercises real seeded accounts against production-style login throttling. It reuses browser auth state during the run instead of weakening the application rate limiter.

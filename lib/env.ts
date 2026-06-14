@@ -15,6 +15,7 @@ const envSchema = z.object({
   OLLAMA_MODEL: z.string().default("qwen2.5:7b"),
   OLLAMA_EMBEDDING_MODEL: z.string().default("nomic-embed-text"),
   OLLAMA_NUM_PREDICT: z.coerce.number().int().positive().default(220),
+  OLLAMA_REQUEST_TIMEOUT_MS: z.coerce.number().int().positive().default(1500),
   ALLOW_EXTERNAL_AI: z.enum(["true", "false"]).default("false"),
   GROQ_API_KEY: z.string().optional(),
   GROQ_MODEL: z.string().default("llama-3.1-70b-versatile"),

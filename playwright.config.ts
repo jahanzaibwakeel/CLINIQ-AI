@@ -7,7 +7,8 @@ export default defineConfig({
   testDir: "./tests/e2e",
   timeout: 30_000,
   expect: { timeout: 8_000 },
-  fullyParallel: true,
+  fullyParallel: false,
+  workers: 1,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
   use: {
@@ -30,7 +31,7 @@ export default defineConfig({
     },
     {
       name: "tablet-chrome",
-      use: { ...devices["iPad Pro 11"] }
+      use: { ...devices["iPad Pro 11"], browserName: "chromium" }
     }
   ]
 });

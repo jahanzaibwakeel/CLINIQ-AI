@@ -25,8 +25,19 @@ function isLocalOrigin(origin: string) {
   return /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/.test(origin);
 }
 
+function requestOriginCandidates(request: NextRequest) {
+  const forwardedProto = request.headers.get("x-forwarded-proto") ?? request.nextUrl.protocol.replace(":", "");
+  const hosts = [
+    request.nextUrl.host,
+    request.headers.get("x-forwarded-host"),
+    request.headers.get("host")
+  ].filter(Boolean);
+
+  return hosts.map((host) => `${forwardedProto}://${host}`);
+}
+
 function isLocalRequest(request: NextRequest) {
-  return isLocalOrigin(request.nextUrl.origin);
+  return requestOriginCandidates(request).some((origin) => isLocalOrigin(origin));
 }
 
 function originAllowed(request: NextRequest) {

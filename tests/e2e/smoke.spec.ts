@@ -33,7 +33,7 @@ test("patient chart export requires privacy reason before download link activate
 
 test("admin can open staff security controls", async ({ page }) => {
   await login(page, "admin@medipilot.local");
-  await page.getByRole("link", { name: "Staff" }).click();
+  await page.getByRole("link", { name: "Staff", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Staff directory" })).toBeVisible();
   await expect(page.getByText("Login lockout")).toBeVisible();
   await expect(page.getByRole("button", { name: /Deactivate|Activate/ }).first()).toBeVisible();

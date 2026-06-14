@@ -7,9 +7,12 @@ export class OllamaProvider implements AiProvider {
   model = env.OLLAMA_MODEL;
 
   async complete(request: AiCompletionRequest): Promise<AiCompletionResponse> {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), env.OLLAMA_REQUEST_TIMEOUT_MS);
     const response = await fetch(`${ollamaBaseUrl}/api/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      signal: controller.signal,
       body: JSON.stringify({
         model: this.model,
         stream: false,
@@ -23,7 +26,7 @@ export class OllamaProvider implements AiProvider {
           { role: "user", content: request.user }
         ]
       })
-    });
+    }).finally(() => clearTimeout(timeout));
 
     if (!response.ok) {
       throw new Error(`Ollama request failed: ${response.status}`);
@@ -39,14 +42,17 @@ export class OllamaProvider implements AiProvider {
 
   async embed(input: string) {
     try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), env.OLLAMA_REQUEST_TIMEOUT_MS);
       const response = await fetch(`${ollamaBaseUrl}/api/embeddings`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
         body: JSON.stringify({
           model: env.OLLAMA_EMBEDDING_MODEL,
           prompt: input
         })
-      });
+      }).finally(() => clearTimeout(timeout));
       if (!response.ok) throw new Error(`Ollama embedding failed: ${response.status}`);
       const data = (await response.json()) as { embedding?: number[] };
       return data.embedding ?? hashEmbedding(input);
