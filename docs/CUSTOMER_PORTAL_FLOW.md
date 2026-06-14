@@ -17,19 +17,21 @@ The patient portal adds that customer layer while preserving the app's safety bo
 ## Patient Journey
 
 1. Patient opens `/portal`.
-2. Patient enters MRN and date of birth.
-3. The portal verifies the record and displays:
+2. Patient can either use the demo MRN/date-of-birth shortcut or request a secure email magic link.
+3. The magic link is hashed in the database, expires quickly, is single-use, and creates a short-lived patient portal session.
+4. The portal displays:
    - upcoming appointments
    - follow-up instructions
    - recent document statuses
    - clinic-reviewed visit summaries
-4. Patient submits a request for:
+5. Patient submits a request for:
    - appointment scheduling
    - medication question
    - document/report question
    - billing
    - general clinic request
-5. The request appears in the internal clinic portal queue.
+6. The request appears in the internal clinic portal queue.
+7. The patient receives an email acknowledgement when an email is on file.
 
 Demo access:
 
@@ -49,6 +51,7 @@ DOB: 1982-04-12
    - `RESOLVED`
    - `CLOSED`
 4. Status changes write audit logs under the signed-in staff user.
+5. Status changes send patient email updates through SMTP or the safe development log fallback.
 
 Portal requests also appear in the main Inbox so staff do not have to check a separate screen.
 
@@ -95,6 +98,7 @@ It does not expose:
 - internal audit events
 
 Public portal writes are rate-limited, validated with Zod, CSRF/origin protected by middleware, and audited with `actorId: null`.
+Magic-link access uses hashed single-use `PatientPortalToken` records and a separate `medipilot_patient_portal` session cookie, not the internal staff session.
 
 ## Why This Improves The Portfolio Project
 

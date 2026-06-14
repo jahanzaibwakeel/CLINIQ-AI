@@ -86,6 +86,7 @@ model Clinic {
   aiGenerations AiGeneration[]
   accountTokens AccountToken[]
   patientPortalRequests PatientPortalRequest[]
+  patientPortalTokens PatientPortalToken[]
 }
 
 model User {
@@ -146,6 +147,7 @@ model Patient {
   aiGenerations AiGeneration[]
   auditLogs     AuditLog[]
   portalRequests PatientPortalRequest[]
+  portalTokens PatientPortalToken[]
 
   @@index([clinicId, lastName, firstName])
 }
@@ -359,6 +361,21 @@ model PatientPortalRequest {
 
   @@index([clinicId, status, createdAt])
   @@index([clinicId, patientId, createdAt])
+}
+
+model PatientPortalToken {
+  id        String   @id @default(cuid())
+  clinicId  String
+  patientId String
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  clinic  Clinic  @relation(fields: [clinicId], references: [id])
+  patient Patient @relation(fields: [patientId], references: [id])
+
+  @@index([clinicId, patientId, expiresAt])
 }
 
 model AuditLog {

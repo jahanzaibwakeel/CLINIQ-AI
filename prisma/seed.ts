@@ -7,6 +7,7 @@ async function main() {
   await prisma.auditLog.deleteMany();
   await prisma.aiGeneration.deleteMany();
   await prisma.accountToken.deleteMany();
+  await prisma.patientPortalToken.deleteMany();
   await prisma.patientPortalRequest.deleteMany();
   await prisma.embedding.deleteMany();
   await prisma.documentChunk.deleteMany();

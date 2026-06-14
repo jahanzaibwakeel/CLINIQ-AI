@@ -1,16 +1,14 @@
 import { NextResponse } from "next/server";
 import { Role } from "@prisma/client";
+import { patientPortalEmailHtml, sendEmail } from "@/lib/email";
 import { prisma } from "@/lib/db";
 import { apiError, parseJson } from "@/lib/http";
+import { patientPortalDayRange } from "@/lib/patient-portal";
 import { rateLimit } from "@/lib/rate-limit";
+import { requestIdFrom } from "@/lib/observability";
+import { getPatientPortalSession } from "@/lib/security/patient-portal-session";
 import { requireUser } from "@/lib/security/rbac";
 import { patientPortalRequestSchema } from "@/lib/validation";
-
-function dayRange(date: string) {
-  const start = new Date(`${date}T00:00:00.000Z`);
-  const end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
-  return { start, end };
-}
 
 function clientKey(request: Request) {
   return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
@@ -31,19 +29,31 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const requestId = requestIdFrom(request);
   const limited = await rateLimit(`portal-request:${clientKey(request)}`, 6, 60);
   if (limited) return limited;
 
   try {
     const input = await parseJson(request, patientPortalRequestSchema);
-    const { start, end } = dayRange(input.dateOfBirth);
+    const portalSession = await getPatientPortalSession();
+    const verifiedBySession = portalSession?.patientId === input.patientId;
+    const dobVerification = input.mrn && input.dateOfBirth ? patientPortalDayRange(input.dateOfBirth) : null;
+
+    if (!verifiedBySession && !dobVerification) {
+      return NextResponse.json({ error: "Patient verification is required." }, { status: 401 });
+    }
+
     const patient = await prisma.patient.findFirst({
       where: {
         id: input.patientId,
-        mrn: input.mrn.trim(),
-        dateOfBirth: { gte: start, lt: end }
+        ...(verifiedBySession
+          ? { clinicId: portalSession.clinicId }
+          : {
+              mrn: input.mrn?.trim(),
+              dateOfBirth: { gte: dobVerification?.start, lt: dobVerification?.end }
+            })
       },
-      select: { id: true, clinicId: true }
+      select: { id: true, clinicId: true, firstName: true, email: true }
     });
 
     if (!patient) {
@@ -61,6 +71,21 @@ export async function POST(request: Request) {
       }
     });
 
+    let delivery: "none" | "smtp" | "log" = "none";
+    if (patient.email) {
+      const result = await sendEmail({
+        to: patient.email,
+        subject: "MediPilot portal request received",
+        text: `Your clinic request was received: ${portalRequest.subject}`,
+        html: patientPortalEmailHtml(
+          "Your clinic request was received",
+          `${patient.firstName}, your clinic team received "${portalRequest.subject}". A staff member will review it during clinic hours.`
+        ),
+        requestId
+      });
+      delivery = result.delivery;
+    }
+
     await prisma.auditLog.create({
       data: {
         clinicId: patient.clinicId,
@@ -69,7 +94,7 @@ export async function POST(request: Request) {
         action: "PATIENT_PORTAL_REQUEST_CREATED",
         entityType: "PatientPortalRequest",
         entityId: portalRequest.id,
-        metadata: { type: portalRequest.type, status: portalRequest.status }
+        metadata: { type: portalRequest.type, status: portalRequest.status, requestId, delivery }
       }
     });
 

@@ -16,6 +16,7 @@
 - Production origin allow-listing for mutating API requests through `NEXT_PUBLIC_APP_URL` or `TRUSTED_ORIGINS`.
 - Audit logs for clinical writes and AI generations.
 - Public patient portal request creation is audited with `actorId: null`, then staff status changes are audited under the signed-in user.
+- Patient portal magic links use hashed, single-use, time-limited `PatientPortalToken` records and a separate patient session cookie.
 - Audit logs for successful and failed known-user login attempts.
 - Clinic-admin audit viewer for recent security and clinical events.
 - Clinic-admin Ops dashboard for AI telemetry, fallback visibility, review backlog, and request trace IDs.
@@ -44,6 +45,7 @@
 - Uploaded document payloads are stored with provider, byte size, checksum, and scan-status metadata.
 - Patient chart exports require a stated reason, default to redacted contact details, and write audit metadata.
 - Patient portal lookup returns limited patient-safe data after MRN/date-of-birth verification and does not expose raw notes, full documents, or unreviewed AI drafts.
+- Patient portal request acknowledgements and status updates use configured SMTP/Nodemailer or the safe development log fallback.
 - External PHI transfer requires explicit `ALLOW_EXTERNAL_AI=true`.
 
 ## Recommended Production Hardening

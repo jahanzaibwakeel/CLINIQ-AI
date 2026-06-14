@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { aiGenerateSchema, aiReviewSchema, appointmentCreateSchema, consultationCreateSchema, patientCreateSchema, patientExportSchema, patientPortalLookupSchema, patientPortalRequestSchema, patientPortalRequestUpdateSchema, passwordResetSchema, staffInviteSchema, staffUpdateSchema } from "@/lib/validation";
+import { aiGenerateSchema, aiReviewSchema, appointmentCreateSchema, consultationCreateSchema, patientCreateSchema, patientExportSchema, patientPortalLookupSchema, patientPortalMagicLinkRequestSchema, patientPortalRequestSchema, patientPortalRequestUpdateSchema, passwordResetSchema, staffInviteSchema, staffUpdateSchema } from "@/lib/validation";
 
 describe("API validation schemas", () => {
   it("accepts a valid patient payload", () => {
@@ -52,6 +52,11 @@ describe("API validation schemas", () => {
 
   it("validates patient portal lookup, requests, and status changes", () => {
     expect(patientPortalLookupSchema.parse({ mrn: "DEMO-1001", dateOfBirth: "1982-04-12" }).mrn).toBe("DEMO-1001");
+    expect(patientPortalMagicLinkRequestSchema.parse({
+      mrn: "DEMO-1001",
+      dateOfBirth: "1982-04-12",
+      email: "sara.demo@example.com"
+    }).email).toBe("sara.demo@example.com");
     expect(patientPortalRequestSchema.parse({
       patientId: "patient-id",
       mrn: "DEMO-1001",
@@ -61,6 +66,12 @@ describe("API validation schemas", () => {
       message: "Please help me schedule the requested follow-up appointment.",
       preferredContact: ""
     }).type).toBe("APPOINTMENT");
+    expect(patientPortalRequestSchema.parse({
+      patientId: "patient-id",
+      type: "DOCUMENT",
+      subject: "Question about report",
+      message: "Please confirm whether the uploaded report has been reviewed."
+    }).type).toBe("DOCUMENT");
     expect(patientPortalRequestUpdateSchema.parse({ status: "IN_REVIEW" }).status).toBe("IN_REVIEW");
     expect(() => patientPortalLookupSchema.parse({ mrn: "DEMO-1001", dateOfBirth: "04/12/1982" })).toThrow();
   });

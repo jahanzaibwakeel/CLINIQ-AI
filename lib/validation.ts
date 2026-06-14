@@ -141,12 +141,23 @@ export const patientPortalLookupSchema = z.object({
   dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/)
 });
 
-export const patientPortalRequestSchema = patientPortalLookupSchema.extend({
+export const patientPortalMagicLinkRequestSchema = patientPortalLookupSchema.extend({
+  email: z.string().email()
+});
+
+export const patientPortalRequestSchema = z.object({
   patientId: z.string().min(1),
+  mrn: z.string().min(3).max(80).optional(),
+  dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   type: z.enum(["APPOINTMENT", "MEDICATION_QUESTION", "DOCUMENT", "BILLING", "OTHER"]),
   subject: z.string().min(4).max(120),
   message: z.string().min(10).max(2000),
   preferredContact: z.string().max(160).optional().or(z.literal(""))
+}).refine((value) => {
+  return (value.mrn && value.dateOfBirth) || (!value.mrn && !value.dateOfBirth);
+}, {
+  message: "MRN and date of birth must be provided together",
+  path: ["mrn"]
 });
 
 export const patientPortalRequestUpdateSchema = z.object({

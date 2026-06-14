@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import type React from "react";
-import { useState } from "react";
-import { CalendarClock, FileText, LifeBuoy, LogIn, MessageSquareText, ShieldAlert } from "lucide-react";
+import { useEffect, useState } from "react";
+import { CalendarClock, FileText, LifeBuoy, Link2, LogIn, MessageSquareText, ShieldAlert } from "lucide-react";
 import { csrfHeaders } from "@/lib/client/csrf";
 
 type PortalState = {
@@ -25,6 +25,7 @@ const requestTypes = [
 export function PatientPortal() {
   const [mrn, setMrn] = useState("DEMO-1001");
   const [dateOfBirth, setDateOfBirth] = useState("1982-04-12");
+  const [email, setEmail] = useState("sara.demo@example.com");
   const [portal, setPortal] = useState<PortalState | null>(null);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -34,6 +35,20 @@ export function PatientPortal() {
   const [subject, setSubject] = useState("Schedule my follow-up visit");
   const [body, setBody] = useState("I would like help scheduling the follow-up appointment requested by my doctor.");
   const [preferredContact, setPreferredContact] = useState("");
+
+  useEffect(() => {
+    async function loadSession() {
+      const response = await fetch("/api/portal/me");
+      if (!response.ok) return;
+      const payload = await response.json().catch(() => null);
+      if (payload?.patient) {
+        setPortal(payload as PortalState);
+        setMrn(payload.patient.mrn);
+        setMessage("Signed in through a secure portal link.");
+      }
+    }
+    void loadSession();
+  }, []);
 
   async function lookup(event: React.FormEvent) {
     event.preventDefault();
@@ -53,6 +68,24 @@ export function PatientPortal() {
       return;
     }
     setPortal(payload as PortalState);
+  }
+
+  async function requestMagicLink() {
+    setLoading(true);
+    setError("");
+    setMessage("");
+    const response = await fetch("/api/portal/request-link", {
+      method: "POST",
+      headers: csrfHeaders({ "Content-Type": "application/json" }),
+      body: JSON.stringify({ mrn, dateOfBirth, email })
+    });
+    setLoading(false);
+    const payload = await response.json().catch(() => null);
+    if (!response.ok) {
+      setError(payload?.error ?? "Unable to request portal link.");
+      return;
+    }
+    setMessage(payload?.message ?? "If the details match, a sign-in link has been sent.");
   }
 
   async function submitRequest(event: React.FormEvent) {
@@ -123,12 +156,22 @@ export function PatientPortal() {
                 <input className="input" value={dateOfBirth} onChange={(event) => setDateOfBirth(event.target.value)} type="date" required />
               </label>
             </div>
+            <label className="field">
+              <span className="label">Email for portal link</span>
+              <input className="input" value={email} onChange={(event) => setEmail(event.target.value)} type="email" />
+            </label>
             {error ? <div className="badge warn">{error}</div> : null}
             {message ? <div className="badge good">{message}</div> : null}
-            <button className="button" disabled={loading} type="submit">
-              <LifeBuoy size={18} />
-              {loading ? "Verifying..." : "Open portal"}
-            </button>
+            <div className="command-actions" style={{ justifyContent: "flex-start" }}>
+              <button className="button" disabled={loading} type="submit">
+                <LifeBuoy size={18} />
+                {loading ? "Verifying..." : "Open demo portal"}
+              </button>
+              <button className="button secondary" disabled={loading || !email} onClick={requestMagicLink} type="button">
+                <Link2 size={18} />
+                Send secure link
+              </button>
+            </div>
           </form>
         </section>
 

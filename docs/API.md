@@ -190,9 +190,30 @@ Public route with CSRF/origin checks and rate limiting. Verifies a patient by MR
 { "mrn": "DEMO-1001", "dateOfBirth": "1982-04-12" }
 ```
 
+### `POST /api/portal/request-link`
+
+Public route with CSRF/origin checks and rate limiting. Verifies MRN, date of birth, and patient email, then sends a hashed, single-use portal magic link. The response is intentionally generic to avoid patient enumeration.
+
+```json
+{
+  "mrn": "DEMO-1001",
+  "dateOfBirth": "1982-04-12",
+  "email": "sara.demo@example.com"
+}
+```
+
+### `GET /portal/access?token=...`
+
+Consumes a valid patient portal token, creates a short-lived patient portal session cookie, writes an audit event, and redirects to `/portal`.
+
+### `GET /api/portal/me`
+
+Returns the same portal-safe patient payload when a valid patient portal session exists.
+
 ### `POST /api/portal/requests`
 
 Public route with CSRF/origin checks and rate limiting. Re-verifies patient identity before creating a clinic-scoped `PatientPortalRequest` and a public-origin audit log event.
+When the patient has an email address, MediPilot sends a request-received notification through the configured SMTP provider or development log fallback.
 
 ```json
 {
@@ -219,6 +240,7 @@ Lists recent patient portal requests for the signed-in clinic.
 Allowed roles: doctor, clinic admin, assistant.
 
 Updates portal request workflow status and writes a staff audit event.
+When the patient has an email address, MediPilot sends a status update notification.
 
 ```json
 { "status": "IN_REVIEW" }
