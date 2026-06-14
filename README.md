@@ -5,8 +5,9 @@ MediPilot AI is a production-minded, local-first AI clinical workflow assistant 
 ## Highlights
 
 - Next.js App Router with TypeScript, API route handlers, and polished dashboard UI.
-- PostgreSQL database with Prisma models for clinics, users, patients, consultations, notes, documents, chunks, embeddings, AI generations, tasks, follow-ups, and audit logs.
-- Role-based access for doctors, clinic admins, and assistants.
+- PostgreSQL database with Prisma models for clinics, users, patients, consultations, notes, documents, chunks, embeddings, AI generations, tasks, follow-ups, patient portal requests, and audit logs.
+- Role-based access for doctors, clinic admins, and assistants, with assistants limited to operational workflows instead of clinical AI review or configuration.
+- Patient portal flow at `/portal` for MRN/DOB verification, upcoming appointments, follow-up instructions, reviewed visit summaries, document statuses, and patient-to-clinic requests.
 - Free local-first AI abstraction with Ollama default, `qwen2.5:7b` configured for no-cost clinical drafting, runtime status checks, gated external adapters, structured prompts, JSON validation, semantic search, and a deterministic `local-clinical-rules-v2` draft engine when Ollama is unavailable.
 - AI modules for consultation summaries, SOAP notes, history timelines, document parsing, follow-up instructions, task extraction, risk flag explanation, visit summaries, referral letters, and patient-context Q&A.
 - Doctor-facing AI review queue with filtering, per-draft reviewer notes, JSON/disclaimer checks, apply-to-record actions, and provider safety signals.
@@ -22,7 +23,7 @@ MediPilot AI is a production-minded, local-first AI clinical workflow assistant 
 - Follow-up operations page and task status quick actions for daily clinic workflow.
 - Appointment scheduling board with audited appointment creation and AI scheduling-note helper.
 - Appointment workflow actions for check-in, completion, cancellation, no-show, and reopen.
-- Notification inbox generated from overdue tasks, missed follow-ups, failed documents, pending AI review, and same-day appointments.
+- Notification inbox generated from overdue tasks, missed follow-ups, failed documents, pending AI review, same-day appointments, and patient portal requests.
 - Role-specific navigation and dashboard emphasis for doctors, clinic admins, and assistants.
 - AI draft review supports doctor-edited output and approve-to-record actions.
 - Document uploads automatically create AI triage drafts for parsing, risk flags, and task candidates.
@@ -41,6 +42,12 @@ After seeding:
 - Clinic admin: `admin@medipilot.local`
 - Assistant: `assistant@medipilot.local`
 - Password: `DemoPassword123!`
+
+Patient portal demo:
+
+- URL: `/portal`
+- MRN: `DEMO-1001`
+- Date of birth: `1982-04-12`
 
 ## Quick Start
 

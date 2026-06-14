@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Bell, Bot, CalendarClock, CheckSquare, FileWarning } from "lucide-react";
+import { Bell, Bot, CalendarClock, CheckSquare, FileWarning, MessageSquareText } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { getAiTaskCopy } from "@/lib/ai/catalog";
 import { prisma } from "@/lib/db";
@@ -11,7 +11,7 @@ type InboxItem = {
   detail: string;
   href: string;
   severity: "high" | "medium" | "low";
-  icon: "task" | "followup" | "ai" | "document" | "schedule";
+  icon: "task" | "followup" | "ai" | "document" | "schedule" | "portal";
   createdAt: Date;
 };
 
@@ -21,7 +21,7 @@ export default async function InboxPage() {
   const now = new Date();
   const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
-  const [overdueTasks, missedFollowUps, pendingAi, failedDocuments, todayAppointments] = await Promise.all([
+  const [overdueTasks, missedFollowUps, pendingAi, failedDocuments, todayAppointments, portalRequests] = await Promise.all([
     prisma.task.findMany({
       where: { clinicId, status: { in: ["OPEN", "IN_PROGRESS"] }, dueAt: { lt: now } },
       include: { patient: true },
@@ -50,6 +50,12 @@ export default async function InboxPage() {
       where: { clinicId, status: "SCHEDULED", startsAt: { gte: now, lt: tomorrow } },
       include: { patient: true, clinician: true },
       orderBy: { startsAt: "asc" },
+      take: 10
+    }),
+    prisma.patientPortalRequest.findMany({
+      where: { clinicId, status: { in: ["NEW", "IN_REVIEW"] } },
+      include: { patient: true },
+      orderBy: { createdAt: "desc" },
       take: 10
     })
   ]);
@@ -99,6 +105,15 @@ export default async function InboxPage() {
       severity: "low" as const,
       icon: "schedule" as const,
       createdAt: appointment.startsAt
+    })),
+    ...portalRequests.map((request) => ({
+      id: `portal-${request.id}`,
+      title: `Patient portal request: ${request.subject}`,
+      detail: `${request.patient.firstName} ${request.patient.lastName} | ${request.type.replaceAll("_", " ").toLowerCase()}`,
+      href: "/portal-requests",
+      severity: request.status === "NEW" ? "medium" as const : "low" as const,
+      icon: "portal" as const,
+      createdAt: request.createdAt
     }))
   ].sort((a, b) => severityRank(b.severity) - severityRank(a.severity) || b.createdAt.getTime() - a.createdAt.getTime());
 
@@ -119,7 +134,7 @@ export default async function InboxPage() {
         <div className="grid dashboard-metrics">
           <Metric title="High priority" value={items.filter((item) => item.severity === "high").length} detail="Needs same-day review" tone="orange" />
           <Metric title="AI review" value={pendingAi.length} detail="Doctor approval required" />
-          <Metric title="Today" value={todayAppointments.length} detail="Scheduled visits" tone="green" />
+          <Metric title="Portal" value={portalRequests.length} detail="Patient requests" tone={portalRequests.length ? "orange" : "green"} />
         </div>
 
         <section className="card card-pad">
@@ -156,6 +171,7 @@ function iconFor(icon: InboxItem["icon"]) {
   if (icon === "followup") return CalendarClock;
   if (icon === "ai") return Bot;
   if (icon === "document") return FileWarning;
+  if (icon === "portal") return MessageSquareText;
   return Bell;
 }
 

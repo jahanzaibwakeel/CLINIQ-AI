@@ -7,6 +7,7 @@ async function main() {
   await prisma.auditLog.deleteMany();
   await prisma.aiGeneration.deleteMany();
   await prisma.accountToken.deleteMany();
+  await prisma.patientPortalRequest.deleteMany();
   await prisma.embedding.deleteMany();
   await prisma.documentChunk.deleteMany();
   await prisma.document.deleteMany();
@@ -254,6 +255,18 @@ async function main() {
     ]
   });
 
+  const portalRequest = await prisma.patientPortalRequest.create({
+    data: {
+      clinicId: clinic.id,
+      patientId: sara.id,
+      type: "APPOINTMENT",
+      subject: "Need help scheduling lab follow-up",
+      message: "I saw the follow-up instructions and would like the clinic to confirm my appointment time.",
+      preferredContact: "+92 300 000 1101",
+      status: "NEW"
+    }
+  });
+
   await prisma.aiGeneration.create({
     data: {
       clinicId: clinic.id,
@@ -288,6 +301,18 @@ async function main() {
       entityType: "AiGeneration",
       entityId: "seed-risk-generation",
       metadata: { seeded: true }
+    }
+  });
+
+  await prisma.auditLog.create({
+    data: {
+      clinicId: clinic.id,
+      actorId: null,
+      patientId: sara.id,
+      action: "PATIENT_PORTAL_REQUEST_CREATED",
+      entityType: "PatientPortalRequest",
+      entityId: portalRequest.id,
+      metadata: { seeded: true, type: portalRequest.type }
     }
   });
 

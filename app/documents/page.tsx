@@ -1,3 +1,4 @@
+import { Role } from "@prisma/client";
 import { AppShell } from "@/components/app-shell";
 import { ClinicalAiComposer } from "@/components/clinical-ai-composer";
 import { DocumentIntelligenceBoard } from "@/components/document-intelligence-board";
@@ -66,14 +67,26 @@ export default async function DocumentsPage() {
             </div>
           </section>
         </div>
-        <ClinicalAiComposer
-          title="Document AI intelligence"
-          description="Parse uploaded reports, explain abnormal values, draft follow-up instructions, and summarize findings in patient-friendly language."
-          defaultText={documents[0]?.extractedText ?? ""}
-          patientId={documents[0]?.patientId}
-          documentId={documents[0]?.id}
-          presets={["DOCUMENT_PARSE", "RISK_FLAG_EXPLAINER", "FOLLOW_UP_INSTRUCTIONS", "VISIT_SUMMARY"]}
-        />
+        {user?.role === Role.ASSISTANT ? (
+          <section className="card card-pad">
+            <div className="section-head">
+              <h2 className="section-title">Assistant document workspace</h2>
+              <span className="badge">Operational scope</span>
+            </div>
+            <p className="muted">
+              Upload reports, confirm processing state, and route failed files. Clinical interpretation, risk explanations, and patient-facing summaries stay in the doctor/admin AI review workflow.
+            </p>
+          </section>
+        ) : (
+          <ClinicalAiComposer
+            title="Document AI intelligence"
+            description="Parse uploaded reports, explain abnormal values, draft follow-up instructions, and summarize findings in patient-friendly language."
+            defaultText={documents[0]?.extractedText ?? ""}
+            patientId={documents[0]?.patientId}
+            documentId={documents[0]?.id}
+            presets={["DOCUMENT_PARSE", "RISK_FLAG_EXPLAINER", "FOLLOW_UP_INSTRUCTIONS", "VISIT_SUMMARY"]}
+          />
+        )}
       </div>
     </AppShell>
   );

@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { Role } from "@prisma/client";
 import { AppShell } from "@/components/app-shell";
 import { PatientExportButton } from "@/components/patient-export-button";
 import { PatientChartTabs } from "@/components/patient-chart-tabs";
@@ -21,6 +22,7 @@ export default async function PatientDetailPage({ params }: { params: Promise<{ 
   });
 
   if (!patient) notFound();
+  const canUseClinicalAi = user?.role === Role.DOCTOR || user?.role === Role.CLINIC_ADMIN;
   const defaultText = [patient.conditions.join(", "), ...patient.notes.map((note) => note.body), ...patient.consultations.map((consultation) => consultation.rawNotes)].join("\n");
   const timeline = [
     ...patient.consultations.map((consultation) => ({
@@ -49,7 +51,7 @@ export default async function PatientDetailPage({ params }: { params: Promise<{ 
                 <p className="muted">MRN {patient.mrn} | {patient.sex} | born {patient.dateOfBirth.toLocaleDateString()}</p>
               </div>
               <div className="command-actions">
-                <PatientExportButton patientId={patient.id} />
+                {canUseClinicalAi ? <PatientExportButton patientId={patient.id} /> : null}
                 <span className={`badge ${patient.riskScore >= 60 ? "warn" : "good"}`}>Risk {patient.riskScore}</span>
               </div>
             </div>
@@ -60,6 +62,7 @@ export default async function PatientDetailPage({ params }: { params: Promise<{ 
           </section>
         <PatientChartTabs
           patientId={patient.id}
+          canUseClinicalAi={canUseClinicalAi}
           defaultText={defaultText}
           timeline={timeline}
           consultations={patient.consultations.map((consultation) => ({

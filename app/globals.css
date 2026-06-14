@@ -820,6 +820,29 @@ th {
   font-size: 30px;
 }
 
+.portal-screen {
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+.portal-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 28px;
+  border-bottom: 1px solid var(--border);
+  background: #fbfcfd;
+}
+
+.portal-layout {
+  display: grid;
+  max-width: 1180px;
+  gap: 16px;
+  margin: 0 auto;
+  padding: 24px 28px 42px;
+}
+
 .chart-bars {
   display: grid;
   gap: 10px;
@@ -905,7 +928,14 @@ th {
   }
 
   .login-panel,
-  .login-card {
+  .login-card,
+  .portal-topbar,
+  .portal-layout {
     padding: 28px;
+  }
+
+  .portal-topbar {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }

@@ -9,6 +9,7 @@ import {
   FileText,
   LayoutDashboard,
   CheckSquare,
+  MessageSquareText,
   UserCog,
   ShieldCheck,
   Settings,
@@ -32,9 +33,10 @@ const nav = [
   { href: "/ai-review", label: "AI Review", icon: CheckSquare, roles: [Role.DOCTOR, Role.CLINIC_ADMIN] },
   { href: "/tasks", label: "Tasks", icon: ClipboardList, roles: [Role.DOCTOR, Role.CLINIC_ADMIN, Role.ASSISTANT] },
   { href: "/follow-ups", label: "Follow-ups", icon: CalendarClock, roles: [Role.DOCTOR, Role.CLINIC_ADMIN, Role.ASSISTANT] },
+  { href: "/portal-requests", label: "Portal", icon: MessageSquareText, roles: [Role.DOCTOR, Role.CLINIC_ADMIN, Role.ASSISTANT] },
   { href: "/ops", label: "Ops", icon: Activity, roles: [Role.CLINIC_ADMIN] },
   { href: "/audit", label: "Audit", icon: ShieldCheck, roles: [Role.CLINIC_ADMIN] },
-  { href: "/settings", label: "Settings", icon: Settings, roles: [Role.DOCTOR, Role.CLINIC_ADMIN, Role.ASSISTANT] }
+  { href: "/settings", label: "Settings", icon: Settings, roles: [Role.DOCTOR, Role.CLINIC_ADMIN] }
 ];
 
 export async function AppShell({ children, active = "/" }: { children: React.ReactNode; active?: string }) {

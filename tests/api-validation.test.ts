@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { aiGenerateSchema, aiReviewSchema, appointmentCreateSchema, consultationCreateSchema, patientCreateSchema, patientExportSchema, passwordResetSchema, staffInviteSchema, staffUpdateSchema } from "@/lib/validation";
+import { aiGenerateSchema, aiReviewSchema, appointmentCreateSchema, consultationCreateSchema, patientCreateSchema, patientExportSchema, patientPortalLookupSchema, patientPortalRequestSchema, patientPortalRequestUpdateSchema, passwordResetSchema, staffInviteSchema, staffUpdateSchema } from "@/lib/validation";
 
 describe("API validation schemas", () => {
   it("accepts a valid patient payload", () => {
@@ -48,6 +48,21 @@ describe("API validation schemas", () => {
         endsAt: "2026-06-12T10:00:00.000Z"
       })
     ).toThrow();
+  });
+
+  it("validates patient portal lookup, requests, and status changes", () => {
+    expect(patientPortalLookupSchema.parse({ mrn: "DEMO-1001", dateOfBirth: "1982-04-12" }).mrn).toBe("DEMO-1001");
+    expect(patientPortalRequestSchema.parse({
+      patientId: "patient-id",
+      mrn: "DEMO-1001",
+      dateOfBirth: "1982-04-12",
+      type: "APPOINTMENT",
+      subject: "Schedule follow-up",
+      message: "Please help me schedule the requested follow-up appointment.",
+      preferredContact: ""
+    }).type).toBe("APPOINTMENT");
+    expect(patientPortalRequestUpdateSchema.parse({ status: "IN_REVIEW" }).status).toBe("IN_REVIEW");
+    expect(() => patientPortalLookupSchema.parse({ mrn: "DEMO-1001", dateOfBirth: "04/12/1982" })).toThrow();
   });
 
   it("requires an export reason for patient chart downloads", () => {

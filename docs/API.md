@@ -180,6 +180,52 @@ Updates appointment workflow status.
 
 Supported statuses: `SCHEDULED`, `CHECKED_IN`, `COMPLETED`, `CANCELLED`, `NO_SHOW`.
 
+## Patient Portal
+
+### `POST /api/portal/lookup`
+
+Public route with CSRF/origin checks and rate limiting. Verifies a patient by MRN and date of birth, then returns portal-safe data only: patient display name, upcoming appointments, open follow-ups, recent document statuses, and reviewed visit summaries.
+
+```json
+{ "mrn": "DEMO-1001", "dateOfBirth": "1982-04-12" }
+```
+
+### `POST /api/portal/requests`
+
+Public route with CSRF/origin checks and rate limiting. Re-verifies patient identity before creating a clinic-scoped `PatientPortalRequest` and a public-origin audit log event.
+
+```json
+{
+  "patientId": "patient-id",
+  "mrn": "DEMO-1001",
+  "dateOfBirth": "1982-04-12",
+  "type": "APPOINTMENT",
+  "subject": "Schedule follow-up",
+  "message": "Please help me schedule the requested follow-up appointment.",
+  "preferredContact": "+92 300 000 1101"
+}
+```
+
+Supported request types: `APPOINTMENT`, `MEDICATION_QUESTION`, `DOCUMENT`, `BILLING`, `OTHER`.
+
+### `GET /api/portal/requests`
+
+Allowed roles: doctor, clinic admin, assistant.
+
+Lists recent patient portal requests for the signed-in clinic.
+
+### `PATCH /api/portal/requests/:id`
+
+Allowed roles: doctor, clinic admin, assistant.
+
+Updates portal request workflow status and writes a staff audit event.
+
+```json
+{ "status": "IN_REVIEW" }
+```
+
+Supported statuses: `NEW`, `IN_REVIEW`, `RESOLVED`, `CLOSED`.
+
 ## Staff
 
 ### `POST /api/staff/invitations`
@@ -212,6 +258,8 @@ Updates staff role, active status, or lockout state with guardrails that preserv
 ### `POST /api/ai/generate`
 
 Runs an AI drafting module and stores an `AiGeneration` row.
+
+Assistants may directly generate only operational drafts: `TASK_EXTRACTION` and `FOLLOW_UP_INSTRUCTIONS`. Doctors and clinic admins can use all configured AI modules, and only doctors/admins can review or apply AI drafts.
 
 Body:
 

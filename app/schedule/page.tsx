@@ -37,6 +37,9 @@ export default async function SchedulePage() {
     .slice(0, 12)
     .map((appointment) => `${appointment.startsAt.toLocaleString()} ${appointment.patient.firstName} ${appointment.patient.lastName}: ${appointment.title} (${appointment.status})`)
     .join("\n");
+  const aiPresets = user?.role === Role.ASSISTANT
+    ? ["TASK_EXTRACTION", "FOLLOW_UP_INSTRUCTIONS"] as const
+    : ["TASK_EXTRACTION", "FOLLOW_UP_INSTRUCTIONS", "VISIT_SUMMARY"] as const;
 
   return (
     <AppShell active="/schedule">
@@ -94,7 +97,7 @@ export default async function SchedulePage() {
           title="Schedule AI helper"
           description="Summarize scheduling notes into follow-up instructions, task lists, or patient-friendly visit prep."
           defaultText={scheduleContext || "- patient needs diabetes lab review\n- bring home glucose log\n- schedule follow-up after report upload"}
-          presets={["TASK_EXTRACTION", "FOLLOW_UP_INSTRUCTIONS", "VISIT_SUMMARY"]}
+          presets={[...aiPresets]}
         />
       </div>
     </AppShell>

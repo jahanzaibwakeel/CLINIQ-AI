@@ -1,3 +1,4 @@
+import { Role } from "@prisma/client";
 import { AppShell } from "@/components/app-shell";
 import { ClinicalAiComposer } from "@/components/clinical-ai-composer";
 import { TaskStatusActions } from "@/components/task-status-actions";
@@ -14,6 +15,9 @@ export default async function TasksPage() {
   const taskContext = tasks
     .map((task) => `${task.title}: ${task.description ?? "No description"} (${task.status})`)
     .join("\n");
+  const aiPresets = user?.role === Role.ASSISTANT
+    ? ["TASK_EXTRACTION", "FOLLOW_UP_INSTRUCTIONS"] as const
+    : ["TASK_EXTRACTION", "FOLLOW_UP_INSTRUCTIONS", "RISK_FLAG_EXPLAINER"] as const;
 
   return (
     <AppShell active="/tasks">
@@ -46,7 +50,7 @@ export default async function TasksPage() {
           title="Task AI organizer"
           description="Paste notes or review the current queue to extract tasks, draft follow-up wording, and identify operational risk."
           defaultText={taskContext}
-          presets={["TASK_EXTRACTION", "FOLLOW_UP_INSTRUCTIONS", "RISK_FLAG_EXPLAINER"]}
+          presets={[...aiPresets]}
         />
       </div>
     </AppShell>

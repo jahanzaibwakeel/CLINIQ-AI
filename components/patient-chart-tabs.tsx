@@ -44,6 +44,7 @@ type PatientChartTabsProps = {
     reviewStatus: string;
     createdAt: string;
   }>;
+  canUseClinicalAi?: boolean;
 };
 
 const tabs = [
@@ -62,10 +63,13 @@ export function PatientChartTabs({
   consultations,
   documents,
   followUps,
-  aiGenerations
+  aiGenerations,
+  canUseClinicalAi = true
 }: PatientChartTabsProps) {
   const [active, setActive] = useState("timeline");
-  const activeTab = useMemo(() => tabs.find((tab) => tab.id === active), [active]);
+  const visibleTabs = useMemo(() => tabs.filter((tab) => canUseClinicalAi || (tab.id !== "ai" && tab.id !== "search")), [canUseClinicalAi]);
+  const activeTab = useMemo(() => visibleTabs.find((tab) => tab.id === active) ?? visibleTabs[0], [active, visibleTabs]);
+  const activeView = activeTab?.id ?? "timeline";
 
   return (
     <section className="card card-pad">
@@ -76,7 +80,7 @@ export function PatientChartTabs({
         </div>
       </div>
       <div className="chart-tabs" role="tablist" aria-label="Patient chart tabs">
-        {tabs.map((tab) => {
+        {visibleTabs.map((tab) => {
           const Icon = tab.icon;
           return (
             <button
@@ -94,7 +98,7 @@ export function PatientChartTabs({
       </div>
 
       <div className="chart-panel">
-        {active === "timeline" ? (
+        {activeView === "timeline" ? (
           <div className="timeline-list">
             {timeline.map((item) => (
               <div className="timeline-item" key={`${item.type}-${item.id}`}>
@@ -108,7 +112,7 @@ export function PatientChartTabs({
           </div>
         ) : null}
 
-        {active === "consults" ? (
+        {activeView === "consults" ? (
           <div className="table-wrap">
             <table>
               <thead><tr><th>Date</th><th>Reason</th><th>Notes</th><th>Status</th></tr></thead>
@@ -126,7 +130,7 @@ export function PatientChartTabs({
           </div>
         ) : null}
 
-        {active === "documents" ? (
+        {activeView === "documents" ? (
           <div className="table-wrap">
             <table>
               <thead><tr><th>Date</th><th>File</th><th>Preview</th><th>Status</th></tr></thead>
@@ -144,7 +148,7 @@ export function PatientChartTabs({
           </div>
         ) : null}
 
-        {active === "followups" ? (
+        {activeView === "followups" ? (
           <div className="timeline-list">
             {followUps.length ? (
               followUps.map((followUp) => (
@@ -162,9 +166,9 @@ export function PatientChartTabs({
           </div>
         ) : null}
 
-        {active === "search" ? <SemanticSearchBox patientId={patientId} /> : null}
+        {activeView === "search" ? <SemanticSearchBox patientId={patientId} /> : null}
 
-        {active === "ai" ? (
+        {activeView === "ai" ? (
           <div className="grid">
             <ClinicalAiComposer
               title="Patient context AI"

@@ -85,6 +85,7 @@ model Clinic {
   auditLogs     AuditLog[]
   aiGenerations AiGeneration[]
   accountTokens AccountToken[]
+  patientPortalRequests PatientPortalRequest[]
 }
 
 model User {
@@ -144,6 +145,7 @@ model Patient {
   appointments  Appointment[]
   aiGenerations AiGeneration[]
   auditLogs     AuditLog[]
+  portalRequests PatientPortalRequest[]
 
   @@index([clinicId, lastName, firstName])
 }
@@ -338,6 +340,25 @@ model Appointment {
 
   @@index([clinicId, startsAt, status])
   @@index([clinicId, patientId])
+}
+
+model PatientPortalRequest {
+  id               String   @id @default(cuid())
+  clinicId         String
+  patientId        String
+  type             String
+  subject          String
+  message          String
+  preferredContact String?
+  status           String   @default("NEW")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  clinic  Clinic  @relation(fields: [clinicId], references: [id])
+  patient Patient @relation(fields: [patientId], references: [id])
+
+  @@index([clinicId, status, createdAt])
+  @@index([clinicId, patientId, createdAt])
 }
 
 model AuditLog {

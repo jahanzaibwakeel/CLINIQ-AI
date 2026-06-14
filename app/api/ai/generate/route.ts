@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { apiError, parseJson } from "@/lib/http";
-import { requireUser } from "@/lib/security/rbac";
+import { assistantAiScopeDescription, canGenerateAiForRole, requireUser } from "@/lib/security/rbac";
 import { aiGenerateSchema } from "@/lib/validation";
 import { runAiGeneration } from "@/lib/ai/service";
 import { rateLimit } from "@/lib/rate-limit";
@@ -16,6 +16,10 @@ export async function POST(request: Request) {
 
   try {
     const input = await parseJson(request, aiGenerateSchema);
+    if (!canGenerateAiForRole(auth.user.role, input.type)) {
+      return NextResponse.json({ error: "Insufficient AI permissions", detail: assistantAiScopeDescription() }, { status: 403 });
+    }
+
     let patientContext = "";
 
     if (input.patientId) {

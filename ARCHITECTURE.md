@@ -20,10 +20,12 @@ Core entities:
 
 - Clinics own users and clinical records.
 - Users have roles: `DOCTOR`, `CLINIC_ADMIN`, `ASSISTANT`.
+- Assistants are operational users: they can schedule, upload documents, manage tasks/follow-ups, and triage portal requests, but cannot review clinical AI drafts, access settings/admin screens, or export patient charts.
 - Users also store active state, failed-login count, temporary lockout expiry, and last-login timestamp for admin security review.
 - Patients contain demo-only demographics, conditions, medications, allergies, and risk score.
 - Consultations store raw notes, summaries, SOAP JSON, status, and sign-off fields.
 - Appointments schedule patient visits with clinician ownership, status, time window, location, and notes.
+- Patient portal requests link verified patient messages to the clinic queue with workflow status and audited staff updates.
 - Staff account changes and appointment status updates are handled through audited route handlers with role checks.
 - Documents store extraction results, chunks, and parsed JSON.
 - Documents also store storage provider, local storage key, file size, checksum, and scan status.
@@ -42,13 +44,14 @@ Core entities:
 6. Login attempts apply rate limiting, known-account lockout policy, and audit metadata.
 7. AI routes build patient context, call the AI service, validate output, store draft metadata and telemetry, and return structured JSON.
 8. Document uploads chunk/embed text and automatically create doctor-review-required AI triage drafts for document parsing, risk flags, and task candidates.
-9. Inbox signals are derived from persisted workflow state instead of a separate notification table, keeping demo data explainable and auditable.
-10. Patient chart exports require a reason, can redact direct contact details, and are recorded in the audit log.
+9. Public patient portal routes verify MRN and date of birth, return limited portal-safe data, and let patients create clinic requests.
+10. Inbox signals are derived from persisted workflow state instead of a separate notification table, keeping demo data explainable and auditable.
+11. Patient chart exports require a reason, can redact direct contact details, and are recorded in the audit log.
 
 ## Testing Shape
 
 - Unit and component tests cover AI guardrails, validation, security policy, storage helpers, and shared UI.
-- Playwright smoke tests cover seeded login, dashboard navigation, patient export privacy, documents, schedule, inbox, and staff surfaces.
+- Playwright smoke tests cover seeded login, dashboard navigation, patient export privacy, documents, schedule, inbox, staff surfaces, and patient portal submission.
 
 ## Deployment Topology
 

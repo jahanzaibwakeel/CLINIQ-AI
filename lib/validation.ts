@@ -136,6 +136,23 @@ export const appointmentUpdateSchema = z.object({
   status: z.enum(["SCHEDULED", "CHECKED_IN", "COMPLETED", "CANCELLED", "NO_SHOW"])
 });
 
+export const patientPortalLookupSchema = z.object({
+  mrn: z.string().min(3).max(80),
+  dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/)
+});
+
+export const patientPortalRequestSchema = patientPortalLookupSchema.extend({
+  patientId: z.string().min(1),
+  type: z.enum(["APPOINTMENT", "MEDICATION_QUESTION", "DOCUMENT", "BILLING", "OTHER"]),
+  subject: z.string().min(4).max(120),
+  message: z.string().min(10).max(2000),
+  preferredContact: z.string().max(160).optional().or(z.literal(""))
+});
+
+export const patientPortalRequestUpdateSchema = z.object({
+  status: z.enum(["NEW", "IN_REVIEW", "RESOLVED", "CLOSED"])
+});
+
 export const staffUpdateSchema = z.object({
   role: z.enum(["DOCTOR", "CLINIC_ADMIN", "ASSISTANT"]).optional(),
   isActive: z.boolean().optional(),

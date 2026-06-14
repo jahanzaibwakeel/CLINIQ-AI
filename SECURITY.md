@@ -5,6 +5,7 @@
 - HTTP-only signed session cookie.
 - Password hashing with bcrypt.
 - Role-based route checks.
+- Assistant role is least-privilege: operational task/follow-up AI only, no clinical AI review, no settings, no staff/security/admin screens, and no patient chart export.
 - Zod validation on API input.
 - Per-IP and per-email login throttling.
 - Known-user account lockout after repeated failed password attempts.
@@ -14,6 +15,7 @@
 - Security headers through middleware: CSP, frame denial, content sniffing protection, referrer policy, and permissions policy.
 - Production origin allow-listing for mutating API requests through `NEXT_PUBLIC_APP_URL` or `TRUSTED_ORIGINS`.
 - Audit logs for clinical writes and AI generations.
+- Public patient portal request creation is audited with `actorId: null`, then staff status changes are audited under the signed-in user.
 - Audit logs for successful and failed known-user login attempts.
 - Clinic-admin audit viewer for recent security and clinical events.
 - Clinic-admin Ops dashboard for AI telemetry, fallback visibility, review backlog, and request trace IDs.
@@ -41,6 +43,7 @@
 - Document processing failures mark the document as failed and write an audit event.
 - Uploaded document payloads are stored with provider, byte size, checksum, and scan-status metadata.
 - Patient chart exports require a stated reason, default to redacted contact details, and write audit metadata.
+- Patient portal lookup returns limited patient-safe data after MRN/date-of-birth verification and does not expose raw notes, full documents, or unreviewed AI drafts.
 - External PHI transfer requires explicit `ALLOW_EXTERNAL_AI=true`.
 
 ## Recommended Production Hardening

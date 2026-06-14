@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, LogIn } from "lucide-react";
 import { csrfHeaders } from "@/lib/client/csrf";
@@ -81,6 +82,9 @@ export function LoginForm() {
       <button className="button secondary" disabled={resetLoading || !email} onClick={requestReset} type="button">
         {resetLoading ? "Sending..." : "Forgot password"}
       </button>
+      <Link className="button secondary" href="/portal">
+        Patient portal
+      </Link>
       <p className="muted" style={{ fontSize: 13 }}>
         Demo password: DemoPassword123!
       </p>
