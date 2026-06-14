@@ -71,13 +71,13 @@ export async function getAiRuntimeStatus(): Promise<AiRuntimeStatus> {
       provider: "fallback",
       mode: "fallback",
       status: "fallback",
-      model: "rule-based-safe-fallback",
+      model: "local-clinical-rules-v2",
       numPredict: env.OLLAMA_NUM_PREDICT,
       externalAiAllowed,
       modelAvailable: null,
       availableModels: [],
       checkedAt: new Date().toISOString(),
-      message: "Safe fallback mode is active. AI drafts will not use a language model."
+      message: "Local rule-based drafting is active. No external API or paid model is required."
     };
   }
 
@@ -114,7 +114,7 @@ export async function getAiRuntimeStatus(): Promise<AiRuntimeStatus> {
       modelAvailable: false,
       availableModels: [],
       checkedAt: new Date().toISOString(),
-      message: "Local Ollama is not reachable. MediPilot will use safe fallback drafts until it is available."
+      message: "Local Ollama is not reachable. MediPilot is using local rule-based drafts until a model is available."
     };
   }
 }

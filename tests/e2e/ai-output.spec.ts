@@ -10,6 +10,7 @@ test("doctor sees AI drafts as readable clinical sections instead of raw JSON", 
   await expect(output).toBeVisible();
   await expect(output.getByRole("heading", { name: "Summary" })).toBeVisible();
   await expect(output).toContainText("AI draft, doctor review required.");
+  await expect(output).not.toContainText("AI service is unavailable");
   await expect(output).not.toContainText('"summary"');
   await expect(output).not.toContainText('"metadata"');
 });

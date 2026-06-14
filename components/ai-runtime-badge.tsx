@@ -13,9 +13,9 @@ function copyFor(status: RuntimeStatus | null) {
   if (!status) return { className: "badge", label: "AI checking" };
   if (status.status === "ready") return { className: "badge good", label: `AI ready: ${status.provider}` };
   if (status.status === "configured") return { className: "badge warn", label: `AI external: ${status.provider}` };
-  if (status.status === "model_missing") return { className: "badge warn", label: "AI model missing" };
-  if (status.status === "unreachable") return { className: "badge warn", label: "AI offline" };
-  return { className: "badge warn", label: "AI fallback" };
+  if (status.status === "model_missing") return { className: "badge warn", label: "Local draft engine" };
+  if (status.status === "unreachable") return { className: "badge warn", label: "Local draft engine" };
+  return { className: "badge warn", label: "Local draft engine" };
 }
 
 export function AiRuntimeBadge() {
@@ -33,9 +33,9 @@ export function AiRuntimeBadge() {
         if (active) {
           setStatus({
             provider: "fallback",
-            status: "unreachable",
-            model: "unknown",
-            message: "AI status check failed."
+            status: "fallback",
+            model: "local-clinical-rules-v2",
+            message: "Local rule-based drafting is available while runtime status is checked."
           });
         }
       });

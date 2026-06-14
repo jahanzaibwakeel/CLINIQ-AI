@@ -33,11 +33,35 @@ describe("Prompt templates", () => {
 });
 
 describe("Fallback provider", () => {
-  it("returns a conservative structured draft", async () => {
+  it("returns a useful local consultation summary instead of an unavailable-service placeholder", async () => {
     const provider = new FallbackProvider();
-    const response = await provider.complete({ system: "safe", user: "source context", json: true });
+    const response = await provider.complete({
+      system: "safe",
+      user: prompts.CONSULTATION_SUMMARY.buildUserPrompt({
+        sourceText: "- patient reports fatigue for 3 weeks\n- glucose readings 160-190\n- missed eye exam\n- mild tingling feet\n- ordered HbA1c, urine ACR, B12"
+      }),
+      json: true
+    });
+    const output = parseSafeAiOutput(response.text);
     expect(response.usedFallback).toBe(true);
-    expect(response.text).toContain("Manual clinician review required");
+    expect(output.summary).toContain("fatigue");
+    expect(output.summary).toContain("glucose");
+    expect(output.flags?.join(" ")).toContain("Eye exam");
+    expect(output.flags?.join(" ")).not.toContain("AI unavailable");
+  });
+
+  it("extracts local operational tasks from clinical bullets", async () => {
+    const provider = new FallbackProvider();
+    const response = await provider.complete({
+      system: "safe",
+      user: prompts.TASK_EXTRACTION.buildUserPrompt({
+        sourceText: "- glucose readings 160-190\n- missed eye exam\n- ordered HbA1c, urine ACR, B12\n- mild tingling feet"
+      }),
+      json: true
+    });
+    const output = parseSafeAiOutput(response.text);
+    expect(output.tasks?.map((task) => task.title).join(" ")).toContain("eye exam");
+    expect(output.tasks?.some((task) => task.priority === "high")).toBe(true);
   });
 
   it("creates deterministic local embeddings", () => {
