@@ -6,9 +6,11 @@ const prisma = new PrismaClient();
 async function main() {
   await prisma.auditLog.deleteMany();
   await prisma.aiGeneration.deleteMany();
+  await prisma.accountToken.deleteMany();
   await prisma.embedding.deleteMany();
   await prisma.documentChunk.deleteMany();
   await prisma.document.deleteMany();
+  await prisma.appointment.deleteMany();
   await prisma.followUp.deleteMany();
   await prisma.task.deleteMany();
   await prisma.note.deleteMany();
