@@ -54,7 +54,10 @@ Production:
 
 ```bash
 npm run db:deploy
+npm run release:check
 ```
+
+Set `PRODUCTION_CHECK_URL=https://your-domain.example` to make `release:check` also call `/api/health` and `/api/ready`.
 
 ## Ollama
 
@@ -93,6 +96,7 @@ The GitHub Actions workflow in `.github/workflows/ci.yml` performs:
 - production build
 - Docker image build
 - GHCR publish on `main`
+- production release check during VPS deploy
 - optional VPS deploy over SSH
 
 To enable automatic VPS deploys, set these repository secrets:
@@ -102,7 +106,7 @@ To enable automatic VPS deploys, set these repository secrets:
 - `VPS_SSH_KEY`: private key with access to the server
 - `VPS_APP_DIR`: app directory on the server, for example `/opt/medipilot-ai`
 
-On the server, keep a production `.env` beside `docker-compose.prod.yml`. The deploy job pulls the latest GHCR image, runs Compose, applies migrations, and checks `/api/ready`.
+On the server, keep a production `.env` beside `docker-compose.prod.yml`. The deploy job pulls the latest GHCR image, runs Compose, applies migrations, checks `/api/ready`, and runs `scripts/production-check.mjs` inside the web container.
 
 ## Health Checks
 
@@ -111,6 +115,8 @@ On the server, keep a production `.env` beside `docker-compose.prod.yml`. The de
 - `/api/metrics`: aggregate AI, document, workflow, and security metrics for clinic admins or bearer-token monitors
 - `/ops`: admin-only in-app operations dashboard for AI latency, fallback rate, cache hit rate, request IDs, and review backlog
 - `/staff`: admin-only role and login-security dashboard for active users, lockouts, and last-login state
+
+`docker-compose.yml` and `docker-compose.prod.yml` both define web container health checks against `/api/health`.
 
 ## Document Storage
 
@@ -180,6 +186,7 @@ The CI pipeline uploads `npm-audit.json` as an artifact so dependency risks can 
 
 - Strong `SESSION_SECRET`.
 - HTTPS enabled.
+- `npm run release:check` passes with `PRODUCTION_CHECK_URL` set to the hosted domain.
 - `ALLOW_EXTERNAL_AI=false` unless explicitly approved.
 - `/api/health` and `/api/ready` monitored.
 - Database backups configured and tested.

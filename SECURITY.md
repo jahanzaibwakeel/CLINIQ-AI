@@ -18,6 +18,7 @@
 - Clinic-admin audit viewer for recent security and clinical events.
 - Clinic-admin Ops dashboard for AI telemetry, fallback visibility, review backlog, and request trace IDs.
 - Aggregate `/api/metrics` endpoint requires clinic-admin session access or an optional bearer token for trusted monitors.
+- `npm run release:check` validates required production env, HTTPS posture, and external AI configuration.
 - Clinic-admin Staff page for role coverage, active status, lockout state, and last login review.
 - Staff role changes, activation/deactivation, and lockout resets require clinic admin privileges and audit logging.
 - Middleware attaches `X-Request-Id` to responses and AI generations for traceability.
@@ -45,6 +46,7 @@
 
 - Add SSO or MFA for clinic users.
 - Use managed secret storage.
+- Run `npm run release:check` during deployment and after secret rotation.
 - Use an approved SMTP provider and rotate SMTP credentials through secret management.
 - Rotate `METRICS_BEARER_TOKEN` like an operational secret when bearer-token monitoring is enabled.
 - Add field-level encryption for highly sensitive records.

@@ -35,6 +35,7 @@ services:
         condition: service_healthy
     environment:
       PORT: ${APP_CONTAINER_PORT:-3000}
+      HOSTNAME: 0.0.0.0
       NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL}
       DATABASE_URL: postgresql://${POSTGRES_USER:-medipilot}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-medipilot_ai}?schema=public
       VALKEY_URL: redis://valkey:6379
@@ -47,6 +48,15 @@ services:
       ALLOW_EXTERNAL_AI: ${ALLOW_EXTERNAL_AI:-false}
       GROQ_API_KEY: ${GROQ_API_KEY:-}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      METRICS_BEARER_TOKEN: ${METRICS_BEARER_TOKEN:-}
+      SMTP_URL: ${SMTP_URL:-}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-MediPilot AI <no-reply@medipilot.local>}
+      ACCOUNT_TOKEN_RETENTION_DAYS: ${ACCOUNT_TOKEN_RETENTION_DAYS:-7}
     ports:
       - "${APP_HOST_PORT:-3000}:${APP_CONTAINER_PORT:-3000}"
     healthcheck:
@@ -54,6 +64,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 20s
 
   ollama:
     image: ollama/ollama:latest

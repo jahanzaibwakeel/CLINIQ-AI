@@ -14,6 +14,7 @@ MediPilot AI is a production-minded, local-first AI clinical workflow assistant 
 - Admin audit viewer for login, AI, document, patient, task, and consultation activity.
 - Admin Ops dashboard for AI latency, cache/fallback rate, request IDs, document triage, and readiness signals.
 - Machine-readable `/api/metrics` endpoint for aggregate AI reliability, workflow, document, and security monitoring.
+- Production release checker for required env, HTTPS posture, external-AI policy, and health/readiness endpoints.
 - Admin Staff page for role coverage, login lockout state, active users, and last-login visibility.
 - Staff management actions for role changes, activation/deactivation, and lockout reset with admin guardrails.
 - Nodemailer-backed SMTP abstraction for password resets and staff invitation setup links, with safe development log fallback.
@@ -90,6 +91,7 @@ npm run test:e2e
 npm run build
 npm run db:studio
 npm run db:backup
+npm run release:check
 ```
 
 ## CI/CD
