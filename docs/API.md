@@ -208,7 +208,7 @@ Consumes a valid patient portal token, creates a short-lived patient portal sess
 
 ### `GET /api/portal/me`
 
-Returns the same portal-safe patient payload when a valid patient portal session exists.
+Returns the same portal-safe patient payload when a valid patient portal session exists, including that patient's recent portal request history and patient-visible comments.
 
 ### `POST /api/portal/requests`
 
@@ -247,6 +247,16 @@ When the patient has an email address, MediPilot sends a status update notificat
 ```
 
 Supported statuses: `NEW`, `IN_REVIEW`, `RESOLVED`, `CLOSED`.
+
+### `POST /api/portal/requests/:id/comments`
+
+Creates a patient-visible comment on a portal request. Signed-in staff can reply from `/portal-requests`; patients can reply when signed in through a valid patient portal magic-link session.
+
+```json
+{ "body": "We confirmed your follow-up appointment for Friday morning." }
+```
+
+Staff replies send patient email notifications when an email address is on file. All replies write audit events.
 
 ## Staff
 

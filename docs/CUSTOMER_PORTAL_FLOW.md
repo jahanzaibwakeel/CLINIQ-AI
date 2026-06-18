@@ -24,6 +24,7 @@ The patient portal adds that customer layer while preserving the app's safety bo
    - follow-up instructions
    - recent document statuses
    - clinic-reviewed visit summaries
+   - request history and staff replies
 5. Patient submits a request for:
    - appointment scheduling
    - medication question
@@ -31,7 +32,9 @@ The patient portal adds that customer layer while preserving the app's safety bo
    - billing
    - general clinic request
 6. The request appears in the internal clinic portal queue.
-7. The patient receives an email acknowledgement when an email is on file.
+7. Clinic staff can reply directly from the portal request queue.
+8. The patient can continue the thread from a secure magic-link session.
+9. The patient receives email acknowledgements and staff-reply notifications when an email is on file.
 
 Demo access:
 
@@ -45,13 +48,14 @@ DOB: 1982-04-12
 
 1. Doctor, clinic admin, or assistant opens `/portal-requests`.
 2. Staff review new patient messages.
-3. Staff move the request through:
+3. Staff reply to the request with patient-visible operational updates.
+4. Staff move the request through:
    - `NEW`
    - `IN_REVIEW`
    - `RESOLVED`
    - `CLOSED`
-4. Status changes write audit logs under the signed-in staff user.
-5. Status changes send patient email updates through SMTP or the safe development log fallback.
+5. Replies and status changes write audit logs under the signed-in staff user.
+6. Staff replies and status changes send patient email updates through SMTP or the safe development log fallback.
 
 Portal requests also appear in the main Inbox so staff do not have to check a separate screen.
 
@@ -87,6 +91,7 @@ The portal intentionally returns limited data:
 - follow-up instructions
 - document names/statuses
 - reviewed visit summaries only
+- portal request history and replies for that verified patient
 
 It does not expose:
 
@@ -99,6 +104,7 @@ It does not expose:
 
 Public portal writes are rate-limited, validated with Zod, CSRF/origin protected by middleware, and audited with `actorId: null`.
 Magic-link access uses hashed single-use `PatientPortalToken` records and a separate `medipilot_patient_portal` session cookie, not the internal staff session.
+Patients can view request history after MRN/date-of-birth verification, but replies require the stronger magic-link session so an MRN/DOB demo lookup cannot impersonate an ongoing secure conversation.
 
 ## Why This Improves The Portfolio Project
 

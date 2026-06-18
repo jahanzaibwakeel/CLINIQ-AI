@@ -164,6 +164,10 @@ export const patientPortalRequestUpdateSchema = z.object({
   status: z.enum(["NEW", "IN_REVIEW", "RESOLVED", "CLOSED"])
 });
 
+export const patientPortalCommentSchema = z.object({
+  body: z.string().min(2).max(2000)
+});
+
 export const staffUpdateSchema = z.object({
   role: z.enum(["DOCTOR", "CLINIC_ADMIN", "ASSISTANT"]).optional(),
   isActive: z.boolean().optional(),

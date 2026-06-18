@@ -8,6 +8,7 @@ async function main() {
   await prisma.aiGeneration.deleteMany();
   await prisma.accountToken.deleteMany();
   await prisma.patientPortalToken.deleteMany();
+  await prisma.patientPortalRequestComment.deleteMany();
   await prisma.patientPortalRequest.deleteMany();
   await prisma.embedding.deleteMany();
   await prisma.documentChunk.deleteMany();
@@ -265,6 +266,17 @@ async function main() {
       message: "I saw the follow-up instructions and would like the clinic to confirm my appointment time.",
       preferredContact: "+92 300 000 1101",
       status: "NEW"
+    }
+  });
+
+  await prisma.patientPortalRequestComment.create({
+    data: {
+      clinicId: clinic.id,
+      requestId: portalRequest.id,
+      patientId: sara.id,
+      authorUserId: assistant.id,
+      authorType: "STAFF",
+      body: "Thanks, Sara. We are checking the schedule and will confirm the lab follow-up time."
     }
   });
 

@@ -80,42 +80,44 @@ model Clinic {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  users         User[]
-  patients      Patient[]
-  auditLogs     AuditLog[]
-  aiGenerations AiGeneration[]
-  accountTokens AccountToken[]
+  users                 User[]
+  patients              Patient[]
+  auditLogs             AuditLog[]
+  aiGenerations         AiGeneration[]
+  accountTokens         AccountToken[]
   patientPortalRequests PatientPortalRequest[]
-  patientPortalTokens PatientPortalToken[]
+  patientPortalTokens   PatientPortalToken[]
+  patientPortalComments PatientPortalRequestComment[]
 }
 
 model User {
-  id           String   @id @default(cuid())
-  clinicId     String
-  email        String   @unique
-  passwordHash String
-  name         String
-  role         Role
-  title        String?
-  isActive     Boolean  @default(true)
-  failedLoginCount Int   @default(0)
+  id               String    @id @default(cuid())
+  clinicId         String
+  email            String    @unique
+  passwordHash     String
+  name             String
+  role             Role
+  title            String?
+  isActive         Boolean   @default(true)
+  failedLoginCount Int       @default(0)
   lockedUntil      DateTime?
   lastLoginAt      DateTime?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
-  clinic        Clinic         @relation(fields: [clinicId], references: [id])
-  patients      Patient[]      @relation("PrimaryDoctor")
-  consultations Consultation[]
-  notes         Note[]
-  documents     Document[]
-  tasksAssigned Task[]         @relation("TaskAssignee")
-  tasksCreated  Task[]         @relation("TaskCreator")
-  followUps     FollowUp[]
-  appointments  Appointment[]
-  auditLogs     AuditLog[]
-  aiReviews     AiGeneration[] @relation("AiReviewer")
-  accountTokens AccountToken[]
+  clinic         Clinic                        @relation(fields: [clinicId], references: [id])
+  patients       Patient[]                     @relation("PrimaryDoctor")
+  consultations  Consultation[]
+  notes          Note[]
+  documents      Document[]
+  tasksAssigned  Task[]                        @relation("TaskAssignee")
+  tasksCreated   Task[]                        @relation("TaskCreator")
+  followUps      FollowUp[]
+  appointments   Appointment[]
+  auditLogs      AuditLog[]
+  aiReviews      AiGeneration[]                @relation("AiReviewer")
+  accountTokens  AccountToken[]
+  portalComments PatientPortalRequestComment[]
 }
 
 model Patient {
@@ -136,36 +138,37 @@ model Patient {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  clinic        Clinic         @relation(fields: [clinicId], references: [id])
-  primaryDoctor User?          @relation("PrimaryDoctor", fields: [primaryDoctorId], references: [id])
-  consultations Consultation[]
-  notes         Note[]
-  documents     Document[]
-  tasks         Task[]
-  followUps     FollowUp[]
-  appointments  Appointment[]
-  aiGenerations AiGeneration[]
-  auditLogs     AuditLog[]
+  clinic         Clinic                        @relation(fields: [clinicId], references: [id])
+  primaryDoctor  User?                         @relation("PrimaryDoctor", fields: [primaryDoctorId], references: [id])
+  consultations  Consultation[]
+  notes          Note[]
+  documents      Document[]
+  tasks          Task[]
+  followUps      FollowUp[]
+  appointments   Appointment[]
+  aiGenerations  AiGeneration[]
+  auditLogs      AuditLog[]
   portalRequests PatientPortalRequest[]
-  portalTokens PatientPortalToken[]
+  portalTokens   PatientPortalToken[]
+  portalComments PatientPortalRequestComment[]
 
   @@index([clinicId, lastName, firstName])
 }
 
 model Consultation {
-  id              String             @id @default(cuid())
-  clinicId        String
-  patientId       String
-  doctorId        String
-  status          ConsultationStatus @default(DRAFT)
-  reason          String
-  rawNotes        String
-  summary         String?
-  soapNote        Json?
-  startedAt       DateTime
-  signedAt        DateTime?
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
+  id        String             @id @default(cuid())
+  clinicId  String
+  patientId String
+  doctorId  String
+  status    ConsultationStatus @default(DRAFT)
+  reason    String
+  rawNotes  String
+  summary   String?
+  soapNote  Json?
+  startedAt DateTime
+  signedAt  DateTime?
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
 
   patient       Patient        @relation(fields: [patientId], references: [id])
   doctor        User           @relation(fields: [doctorId], references: [id])
@@ -196,22 +199,22 @@ model Note {
 }
 
 model Document {
-  id             String         @id @default(cuid())
-  clinicId       String
-  patientId      String
-  uploadedById   String
-  fileName       String
-  mimeType       String
-  storageKey     String
-  storageProvider String        @default("local")
+  id              String         @id @default(cuid())
+  clinicId        String
+  patientId       String
+  uploadedById    String
+  fileName        String
+  mimeType        String
+  storageKey      String
+  storageProvider String         @default("local")
   fileSizeBytes   Int?
   checksumSha256  String?
-  virusScanStatus String        @default("not_scanned")
-  extractedText  String?
-  parsedJson     Json?
-  status         DocumentStatus @default(UPLOADED)
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  virusScanStatus String         @default("not_scanned")
+  extractedText   String?
+  parsedJson      Json?
+  status          DocumentStatus @default(UPLOADED)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
 
   patient       Patient         @relation(fields: [patientId], references: [id])
   uploadedBy    User            @relation(fields: [uploadedById], references: [id])
@@ -356,21 +359,41 @@ model PatientPortalRequest {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  clinic  Clinic  @relation(fields: [clinicId], references: [id])
-  patient Patient @relation(fields: [patientId], references: [id])
+  clinic   Clinic                        @relation(fields: [clinicId], references: [id])
+  patient  Patient                       @relation(fields: [patientId], references: [id])
+  comments PatientPortalRequestComment[]
 
   @@index([clinicId, status, createdAt])
   @@index([clinicId, patientId, createdAt])
 }
 
+model PatientPortalRequestComment {
+  id           String   @id @default(cuid())
+  clinicId     String
+  requestId    String
+  patientId    String
+  authorUserId String?
+  authorType   String
+  body         String
+  createdAt    DateTime @default(now())
+
+  clinic     Clinic               @relation(fields: [clinicId], references: [id])
+  request    PatientPortalRequest @relation(fields: [requestId], references: [id])
+  patient    Patient              @relation(fields: [patientId], references: [id])
+  authorUser User?                @relation(fields: [authorUserId], references: [id])
+
+  @@index([clinicId, requestId, createdAt])
+  @@index([clinicId, patientId, createdAt])
+}
+
 model PatientPortalToken {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   clinicId  String
   patientId String
-  tokenHash String   @unique
+  tokenHash String    @unique
   expiresAt DateTime
   usedAt    DateTime?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 
   clinic  Clinic  @relation(fields: [clinicId], references: [id])
   patient Patient @relation(fields: [patientId], references: [id])

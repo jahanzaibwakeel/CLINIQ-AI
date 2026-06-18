@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { aiGenerateSchema, aiReviewSchema, appointmentCreateSchema, consultationCreateSchema, patientCreateSchema, patientExportSchema, patientPortalLookupSchema, patientPortalMagicLinkRequestSchema, patientPortalRequestSchema, patientPortalRequestUpdateSchema, passwordResetSchema, staffInviteSchema, staffUpdateSchema } from "@/lib/validation";
+import { aiGenerateSchema, aiReviewSchema, appointmentCreateSchema, consultationCreateSchema, patientCreateSchema, patientExportSchema, patientPortalCommentSchema, patientPortalLookupSchema, patientPortalMagicLinkRequestSchema, patientPortalRequestSchema, patientPortalRequestUpdateSchema, passwordResetSchema, staffInviteSchema, staffUpdateSchema } from "@/lib/validation";
 
 describe("API validation schemas", () => {
   it("accepts a valid patient payload", () => {
@@ -73,6 +73,8 @@ describe("API validation schemas", () => {
       message: "Please confirm whether the uploaded report has been reviewed."
     }).type).toBe("DOCUMENT");
     expect(patientPortalRequestUpdateSchema.parse({ status: "IN_REVIEW" }).status).toBe("IN_REVIEW");
+    expect(patientPortalCommentSchema.parse({ body: "Thanks, I can make that time." }).body).toContain("Thanks");
+    expect(() => patientPortalCommentSchema.parse({ body: "" })).toThrow();
     expect(() => patientPortalLookupSchema.parse({ mrn: "DEMO-1001", dateOfBirth: "04/12/1982" })).toThrow();
   });
 

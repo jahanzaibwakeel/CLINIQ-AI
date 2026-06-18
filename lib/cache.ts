@@ -14,6 +14,8 @@ function getRedis() {
   if (!redis) {
     redis = new Redis(env.VALKEY_URL, {
       maxRetriesPerRequest: 1,
+      connectTimeout: 750,
+      commandTimeout: 750,
       lazyConnect: true,
       enableOfflineQueue: false
     });

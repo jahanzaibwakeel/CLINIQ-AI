@@ -3,7 +3,7 @@
 import Link from "next/link";
 import type React from "react";
 import { useEffect, useState } from "react";
-import { CalendarClock, FileText, LifeBuoy, Link2, LogIn, MessageSquareText, ShieldAlert } from "lucide-react";
+import { CalendarClock, FileText, LifeBuoy, Link2, LogIn, MessageSquareText, Send, ShieldAlert } from "lucide-react";
 import { csrfHeaders } from "@/lib/client/csrf";
 
 type PortalState = {
@@ -12,6 +12,16 @@ type PortalState = {
   followUps: Array<{ title: string; instructions: string; scheduledFor: string; status: string }>;
   documents: Array<{ fileName: string; status: string; createdAt: string }>;
   visitSummaries: Array<{ summary: string; reviewedAt: string }>;
+  requests: Array<{
+    id: string;
+    type: string;
+    subject: string;
+    message: string;
+    status: string;
+    createdAt: string;
+    updatedAt: string;
+    comments: Array<{ id: string; authorType: string; authorName: string; body: string; createdAt: string }>;
+  }>;
 };
 
 const requestTypes = [
@@ -31,6 +41,7 @@ export function PatientPortal() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [requestLoading, setRequestLoading] = useState(false);
+  const [sessionLinked, setSessionLinked] = useState(false);
   const [requestType, setRequestType] = useState("APPOINTMENT");
   const [subject, setSubject] = useState("Schedule my follow-up visit");
   const [body, setBody] = useState("I would like help scheduling the follow-up appointment requested by my doctor.");
@@ -44,6 +55,7 @@ export function PatientPortal() {
       if (payload?.patient) {
         setPortal(payload as PortalState);
         setMrn(payload.patient.mrn);
+        setSessionLinked(true);
         setMessage("Signed in through a secure portal link.");
       }
     }
@@ -68,6 +80,7 @@ export function PatientPortal() {
       return;
     }
     setPortal(payload as PortalState);
+    setSessionLinked(false);
   }
 
   async function requestMagicLink() {
@@ -114,9 +127,42 @@ export function PatientPortal() {
       return;
     }
     setMessage("Request sent to the clinic team. A staff member will review it during clinic hours.");
+    if (payload?.request) {
+      setPortal((current) => current ? {
+        ...current,
+        requests: [{
+          id: payload.request.id,
+          type: payload.request.type,
+          subject: payload.request.subject,
+          message: payload.request.message,
+          status: payload.request.status,
+          createdAt: payload.request.createdAt,
+          updatedAt: payload.request.updatedAt,
+          comments: []
+        }, ...current.requests]
+      } : current);
+    }
     setSubject("");
     setBody("");
     setPreferredContact("");
+  }
+
+  async function submitReply(requestId: string, body: string) {
+    const response = await fetch(`/api/portal/requests/${requestId}/comments`, {
+      method: "POST",
+      headers: csrfHeaders({ "Content-Type": "application/json" }),
+      body: JSON.stringify({ body })
+    });
+    const payload = await response.json().catch(() => null);
+    if (!response.ok) {
+      throw new Error(payload?.error ?? "Unable to send reply.");
+    }
+    setPortal((current) => current ? {
+      ...current,
+      requests: current.requests.map((request) => request.id === requestId
+        ? { ...request, comments: [...request.comments, payload.comment] }
+        : request)
+    } : current);
   }
 
   return (
@@ -191,6 +237,44 @@ export function PatientPortal() {
               <PortalMetric title="Follow-ups" value={portal.followUps.length} detail="Open clinic follow-ups" tone="green" />
               <PortalMetric title="Documents" value={portal.documents.length} detail="Recent report statuses" />
             </div>
+
+            <section className="card card-pad">
+              <div className="section-head">
+                <h2 className="section-title">Request history</h2>
+                <span className="badge">{portal.requests.length} requests</span>
+              </div>
+              <div className="timeline-list">
+                {portal.requests.length ? portal.requests.map((request) => (
+                  <div className="timeline-item" key={request.id}>
+                    <div style={{ width: "100%" }}>
+                      <div className="section-head" style={{ marginBottom: 8 }}>
+                        <div>
+                          <strong>{request.subject}</strong>
+                          <p className="muted">{request.message}</p>
+                        </div>
+                        <span className={request.status === "NEW" || request.status === "IN_REVIEW" ? "badge warn" : "badge good"}>{request.status.replace("_", " ")}</span>
+                      </div>
+                      <div className="timeline-list">
+                        {request.comments.length ? request.comments.map((comment) => (
+                          <div className="timeline-item" key={comment.id}>
+                            <div>
+                              <strong>{comment.authorName}</strong>
+                              <p className="muted">{comment.body}</p>
+                            </div>
+                            <span className="badge">{new Date(comment.createdAt).toLocaleDateString()}</span>
+                          </div>
+                        )) : <div className="empty">No clinic replies yet.</div>}
+                      </div>
+                      {sessionLinked ? (
+                        <PatientReplyForm onSubmit={(body) => submitReply(request.id, body)} />
+                      ) : (
+                        <p className="muted" style={{ marginBottom: 0 }}>Use a secure portal link to reply to this request.</p>
+                      )}
+                    </div>
+                  </div>
+                )) : <div className="empty">Requests you send to the clinic will appear here.</div>}
+              </div>
+            </section>
 
             <div className="grid two-column">
               <PortalList
@@ -276,6 +360,40 @@ export function PatientPortal() {
         )}
       </main>
     </div>
+  );
+}
+
+function PatientReplyForm({ onSubmit }: { onSubmit: (body: string) => Promise<void> }) {
+  const [body, setBody] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function submit(event: React.FormEvent) {
+    event.preventDefault();
+    setLoading(true);
+    setError("");
+    try {
+      await onSubmit(body);
+      setBody("");
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Unable to send reply.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <form className="form-grid" onSubmit={submit} style={{ marginTop: 10 }}>
+      <label className="field">
+        <span className="label">Reply to clinic</span>
+        <textarea className="textarea compact-textarea" maxLength={2000} minLength={2} onChange={(event) => setBody(event.target.value)} required value={body} />
+      </label>
+      {error ? <span className="badge warn">{error}</span> : null}
+      <button className="button secondary" disabled={loading || body.trim().length < 2} type="submit">
+        <Send size={16} />
+        {loading ? "Sending..." : "Send reply"}
+      </button>
+    </form>
   );
 }
 

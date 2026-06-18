@@ -56,6 +56,30 @@ export async function getPatientPortalPayload(patientId: string, clinicId?: stri
         orderBy: { createdAt: "desc" },
         take: 3,
         select: { output: true, reviewedAt: true, createdAt: true }
+      },
+      portalRequests: {
+        orderBy: { createdAt: "desc" },
+        take: 10,
+        select: {
+          id: true,
+          type: true,
+          subject: true,
+          message: true,
+          status: true,
+          createdAt: true,
+          updatedAt: true,
+          comments: {
+            orderBy: { createdAt: "asc" },
+            take: 8,
+            select: {
+              id: true,
+              authorType: true,
+              body: true,
+              createdAt: true,
+              authorUser: { select: { name: true, role: true } }
+            }
+          }
+        }
       }
     }
   });
@@ -76,6 +100,22 @@ export async function getPatientPortalPayload(patientId: string, clinicId?: stri
     visitSummaries: patient.aiGenerations.map((generation) => ({
       summary: summaryFromOutput(generation.output),
       reviewedAt: generation.reviewedAt ?? generation.createdAt
+    })),
+    requests: patient.portalRequests.map((request) => ({
+      id: request.id,
+      type: request.type,
+      subject: request.subject,
+      message: request.message,
+      status: request.status,
+      createdAt: request.createdAt,
+      updatedAt: request.updatedAt,
+      comments: request.comments.map((comment) => ({
+        id: comment.id,
+        authorType: comment.authorType,
+        authorName: comment.authorUser?.name ?? (comment.authorType === "PATIENT" ? "Patient" : "Clinic team"),
+        body: comment.body,
+        createdAt: comment.createdAt
+      }))
     }))
   };
 }
