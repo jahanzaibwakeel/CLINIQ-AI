@@ -6,6 +6,7 @@ describe("role-based AI permissions", () => {
   it("limits assistants to operational AI drafting modules", () => {
     expect(canGenerateAiForRole(Role.ASSISTANT, "TASK_EXTRACTION")).toBe(true);
     expect(canGenerateAiForRole(Role.ASSISTANT, "FOLLOW_UP_INSTRUCTIONS")).toBe(true);
+    expect(canGenerateAiForRole(Role.ASSISTANT, "PORTAL_REPLY_DRAFT")).toBe(true);
     expect(canGenerateAiForRole(Role.ASSISTANT, "RISK_FLAG_EXPLAINER")).toBe(false);
     expect(canGenerateAiForRole(Role.ASSISTANT, "VISIT_SUMMARY")).toBe(false);
     expect(assistantAiScopeDescription()).toContain("operational");

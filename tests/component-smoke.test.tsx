@@ -43,4 +43,20 @@ describe("AiOutputRenderer", () => {
     expect(screen.getByText("Call patient about eye exam")).toBeInTheDocument();
     expect(screen.getByText("medium")).toBeInTheDocument();
   });
+
+  it("renders patient portal reply drafts as readable text", () => {
+    render(
+      <AiOutputRenderer
+        output={{
+          disclaimer: "AI draft, doctor review required.",
+          summary: "Patient asked about scheduling.",
+          patientReply: "Thank you for your message. Our clinic team will review the schedule and follow up."
+        }}
+        metadata={{ type: "PORTAL_REPLY_DRAFT", provider: "fallback", model: "local-clinical-rules-v2" }}
+      />
+    );
+
+    expect(screen.getByText("Patient reply draft")).toBeInTheDocument();
+    expect(screen.getByText(/clinic team will review/i)).toBeInTheDocument();
+  });
 });

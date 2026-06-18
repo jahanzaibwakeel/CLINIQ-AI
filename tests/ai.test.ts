@@ -65,6 +65,21 @@ describe("Fallback provider", () => {
     expect(output.tasks?.some((task) => task.priority === "high")).toBe(true);
   });
 
+  it("drafts patient-safe portal replies locally", async () => {
+    const provider = new FallbackProvider();
+    const response = await provider.complete({
+      system: "safe",
+      user: prompts.PORTAL_REPLY_DRAFT.buildUserPrompt({
+        sourceText: "Request subject: Schedule follow-up\nPatient message: Please confirm my follow-up appointment time.\nConversation so far: No prior replies."
+      }),
+      json: true
+    });
+    const output = parseSafeAiOutput(response.text);
+    expect(output.patientReply).toContain("received your request");
+    expect(output.patientReply).toContain("schedule");
+    expect(output.disclaimer).toBe("AI draft, doctor review required.");
+  });
+
   it("creates deterministic local embeddings", () => {
     expect(hashEmbedding("HbA1c high")).toEqual(hashEmbedding("HbA1c high"));
   });

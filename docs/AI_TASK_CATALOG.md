@@ -15,10 +15,11 @@ MediPilot AI uses consistent names for every AI workflow. Each output remains an
 | `REFERRAL_LETTER` | AI referral letter draft | Drafts specialist referral wording with context, findings, and missing send-ready items. |
 | `ASSISTANT_RESPONSE` | AI patient-context answer draft | Answers a doctor question using selected patient context and citations. |
 | `SEMANTIC_SEARCH` | AI semantic search summary draft | Summarizes relevant note and document matches for a clinical query. |
+| `PORTAL_REPLY_DRAFT` | AI patient portal reply draft | Drafts patient-safe operational wording for staff to review, edit, and send manually. |
 
 ## Review Flow
 
-1. A doctor or clinic admin generates a named AI draft from the dashboard, consultation page, document page, patient chart, schedule, tasks, or AI Assistant.
+1. A doctor, clinic admin, or permitted assistant generates a named AI draft from the dashboard, consultation page, document page, patient chart, schedule, tasks, patient portal queue, or AI Assistant.
 2. The app stores the draft with provider, model, prompt version, source context, timestamp, request ID, and review status.
 3. The readable draft is shown with the task-specific title and clinical sections.
 4. The AI Review queue keeps editable JSON under `Corrected AI draft JSON`.

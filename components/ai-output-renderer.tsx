@@ -198,6 +198,7 @@ function renderFallback(record: Record<string, unknown>) {
     "flags",
     "explanation",
     "patientInstructions",
+    "patientReply",
     "referralLetter",
     "answer",
     "citations",
@@ -242,6 +243,7 @@ export function AiOutputRenderer({ output, metadata }: AiOutputRendererProps) {
       {renderTextSection(copy.primarySectionTitle, record.summary)}
       {renderSoap(record.soap)}
       {renderListSection("Patient instructions", record.patientInstructions)}
+      {renderTextSection("Patient reply draft", record.patientReply)}
       {renderTasks(metadata?.type === "TASK_EXTRACTION" ? "Extracted clinic tasks" : "Tasks", record.tasks)}
       {renderListSection("Flags for doctor review", record.flags)}
       {renderTextSection("Explanation", record.explanation)}

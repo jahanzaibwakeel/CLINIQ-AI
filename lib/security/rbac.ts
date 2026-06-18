@@ -2,7 +2,7 @@ import { Role, type AiGenerationType } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { getSession, type SessionUser } from "@/lib/security/session";
 
-const assistantAiTypes = new Set<AiGenerationType>(["TASK_EXTRACTION", "FOLLOW_UP_INSTRUCTIONS"]);
+const assistantAiTypes = new Set<AiGenerationType>(["TASK_EXTRACTION", "FOLLOW_UP_INSTRUCTIONS", "PORTAL_REPLY_DRAFT"]);
 
 export function hasRole(user: SessionUser, allowed: Role[]) {
   return allowed.includes(user.role);
@@ -14,7 +14,7 @@ export function canGenerateAiForRole(role: Role, type: AiGenerationType) {
 }
 
 export function assistantAiScopeDescription() {
-  return "Assistants can generate operational task and follow-up drafts only. Clinical summaries, risk explanations, referrals, semantic answers, and AI review remain doctor/admin responsibilities.";
+  return "Assistants can generate operational task, follow-up, and patient portal reply drafts only. Clinical summaries, risk explanations, referrals, semantic answers, and AI review remain doctor/admin responsibilities.";
 }
 
 export async function requireUser(allowed?: Role[]) {

@@ -25,7 +25,7 @@ Core entities:
 - Patients contain demo-only demographics, conditions, medications, allergies, and risk score.
 - Consultations store raw notes, summaries, SOAP JSON, status, and sign-off fields.
 - Appointments schedule patient visits with clinician ownership, status, time window, location, and notes.
-- Patient portal requests link verified patient messages to the clinic queue with workflow status, audited comments, and staff reply notifications.
+- Patient portal requests link verified patient messages to the clinic queue with workflow status, audited comments, AI reply-assist drafts, and staff reply notifications.
 - Patient portal tokens are hashed, single-use, time-limited records used for email magic-link access to a separate patient portal session.
 - Staff account changes and appointment status updates are handled through audited route handlers with role checks.
 - Documents store extraction results, chunks, and parsed JSON.

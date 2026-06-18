@@ -48,14 +48,15 @@ DOB: 1982-04-12
 
 1. Doctor, clinic admin, or assistant opens `/portal-requests`.
 2. Staff review new patient messages.
-3. Staff reply to the request with patient-visible operational updates.
-4. Staff move the request through:
+3. Staff can use AI reply assist to draft patient-safe operational wording.
+4. Staff review, edit, and manually send patient-visible operational updates.
+5. Staff move the request through:
    - `NEW`
    - `IN_REVIEW`
    - `RESOLVED`
    - `CLOSED`
-5. Replies and status changes write audit logs under the signed-in staff user.
-6. Staff replies and status changes send patient email updates through SMTP or the safe development log fallback.
+6. AI drafts, replies, and status changes write audit logs under the signed-in staff user.
+7. Staff replies and status changes send patient email updates through SMTP or the safe development log fallback.
 
 Portal requests also appear in the main Inbox so staff do not have to check a separate screen.
 
@@ -73,7 +74,7 @@ Assistants can:
 - upload and track documents
 - manage tasks and follow-ups
 - triage patient portal requests
-- generate operational AI drafts for task extraction and follow-up wording
+- generate operational AI drafts for task extraction, follow-up wording, and patient portal replies
 
 Assistants cannot:
 
@@ -105,6 +106,7 @@ It does not expose:
 Public portal writes are rate-limited, validated with Zod, CSRF/origin protected by middleware, and audited with `actorId: null`.
 Magic-link access uses hashed single-use `PatientPortalToken` records and a separate `medipilot_patient_portal` session cookie, not the internal staff session.
 Patients can view request history after MRN/date-of-birth verification, but replies require the stronger magic-link session so an MRN/DOB demo lookup cannot impersonate an ongoing secure conversation.
+AI reply assist runs only inside the staff portal queue, stores the draft as an internal `AiGeneration`, and never sends a patient message automatically.
 
 ## Why This Improves The Portfolio Project
 

@@ -258,6 +258,18 @@ Creates a patient-visible comment on a portal request. Signed-in staff can reply
 
 Staff replies send patient email notifications when an email address is on file. All replies write audit events.
 
+### `POST /api/portal/requests/:id/draft-reply`
+
+Allowed roles: doctor, clinic admin, assistant.
+
+Generates a patient-safe AI portal reply draft from the portal request and recent conversation. The draft is stored as an `AiGeneration` with provider/model metadata and must be inserted, edited, and sent manually by staff.
+
+```json
+{ "instruction": "Acknowledge the request and say scheduling will call." }
+```
+
+The response includes `draft`, structured `output`, and generation metadata. It never sends the message automatically.
+
 ## Staff
 
 ### `POST /api/staff/invitations`

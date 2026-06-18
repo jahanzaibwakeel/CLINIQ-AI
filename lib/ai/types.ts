@@ -48,6 +48,7 @@ export type SafeAiOutput = {
   flags?: string[];
   explanation?: string;
   patientInstructions?: string[];
+  patientReply?: string;
   referralLetter?: string;
   answer?: string;
   citations?: string[];

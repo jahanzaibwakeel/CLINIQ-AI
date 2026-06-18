@@ -63,6 +63,18 @@ function buildDraft(input: {
     };
   }
 
+  if (task.includes("portal request") || task.includes("patient-safe reply") || task.includes("patient-visible portal")) {
+    return {
+      disclaimer,
+      summary: summary || "Portal request reviewed for a patient-safe staff reply.",
+      patientReply: buildPortalReply(sourceText, flags),
+      flags: [
+        ...flags,
+        "Staff must verify scheduling, results, medication instructions, and clinic policy before sending."
+      ].slice(0, 8)
+    };
+  }
+
   if (task.includes("patient-friendly") || task.includes("follow-up instructions") || task.includes("visit summary")) {
     return {
       disclaimer,
@@ -303,6 +315,34 @@ function buildPatientInstructions(sourceText: string, findings: Finding[], flags
   if (findings.some((finding) => finding.status === "abnormal")) instructions.push("Some values may need doctor review before any changes are made.");
   if (flags.some((flag) => /tingling|neuropathy/i.test(flag))) instructions.push("Tell the clinic promptly if tingling, numbness, pain, or weakness changes.");
   return dedupe(instructions).slice(0, 6);
+}
+
+function buildPortalReply(sourceText: string, flags: string[]) {
+  const lower = sourceText.toLowerCase();
+  const lines = [
+    "Thank you for your message. We have received your request and will route it to the clinic team for review."
+  ];
+
+  if (/appointment|schedule|follow-up|follow up/.test(lower)) {
+    lines.push("A staff member will check the schedule and follow up with available appointment options.");
+  }
+  if (/document|report|lab|result/.test(lower)) {
+    lines.push("If this is about a report or lab result, the clinic will confirm whether it has been reviewed before giving next-step instructions.");
+  }
+  if (/medication|refill|dose|dosage/.test(lower)) {
+    lines.push("Please do not change any medication unless your clinician has specifically told you to do so.");
+  }
+  if (/urgent|emergency|chest pain|shortness of breath|severe/.test(lower)) {
+    lines.push("If you are having urgent or severe symptoms, please contact emergency services or call the clinic directly.");
+  }
+
+  lines.push("This is a draft reply and should be reviewed by clinic staff before sending.");
+
+  if (flags.length) {
+    lines.push("Before sending, verify any clinical details, pending results, and promised follow-up timing.");
+  }
+
+  return dedupe(lines).join(" ");
 }
 
 function patientFriendlySummary(concerns: string[], findings: Finding[]) {

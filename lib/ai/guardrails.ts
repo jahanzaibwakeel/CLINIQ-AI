@@ -25,6 +25,7 @@ const outputSchema = z
     flags: z.array(z.string()).optional(),
     explanation: z.string().optional(),
     patientInstructions: z.array(z.string()).optional(),
+    patientReply: z.string().optional(),
     referralLetter: z.string().optional(),
     answer: z.string().optional(),
     citations: z.array(z.string()).optional(),

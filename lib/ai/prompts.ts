@@ -52,6 +52,12 @@ const schemas = {
   "answer": "...",
   "citations": ["short source snippet"],
   "flags": ["uncertainty or missing context"]
+}`,
+  portalReply: `{
+  "disclaimer": "AI draft, doctor review required.",
+  "summary": "short internal summary of what the reply addresses",
+  "patientReply": "patient-visible reply draft",
+  "flags": ["item staff or doctor should verify before sending"]
 }`
 } as const;
 
@@ -138,5 +144,19 @@ export const prompts: Record<AiGenerationType, PromptTemplate> = {
     type: "SEMANTIC_SEARCH",
     system: safetySystem,
     buildUserPrompt: jsonPrompt("Summarize the most relevant search matches and explain how they relate to the query.", schemas.assistant)
+  },
+  PORTAL_REPLY_DRAFT: {
+    version: "portal-reply-draft-v1",
+    type: "PORTAL_REPLY_DRAFT",
+    system: [
+      safetySystem,
+      "Draft patient-visible portal replies only.",
+      "Do not provide diagnosis, medication changes, test interpretation, or emergency triage instructions beyond telling the patient to contact emergency services for urgent symptoms.",
+      "Use warm, concise clinic language and clearly identify missing information staff must verify before sending."
+    ].join(" "),
+    buildUserPrompt: jsonPrompt(
+      "Draft a patient-safe reply to the portal request. Keep it operational, concise, empathetic, and non-diagnostic. Do not promise appointments, results, medication changes, or clinical conclusions unless the source context explicitly confirms them.",
+      schemas.portalReply
+    )
   }
 };

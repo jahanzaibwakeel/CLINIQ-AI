@@ -78,7 +78,8 @@ export const aiGenerateSchema = z.object({
     "VISIT_SUMMARY",
     "REFERRAL_LETTER",
     "ASSISTANT_RESPONSE",
-    "SEMANTIC_SEARCH"
+    "SEMANTIC_SEARCH",
+    "PORTAL_REPLY_DRAFT"
   ]),
   input: z.string().min(1),
   question: z.string().optional()
@@ -166,6 +167,10 @@ export const patientPortalRequestUpdateSchema = z.object({
 
 export const patientPortalCommentSchema = z.object({
   body: z.string().min(2).max(2000)
+});
+
+export const patientPortalReplyDraftSchema = z.object({
+  instruction: z.string().max(500).optional().or(z.literal(""))
 });
 
 export const staffUpdateSchema = z.object({

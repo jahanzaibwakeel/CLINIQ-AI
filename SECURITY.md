@@ -39,6 +39,7 @@
 - AI generation metadata includes source context and provider/model.
 - AI generation telemetry includes latency, cache-hit state, token estimate, and request ID.
 - AI drafts require explicit review and can be approved or rejected with audit logging.
+- Patient portal reply AI drafts are internal-only until staff insert, edit, and manually send them.
 - Reviewed AI drafts can be edited before approval and applied into records with audit metadata.
 - Uploaded documents automatically create AI triage drafts while preserving doctor review before clinical use.
 - Document processing failures mark the document as failed and write an audit event.

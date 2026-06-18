@@ -24,11 +24,11 @@ describe("API validation schemas", () => {
 
   it("allows supported AI generation modules", () => {
     const parsed = aiGenerateSchema.parse({
-      type: "TASK_EXTRACTION",
+      type: "PORTAL_REPLY_DRAFT",
       input: "Order lab follow up and call patient",
       patientId: "patient-id"
     });
-    expect(parsed.type).toBe("TASK_EXTRACTION");
+    expect(parsed.type).toBe("PORTAL_REPLY_DRAFT");
   });
 
   it("defaults AI review apply-to-record to false", () => {

@@ -9,7 +9,8 @@ export type AiTaskType =
   | "VISIT_SUMMARY"
   | "REFERRAL_LETTER"
   | "ASSISTANT_RESPONSE"
-  | "SEMANTIC_SEARCH";
+  | "SEMANTIC_SEARCH"
+  | "PORTAL_REPLY_DRAFT";
 
 export type AiTaskCopy = {
   type: AiTaskType;
@@ -33,7 +34,8 @@ export const aiTaskOrder: AiTaskType[] = [
   "VISIT_SUMMARY",
   "REFERRAL_LETTER",
   "ASSISTANT_RESPONSE",
-  "SEMANTIC_SEARCH"
+  "SEMANTIC_SEARCH",
+  "PORTAL_REPLY_DRAFT"
 ];
 
 export const aiTaskCatalog: Record<AiTaskType, AiTaskCopy> = {
@@ -146,6 +148,16 @@ export const aiTaskCatalog: Record<AiTaskType, AiTaskCopy> = {
     reviewTitle: "Semantic search review",
     help: "Summarize relevant note and document matches for a clinical query.",
     outputSummary: "Ranks and explains patient-history matches using local embeddings when available."
+  },
+  PORTAL_REPLY_DRAFT: {
+    type: "PORTAL_REPLY_DRAFT",
+    shortLabel: "Portal reply",
+    actionLabel: "patient-safe portal reply",
+    draftTitle: "AI patient portal reply draft",
+    primarySectionTitle: "Reply summary",
+    reviewTitle: "Portal reply review",
+    help: "Draft a warm, operational response to a patient portal request without giving diagnosis or treatment changes.",
+    outputSummary: "Creates patient-safe wording for staff to review, edit, and send manually."
   }
 };
 

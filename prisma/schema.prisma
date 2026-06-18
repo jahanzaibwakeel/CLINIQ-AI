@@ -38,6 +38,7 @@ enum AiGenerationType {
   REFERRAL_LETTER
   ASSISTANT_RESPONSE
   SEMANTIC_SEARCH
+  PORTAL_REPLY_DRAFT
 }
 
 enum ReviewStatus {

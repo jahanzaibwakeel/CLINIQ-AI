@@ -7,10 +7,10 @@ import { AiRuntimeBadge } from "@/components/ai-runtime-badge";
 import { csrfHeaders } from "@/lib/client/csrf";
 import { aiTaskOrder, getAiTaskCopy, type AiTaskType } from "@/lib/ai/catalog";
 
-type AiType = Exclude<AiTaskType, "SEMANTIC_SEARCH">;
+type AiType = Exclude<AiTaskType, "SEMANTIC_SEARCH" | "PORTAL_REPLY_DRAFT">;
 
 const aiOptions = aiTaskOrder
-  .filter((type): type is AiType => type !== "SEMANTIC_SEARCH")
+  .filter((type): type is AiType => type !== "SEMANTIC_SEARCH" && type !== "PORTAL_REPLY_DRAFT")
   .map((type) => ({ value: type, label: getAiTaskCopy(type).shortLabel }));
 
 type AiWorkbenchResult = {

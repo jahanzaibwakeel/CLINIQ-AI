@@ -235,7 +235,7 @@ textarea {
   justify-content: flex-end;
 }
 
-.command-actions .button.secondary {
+.command-band .command-actions .button.secondary {
   border-color: rgba(255, 255, 255, 0.55);
   background: rgba(255, 255, 255, 0.12);
   color: white;
@@ -708,6 +708,27 @@ th {
   border: 1px solid var(--border);
   border-radius: 8px;
   background: white;
+}
+
+.inline-ai-draft {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #f8fbfc;
+}
+
+.compact-ai-output {
+  padding: 10px;
+}
+
+.compact-ai-output .ai-output {
+  padding: 10px;
+}
+
+.compact-ai-output .ai-output-section h4 {
+  font-size: 13px;
 }
 
 .ai-output-meta {
