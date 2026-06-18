@@ -5,6 +5,8 @@ const env = process.env;
 const placeholderSecrets = new Set([
   "replace-this-in-production-with-a-long-random-secret",
   "replace-with-a-long-random-secret-at-least-32-chars",
+  "replace-with-a-strong-database-password",
+  "replace-with-monitoring-token-or-leave-blank",
   "development-only-secret-change-me-32",
   "docker-build-secret-docker-build-secret"
 ]);
@@ -22,6 +24,14 @@ if (env.SESSION_SECRET && placeholderSecrets.has(env.SESSION_SECRET)) {
   failures.push("SESSION_SECRET is still using a documented placeholder value.");
 }
 
+if (env.POSTGRES_PASSWORD && placeholderSecrets.has(env.POSTGRES_PASSWORD)) {
+  failures.push("POSTGRES_PASSWORD is still using a documented placeholder value.");
+}
+
+if (env.METRICS_BEARER_TOKEN && placeholderSecrets.has(env.METRICS_BEARER_TOKEN)) {
+  failures.push("METRICS_BEARER_TOKEN is still using a documented placeholder value.");
+}
+
 if (env.NEXT_PUBLIC_APP_URL) {
   try {
     const appUrl = new URL(env.NEXT_PUBLIC_APP_URL);
@@ -34,12 +44,16 @@ if (env.NEXT_PUBLIC_APP_URL) {
       warnings.push("NEXT_PUBLIC_APP_URL includes an explicit port; production domains usually terminate HTTPS on the standard port.");
     }
     if (env.TRUSTED_ORIGINS) {
-      const trustedOrigins = env.TRUSTED_ORIGINS.split(",").map((origin) => origin.trim()).filter(Boolean);
-      if (!trustedOrigins.includes(appUrl.origin)) {
+      const trustedOrigins = parseTrustedOrigins(env.TRUSTED_ORIGINS);
+      if (!trustedOrigins.origins.includes(appUrl.origin)) {
         failures.push("TRUSTED_ORIGINS must include the exact NEXT_PUBLIC_APP_URL origin.");
       }
-      if (!isLocal && trustedOrigins.some((origin) => /localhost|127\.0\.0\.1|\[::1\]/.test(origin))) {
+      if (trustedOrigins.failures.length) failures.push(...trustedOrigins.failures);
+      if (!isLocal && trustedOrigins.origins.some((origin) => /localhost|127\.0\.0\.1|\[::1\]/.test(origin))) {
         warnings.push("TRUSTED_ORIGINS contains local development origins while NEXT_PUBLIC_APP_URL is non-local.");
+      }
+      if (!isLocal && trustedOrigins.origins.some((origin) => origin.startsWith("http://") && !/localhost|127\.0\.0\.1|\[::1\]/.test(origin))) {
+        failures.push("TRUSTED_ORIGINS must use HTTPS outside local development.");
       }
     }
   } catch {
@@ -83,6 +97,23 @@ if (failures.length) process.exit(1);
 
 function requireValue(name) {
   if (!env[name]) failures.push(`${name} is required.`);
+}
+
+function parseTrustedOrigins(value) {
+  const origins = [];
+  const originFailures = [];
+  for (const origin of value.split(",").map((entry) => entry.trim()).filter(Boolean)) {
+    try {
+      const parsed = new URL(origin);
+      if (parsed.origin !== origin.replace(/\/$/, "")) {
+        originFailures.push(`TRUSTED_ORIGINS entry must be an origin without path/query/hash: ${origin}`);
+      }
+      origins.push(parsed.origin);
+    } catch {
+      originFailures.push(`TRUSTED_ORIGINS contains an invalid URL: ${origin}`);
+    }
+  }
+  return { origins, failures: originFailures };
 }
 
 async function checkEndpoint(path) {

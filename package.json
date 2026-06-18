@@ -23,6 +23,7 @@
     "db:restore": "tsx scripts/db-restore.ts",
     "release:check": "node scripts/production-check.mjs",
     "ops:monitor": "node scripts/ops-monitor.mjs",
+    "secrets:generate": "node scripts/generate-secrets.mjs",
     "security:cleanup-tokens": "tsx scripts/account-token-cleanup.ts",
     "security:audit": "npm audit --audit-level=high --omit=optional"
   },

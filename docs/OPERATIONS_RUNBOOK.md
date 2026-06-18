@@ -69,7 +69,9 @@ Before final deployment:
 - `NEXT_PUBLIC_APP_URL` is the HTTPS domain origin.
 - `TRUSTED_ORIGINS` includes the exact HTTPS domain origin.
 - `APP_HOST_PORT` and `APP_CONTAINER_PORT` are explicit in server env.
+- `APP_BIND_ADDRESS=127.0.0.1` when HTTPS is terminated by the included proxy on the same VPS.
 - `SESSION_SECRET`, `POSTGRES_PASSWORD`, SMTP credentials, and monitor token are strong secrets.
+- `npm run secrets:generate` has been used instead of example secret values.
 - `npm run release:check` passes with `PRODUCTION_CHECK_URL` set.
 - `npm run ops:monitor` returns no failed checks against the domain.
 - Backups and restore drill are documented.

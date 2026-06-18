@@ -14,6 +14,7 @@
 - AI rate limiting.
 - Security headers through middleware: CSP, frame denial, content sniffing protection, referrer policy, and permissions policy.
 - Production origin allow-listing for mutating API requests through `NEXT_PUBLIC_APP_URL` or `TRUSTED_ORIGINS`.
+- Production Compose can bind the internal app port to `127.0.0.1` through `APP_BIND_ADDRESS` while HTTPS terminates at the proxy.
 - Audit logs for clinical writes and AI generations.
 - Public patient portal request creation and patient replies are audited with `actorId: null`, then staff replies and status changes are audited under the signed-in user.
 - Patient portal magic links use hashed, single-use, time-limited `PatientPortalToken` records and a separate patient session cookie.
@@ -29,6 +30,7 @@
 - Local deterministic AI draft engine is available when Ollama is unavailable, avoiding paid APIs and external PHI transfer for demos.
 - AI output stored as draft with review status.
 - No secrets committed; `.env.example` documents expected variables.
+- Strong deployment secrets can be generated locally with `npm run secrets:generate`.
 - Email delivery uses environment-configured SMTP/Nodemailer settings or development log previews.
 
 ## Healthcare Safety Controls

@@ -117,6 +117,7 @@ npm run db:studio
 npm run db:backup
 npm run release:check
 npm run ops:monitor
+npm run secrets:generate
 ```
 
 ## CI/CD
@@ -131,6 +132,7 @@ For VPS auto-deploy, configure these repository secrets:
 - `VPS_APP_DIR`
 
 The VPS should contain `docker-compose.prod.yml` and a production `.env`.
+For domain launch with the included HTTPS proxy, follow [docs/DOMAIN_GO_LIVE.md](docs/DOMAIN_GO_LIVE.md).
 
 ## Documentation
 
@@ -144,6 +146,7 @@ The VPS should contain `docker-compose.prod.yml` and a production `.env`.
 - [docs/CUSTOMER_PORTAL_FLOW.md](docs/CUSTOMER_PORTAL_FLOW.md)
 - [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md)
 - [docs/OPERATIONS_RUNBOOK.md](docs/OPERATIONS_RUNBOOK.md)
+- [docs/DOMAIN_GO_LIVE.md](docs/DOMAIN_GO_LIVE.md)
 - [docs/PRODUCTION_REVIEW.md](docs/PRODUCTION_REVIEW.md)
 - [docs/SCREENSHOTS.md](docs/SCREENSHOTS.md)
 - [docs/RESUME_BULLETS.md](docs/RESUME_BULLETS.md)

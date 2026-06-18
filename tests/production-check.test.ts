@@ -43,4 +43,25 @@ describe("production configuration check", () => {
     expect(result.status).toBe(1);
     expect(result.stdout).toContain("TRUSTED_ORIGINS must include");
   });
+
+  it("fails when production placeholders remain configured", () => {
+    const result = runProductionCheckFailure({
+      ...baseEnv,
+      POSTGRES_PASSWORD: "replace-with-a-strong-database-password",
+      METRICS_BEARER_TOKEN: "replace-with-monitoring-token-or-leave-blank"
+    });
+    expect(result.status).toBe(1);
+    expect(result.stdout).toContain("POSTGRES_PASSWORD is still using");
+    expect(result.stdout).toContain("METRICS_BEARER_TOKEN is still using");
+  });
+
+  it("fails when trusted origins contain paths or insecure public origins", () => {
+    const result = runProductionCheckFailure({
+      ...baseEnv,
+      TRUSTED_ORIGINS: "https://clinic.example.com/app,http://other.example.com"
+    });
+    expect(result.status).toBe(1);
+    expect(result.stdout).toContain("without path/query/hash");
+    expect(result.stdout).toContain("must use HTTPS outside local development");
+  });
 });

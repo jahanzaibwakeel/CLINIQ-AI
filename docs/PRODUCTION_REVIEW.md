@@ -5,8 +5,9 @@ This review summarizes the current hosting posture for MediPilot AI before putti
 ## Ready For Portfolio Hosting
 
 - Production Docker image builds successfully with Next.js standalone output.
-- Docker Compose includes web, PostgreSQL, Valkey, and optional Ollama services.
+- Docker Compose includes web, PostgreSQL, Valkey, optional Ollama, and optional Caddy HTTPS proxy services.
 - Host and container ports are explicitly environment-driven through `APP_HOST_PORT`, `APP_CONTAINER_PORT`, `POSTGRES_HOST_PORT`, and `VALKEY_HOST_PORT`; Compose fails fast when required app ports are missing.
+- Production web binding can be restricted with `APP_BIND_ADDRESS`, keeping the app behind the HTTPS proxy on a VPS.
 - Browser origins are environment-driven through `NEXT_PUBLIC_APP_URL` and `TRUSTED_ORIGINS`.
 - PostgreSQL schema is managed with Prisma migrations and seeded demo data.
 - Authentication uses signed HTTP-only cookies, bcrypt password hashes, login rate limiting, and account lockout.
@@ -24,6 +25,7 @@ This review summarizes the current hosting posture for MediPilot AI before putti
 - Replace demo users and demo patient data with clinic onboarding flows and real identity policy.
 - Add MFA or SSO for clinic accounts.
 - Store production secrets in a managed secret store, not plain server files.
+- Generate fresh production secrets with `npm run secrets:generate`; never reuse example values.
 - Configure HTTPS with the final domain and set `NEXT_PUBLIC_APP_URL` plus `TRUSTED_ORIGINS`.
 - Configure an approved SMTP provider for password resets and staff invites.
 - Use encrypted disks and encrypted database backups.

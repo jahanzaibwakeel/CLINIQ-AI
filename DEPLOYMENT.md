@@ -21,6 +21,7 @@ Required:
 - `SESSION_SECRET`
 - `NEXT_PUBLIC_APP_URL`
 - `TRUSTED_ORIGINS`
+- `APP_BIND_ADDRESS`
 - `APP_HOST_PORT`
 - `APP_CONTAINER_PORT`
 
@@ -42,6 +43,12 @@ Recommended:
 - `ACCOUNT_TOKEN_RETENTION_DAYS` for used reset/invite token retention before cleanup
 
 Do not commit `.env`.
+
+Generate strong local secrets with:
+
+```bash
+npm run secrets:generate
+```
 
 ## Database
 
@@ -83,6 +90,17 @@ Use `OLLAMA_NUM_PREDICT` to tune local generation length. Smaller values are fas
 6. Start `docker compose up -d web`.
 7. Place Caddy, Nginx, or a cloud load balancer in front with HTTPS.
 
+For the included Caddy HTTPS profile:
+
+```bash
+docker compose -f docker-compose.prod.yml --profile proxy up -d
+docker compose -f docker-compose.prod.yml exec -T web npm run db:deploy
+docker compose -f docker-compose.prod.yml exec -T web npm run release:check
+docker compose -f docker-compose.prod.yml exec -T web npm run ops:monitor
+```
+
+Set `DOMAIN`, `PROXY_HTTP_PORT`, and `PROXY_HTTPS_PORT` in the server `.env`. Keep `APP_BIND_ADDRESS=127.0.0.1` when the proxy runs on the same host.
+
 ## Automated CI/CD
 
 The GitHub Actions workflow in `.github/workflows/ci.yml` is split into professional release stages. See [docs/CICD_PIPELINE.md](docs/CICD_PIPELINE.md) for the full pipeline map.
@@ -114,7 +132,7 @@ To enable automatic VPS deploys, set these repository secrets:
 - `VPS_SSH_KEY`: private key with access to the server
 - `VPS_APP_DIR`: app directory on the server, for example `/opt/medipilot-ai`
 
-On the server, keep a production `.env` beside `docker-compose.prod.yml`. The deploy job pulls the latest GHCR image, runs Compose, applies migrations, checks `/api/ready`, and runs `scripts/production-check.mjs` inside the web container.
+On the server, keep a production `.env` beside `docker-compose.prod.yml`. The deploy job pulls the latest GHCR image, runs Compose, applies migrations, checks `/api/ready`, runs `scripts/production-check.mjs`, and runs the operations monitor inside the web container.
 
 ## Health Checks
 
@@ -195,6 +213,7 @@ The CI pipeline uploads `npm-audit.json` as an artifact so dependency risks can 
 
 - Strong `SESSION_SECRET`.
 - HTTPS enabled.
+- `APP_BIND_ADDRESS` reviewed so the internal app port is not publicly exposed unless intentionally deployed that way.
 - `npm run release:check` passes with `PRODUCTION_CHECK_URL` set to the hosted domain.
 - `ALLOW_EXTERNAL_AI=false` unless explicitly approved.
 - `/api/health` and `/api/ready` monitored.
