@@ -11,7 +11,7 @@ npm run db:seed
 npm run dev
 ```
 
-Visit the URL configured by `NEXT_PUBLIC_APP_URL`. The default template uses port `3000`; set `APP_HOST_PORT`, `APP_CONTAINER_PORT`, and `PORT` when another port is needed.
+Visit the URL configured by `NEXT_PUBLIC_APP_URL`. Set `APP_HOST_PORT`, `APP_CONTAINER_PORT`, and `PORT` explicitly for each environment; deployment should not depend on hardcoded app ports.
 
 ## Environment Variables
 
@@ -19,11 +19,13 @@ Required:
 
 - `DATABASE_URL`
 - `SESSION_SECRET`
+- `NEXT_PUBLIC_APP_URL`
+- `TRUSTED_ORIGINS`
+- `APP_HOST_PORT`
+- `APP_CONTAINER_PORT`
 
 Recommended:
 
-- `APP_HOST_PORT`
-- `APP_CONTAINER_PORT`
 - `DOCUMENT_STORAGE_DIR`
 - `DOCUMENT_MAX_UPLOAD_BYTES`
 - `VALKEY_URL`

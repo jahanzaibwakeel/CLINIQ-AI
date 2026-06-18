@@ -2,7 +2,7 @@
 
 ## Provider Strategy
 
-Default mode is local Ollama:
+Default mode is local Ollama. The values below are examples; choose host ports through environment variables for each machine or domain:
 
 ```env
 AI_PROVIDER=ollama
@@ -34,6 +34,7 @@ MediPilot AI implements these generation types:
 - `REFERRAL_LETTER`
 - `ASSISTANT_RESPONSE`
 - `SEMANTIC_SEARCH`
+- `PORTAL_REPLY_DRAFT`
 
 The user-facing names, output purposes, and review behavior are documented in [docs/AI_TASK_CATALOG.md](docs/AI_TASK_CATALOG.md).
 
@@ -48,6 +49,7 @@ AI is integrated into everyday workflow surfaces:
 - Document upload pipeline: every uploaded extracted-text report is chunked, embedded, then sent through document parse, risk flag explanation, and task extraction drafts for review.
 - Document intelligence: reviewed parsed JSON, AI document-parse drafts, and lightweight text-scanned lab values are normalized into a parsed-value review board for clinician approval.
 - Tasks: current queue or pasted notes to extracted tasks, follow-up language, and operational risk review.
+- Patient portal: staff can draft patient-safe operational replies from request history, then insert, edit, and send manually.
 
 Prompt templates live in `lib/ai/prompts.ts` and include stable version IDs.
 

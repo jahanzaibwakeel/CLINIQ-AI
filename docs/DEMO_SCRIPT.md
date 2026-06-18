@@ -37,8 +37,14 @@ Use this path for a focused 5-7 minute portfolio walkthrough.
 - Open Settings/Ops for readiness, telemetry, and AI provider status.
 - Sign in as `admin@medipilot.local` to show Staff role controls, failed-login counters, and account state.
 
-## 7. Deployment Proof
+## 7. Patient Portal And Assistant Workflow
+
+- Open `/portal` and show the patient-safe customer view with request history.
+- Open `/portal-requests` as the assistant and generate an AI portal reply draft.
+- Point out that the draft is internal, patient-safe, marked for review, and must be inserted/edited before sending.
+
+## 8. Deployment Proof
 
 - Mention Docker Compose services: web, PostgreSQL, Valkey, and optional Ollama.
 - Mention CI coverage: lint, type check, unit tests, integration tests when services are available, Playwright E2E, build, and release checks.
-- Mention domain readiness: `NEXT_PUBLIC_APP_URL` and `TRUSTED_ORIGINS` control browser origins without hardcoded ports.
+- Mention domain readiness: `NEXT_PUBLIC_APP_URL`, `TRUSTED_ORIGINS`, `APP_HOST_PORT`, and `APP_CONTAINER_PORT` control browser origins and ports without deployment hardcoding.

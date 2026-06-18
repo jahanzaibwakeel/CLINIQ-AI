@@ -6,7 +6,7 @@ This review summarizes the current hosting posture for MediPilot AI before putti
 
 - Production Docker image builds successfully with Next.js standalone output.
 - Docker Compose includes web, PostgreSQL, Valkey, and optional Ollama services.
-- Host and container ports are environment-driven through `APP_HOST_PORT`, `APP_CONTAINER_PORT`, `POSTGRES_HOST_PORT`, and `VALKEY_HOST_PORT`.
+- Host and container ports are explicitly environment-driven through `APP_HOST_PORT`, `APP_CONTAINER_PORT`, `POSTGRES_HOST_PORT`, and `VALKEY_HOST_PORT`; Compose fails fast when required app ports are missing.
 - Browser origins are environment-driven through `NEXT_PUBLIC_APP_URL` and `TRUSTED_ORIGINS`.
 - PostgreSQL schema is managed with Prisma migrations and seeded demo data.
 - Authentication uses signed HTTP-only cookies, bcrypt password hashes, login rate limiting, and account lockout.

@@ -8,7 +8,6 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 RUN apk add --no-cache openssl
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV DATABASE_URL=postgresql://medipilot:medipilot@postgres:5432/medipilot_ai?schema=public
 ENV AI_PROVIDER=fallback
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .

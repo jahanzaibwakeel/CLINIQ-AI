@@ -28,10 +28,10 @@ env:
   SESSION_SECRET: ci-secret-ci-secret-ci-secret-ci-secret
   AI_PROVIDER: fallback
   ALLOW_EXTERNAL_AI: "false"
-  NEXT_PUBLIC_APP_URL: http://127.0.0.1:3000
-  TRUSTED_ORIGINS: http://127.0.0.1:3000,http://localhost:3000
-  DATABASE_URL: postgresql://medipilot:medipilot@127.0.0.1:5432/medipilot_ai?schema=public
-  VALKEY_URL: redis://127.0.0.1:6379
+  NEXT_PUBLIC_APP_URL: http://localhost
+  TRUSTED_ORIGINS: http://localhost
+  DATABASE_URL: postgresql://medipilot:medipilot@localhost/medipilot_ai?schema=public
+  VALKEY_URL: redis://localhost
 
 jobs:
   quality:
@@ -178,8 +178,6 @@ jobs:
     env:
       DATABASE_URL: postgresql://medipilot:medipilot@127.0.0.1:${{ job.services.postgres.ports[5432] }}/medipilot_ai?schema=public
       VALKEY_URL: redis://127.0.0.1:${{ job.services.valkey.ports[6379] }}
-      PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
-      PORT: "3000"
 
     steps:
       - name: Checkout repository
@@ -205,6 +203,16 @@ jobs:
 
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
+
+      - name: Resolve browser smoke port
+        shell: bash
+        run: |
+          PORT="$(node -e "const net=require('net'); const s=net.createServer(); s.listen(0,'127.0.0.1',()=>{ const p=s.address().port; s.close(()=>process.stdout.write(String(p))); });")"
+          echo "APP_HOST_PORT=$PORT" >> "$GITHUB_ENV"
+          echo "PORT=$PORT" >> "$GITHUB_ENV"
+          echo "PLAYWRIGHT_BASE_URL=http://127.0.0.1:$PORT" >> "$GITHUB_ENV"
+          echo "NEXT_PUBLIC_APP_URL=http://127.0.0.1:$PORT" >> "$GITHUB_ENV"
+          echo "TRUSTED_ORIGINS=http://127.0.0.1:$PORT,http://localhost:$PORT" >> "$GITHUB_ENV"
 
       - name: Run desktop browser smoke suite
         run: npm run test:e2e -- --project=desktop-chrome
@@ -319,8 +327,9 @@ jobs:
             export MEDIPILOT_IMAGE="$IMAGE"
             docker compose -f docker-compose.prod.yml up -d --remove-orphans
             docker compose -f docker-compose.prod.yml exec -T web npm run db:deploy
-            docker compose -f docker-compose.prod.yml exec -T web node -e "fetch('http://127.0.0.1:' + (process.env.PORT || 3000) + '/api/ready').then(r => { if (!r.ok) process.exit(1); console.log('ready') }).catch(() => process.exit(1))"
-            APP_PORT="$(docker compose -f docker-compose.prod.yml exec -T web node -e "process.stdout.write(process.env.PORT || '3000')")"
+            docker compose -f docker-compose.prod.yml exec -T web node -e "const port = process.env.PORT; if (!port) process.exit(1); fetch('http://127.0.0.1:' + port + '/api/ready').then(r => { if (!r.ok) process.exit(1); console.log('ready') }).catch(() => process.exit(1))"
+            APP_PORT="$(docker compose -f docker-compose.prod.yml exec -T web node -e "process.stdout.write(process.env.PORT || '')")"
+            test -n "$APP_PORT"
             docker compose -f docker-compose.prod.yml exec -T -e PRODUCTION_CHECK_URL="http://127.0.0.1:${APP_PORT}" web node scripts/production-check.mjs
 
   pipeline-summary:

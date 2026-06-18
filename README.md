@@ -61,7 +61,7 @@ npm run db:backup
 npm run dev
 ```
 
-Open the URL configured by `NEXT_PUBLIC_APP_URL`. The default is `http://localhost:3000`, and you can change the port with `APP_HOST_PORT`/`PORT`.
+Open the URL configured by `NEXT_PUBLIC_APP_URL`. Choose local and production ports through `APP_HOST_PORT`, `APP_CONTAINER_PORT`, and `PORT`; do not rely on hardcoded ports.
 
 ## Docker Development
 

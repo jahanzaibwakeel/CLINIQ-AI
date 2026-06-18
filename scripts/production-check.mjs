@@ -12,6 +12,7 @@ const placeholderSecrets = new Set([
 requireValue("DATABASE_URL");
 requireValue("SESSION_SECRET");
 requireValue("NEXT_PUBLIC_APP_URL");
+requireValue("TRUSTED_ORIGINS");
 
 if (env.SESSION_SECRET && env.SESSION_SECRET.length < 32) {
   failures.push("SESSION_SECRET must be at least 32 characters.");
@@ -25,8 +26,21 @@ if (env.NEXT_PUBLIC_APP_URL) {
   try {
     const appUrl = new URL(env.NEXT_PUBLIC_APP_URL);
     const localHosts = new Set(["localhost", "127.0.0.1", "::1"]);
-    if (appUrl.protocol !== "https:" && !localHosts.has(appUrl.hostname)) {
+    const isLocal = localHosts.has(appUrl.hostname);
+    if (appUrl.protocol !== "https:" && !isLocal) {
       failures.push("NEXT_PUBLIC_APP_URL must use HTTPS outside local development.");
+    }
+    if (!isLocal && appUrl.port) {
+      warnings.push("NEXT_PUBLIC_APP_URL includes an explicit port; production domains usually terminate HTTPS on the standard port.");
+    }
+    if (env.TRUSTED_ORIGINS) {
+      const trustedOrigins = env.TRUSTED_ORIGINS.split(",").map((origin) => origin.trim()).filter(Boolean);
+      if (!trustedOrigins.includes(appUrl.origin)) {
+        failures.push("TRUSTED_ORIGINS must include the exact NEXT_PUBLIC_APP_URL origin.");
+      }
+      if (!isLocal && trustedOrigins.some((origin) => /localhost|127\.0\.0\.1|\[::1\]/.test(origin))) {
+        warnings.push("TRUSTED_ORIGINS contains local development origins while NEXT_PUBLIC_APP_URL is non-local.");
+      }
     }
   } catch {
     failures.push("NEXT_PUBLIC_APP_URL must be a valid URL.");

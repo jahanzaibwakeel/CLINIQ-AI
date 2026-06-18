@@ -8,6 +8,7 @@
 - Added automatic AI document triage that parses uploaded reports, explains risk flags, and extracts task candidates immediately after chunking and embedding.
 - Built role-specific product surfaces for doctors, clinic admins, and assistants, plus an AI draft review workflow that lets clinicians edit and apply reviewed output to records.
 - Added appointment scheduling, a derived notification inbox, and audited patient chart export to broaden the clinical operations surface.
+- Built a patient portal with secure magic links, request history, two-way clinic messaging, staff replies, and AI-assisted patient-safe reply drafting.
 - Implemented appointment workflow actions, staff role/account controls, and privacy-gated patient export with redaction and audit reasons.
 - Added local document storage with checksum/scan metadata and Playwright smoke tests for recruiter-ready workflow validation.
 - Added full desktop/tablet Playwright E2E coverage with reusable authenticated browser state for production-style rate-limited demo accounts.
@@ -15,5 +16,5 @@
 - Built an admin Ops dashboard with request IDs, AI latency, cache/fallback rates, token estimates, document triage volume, readiness checks, and audit signals.
 - Added admin staff security visibility with role coverage, last-login state, active status, failed-login counters, and temporary account lockout.
 - Added healthcare safety controls including doctor-review disclaimers, AI draft metadata, provider/model traceability, review status, audit logging, and external PHI opt-in controls.
-- Delivered deployment readiness with Docker Compose, PostgreSQL/Valkey health checks, GitHub Actions CI, tests, seed data, environment examples, and production security documentation.
-- Hardened production release packaging with standalone Docker output, configurable trusted origins, health checks, release verification scripts, and fast local-AI fallback timeouts.
+- Delivered deployment readiness with Docker Compose, PostgreSQL/Valkey health checks, GitHub Actions CI, tests, seed data, explicit environment configuration, and production security documentation.
+- Hardened production release packaging with standalone Docker output, configurable trusted origins, explicit port configuration, health checks, release verification scripts, and fast local-AI fallback timeouts.

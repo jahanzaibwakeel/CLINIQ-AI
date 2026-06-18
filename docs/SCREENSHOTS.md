@@ -17,7 +17,7 @@ Run the app, then use Playwright or browser screenshots to refresh the set:
 
 ```bash
 docker compose up -d postgres valkey web
-PLAYWRIGHT_BASE_URL=http://127.0.0.1:${APP_HOST_PORT:-3000} npm run test:e2e
+PLAYWRIGHT_BASE_URL="${NEXT_PUBLIC_APP_URL}" npm run test:e2e
 ```
 
 Keep desktop and tablet captures in the set to demonstrate responsive dashboard behavior.
@@ -35,7 +35,7 @@ The suite logs in with seeded demo users and checks the main dashboard, patients
 For a Docker-hosted local verification run, keep ports environment-driven:
 
 ```bash
-PLAYWRIGHT_SKIP_WEB_SERVER=1 PLAYWRIGHT_BASE_URL=http://127.0.0.1:${APP_HOST_PORT:-3000} npm run test:e2e
+PLAYWRIGHT_SKIP_WEB_SERVER=1 PLAYWRIGHT_BASE_URL="${NEXT_PUBLIC_APP_URL}" npm run test:e2e
 RUN_INTEGRATION_TESTS=1 AI_PROVIDER=fallback npm run test:integration
 ```
 

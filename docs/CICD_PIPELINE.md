@@ -123,6 +123,7 @@ This keeps deployment controlled while allowing automatic checks and image publi
 
 - External AI remains disabled by default.
 - Real domain hosting must set `NEXT_PUBLIC_APP_URL` and `TRUSTED_ORIGINS`.
+- Browser smoke tests resolve a free local app port at runtime and export `PLAYWRIGHT_BASE_URL`, `NEXT_PUBLIC_APP_URL`, and `TRUSTED_ORIGINS` for that job instead of relying on a committed app port.
 - Production secrets must live in GitHub repository secrets or server-side secret management.
 - `.env` files must not be committed.
 - Use the final domain with HTTPS before enabling real clinic usage.

@@ -1,7 +1,11 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const port = process.env.PORT ?? process.env.APP_HOST_PORT ?? "3000";
-const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? `http://127.0.0.1:${port}`;
+const configuredPort = process.env.PORT ?? process.env.APP_HOST_PORT;
+if (!process.env.PLAYWRIGHT_BASE_URL && !process.env.NEXT_PUBLIC_APP_URL && !configuredPort) {
+  throw new Error("Set PLAYWRIGHT_BASE_URL, NEXT_PUBLIC_APP_URL, APP_HOST_PORT, or PORT before running Playwright.");
+}
+
+const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? `http://127.0.0.1:${configuredPort}`;
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -19,7 +23,7 @@ export default defineConfig({
   webServer: process.env.PLAYWRIGHT_SKIP_WEB_SERVER
     ? undefined
     : {
-        command: `npm run dev -- -p ${port}`,
+        command: `npm run dev -- -p ${configuredPort}`,
         url: baseURL,
         reuseExistingServer: !process.env.CI,
         timeout: 120_000
