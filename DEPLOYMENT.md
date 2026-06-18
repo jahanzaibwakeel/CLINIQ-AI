@@ -125,6 +125,7 @@ On the server, keep a production `.env` beside `docker-compose.prod.yml`. The de
 - `/staff`: admin-only role and login-security dashboard for active users, lockouts, and last-login state
 
 `docker-compose.yml` and `docker-compose.prod.yml` both define web container health checks against `/api/health`.
+For external monitoring or cron checks, use `npm run ops:monitor`; see [docs/OPERATIONS_RUNBOOK.md](docs/OPERATIONS_RUNBOOK.md).
 
 ## Document Storage
 
@@ -197,6 +198,7 @@ The CI pipeline uploads `npm-audit.json` as an artifact so dependency risks can 
 - `npm run release:check` passes with `PRODUCTION_CHECK_URL` set to the hosted domain.
 - `ALLOW_EXTERNAL_AI=false` unless explicitly approved.
 - `/api/health` and `/api/ready` monitored.
+- `npm run ops:monitor` passes against the hosted domain.
 - Database backups configured and tested.
 - Audit log retention policy defined.
 - Account-token cleanup scheduled.

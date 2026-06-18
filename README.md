@@ -99,6 +99,10 @@ MediPilot AI is designed for workflow productivity, not autonomous diagnosis. Ev
 | --- | --- |
 | ![Patient detail](docs/screenshots/04-patient-detail.png) | ![AI review queue](docs/screenshots/06-ai-review.png) |
 
+| Patient portal | Portal AI reply draft |
+| --- | --- |
+| ![Patient portal](docs/screenshots/09-patient-portal.png) | ![Portal AI reply draft](docs/screenshots/10-portal-reply-ai.png) |
+
 More screenshots are available in [docs/screenshots](docs/screenshots), including login, patients, settings, and tablet dashboard views.
 
 ## Useful Commands
@@ -112,6 +116,7 @@ npm run build
 npm run db:studio
 npm run db:backup
 npm run release:check
+npm run ops:monitor
 ```
 
 ## CI/CD
@@ -138,6 +143,7 @@ The VPS should contain `docker-compose.prod.yml` and a production `.env`.
 - [docs/CICD_PIPELINE.md](docs/CICD_PIPELINE.md)
 - [docs/CUSTOMER_PORTAL_FLOW.md](docs/CUSTOMER_PORTAL_FLOW.md)
 - [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md)
+- [docs/OPERATIONS_RUNBOOK.md](docs/OPERATIONS_RUNBOOK.md)
 - [docs/PRODUCTION_REVIEW.md](docs/PRODUCTION_REVIEW.md)
 - [docs/SCREENSHOTS.md](docs/SCREENSHOTS.md)
 - [docs/RESUME_BULLETS.md](docs/RESUME_BULLETS.md)

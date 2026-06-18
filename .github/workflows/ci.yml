@@ -331,6 +331,7 @@ jobs:
             APP_PORT="$(docker compose -f docker-compose.prod.yml exec -T web node -e "process.stdout.write(process.env.PORT || '')")"
             test -n "$APP_PORT"
             docker compose -f docker-compose.prod.yml exec -T -e PRODUCTION_CHECK_URL="http://127.0.0.1:${APP_PORT}" web node scripts/production-check.mjs
+            docker compose -f docker-compose.prod.yml exec -T -e MONITOR_BASE_URL="http://127.0.0.1:${APP_PORT}" web npm run ops:monitor
 
   pipeline-summary:
     name: Pipeline Summary

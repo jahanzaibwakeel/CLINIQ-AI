@@ -10,6 +10,8 @@ The current portfolio screenshot set lives in `docs/screenshots`:
 - `06-ai-review.png`: AI draft review queue.
 - `07-settings.png`: production readiness and local-first AI settings.
 - `08-tablet-dashboard.png`: tablet dashboard responsiveness.
+- `09-patient-portal.png`: patient-safe portal with limited clinical data and request history.
+- `10-portal-reply-ai.png`: staff portal queue with AI-assisted patient reply drafting.
 
 ## Recapture
 

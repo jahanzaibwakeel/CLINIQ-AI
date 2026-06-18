@@ -54,6 +54,7 @@
 - Add SSO or MFA for clinic users.
 - Use managed secret storage.
 - Run `npm run release:check` during deployment and after secret rotation.
+- Run `npm run ops:monitor` from a trusted monitor or cron target after deployment; see [docs/OPERATIONS_RUNBOOK.md](docs/OPERATIONS_RUNBOOK.md).
 - Use an approved SMTP provider and rotate SMTP credentials through secret management.
 - Rotate `METRICS_BEARER_TOKEN` like an operational secret when bearer-token monitoring is enabled.
 - Add field-level encryption for highly sensitive records.

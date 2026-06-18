@@ -15,6 +15,7 @@ This review summarizes the current hosting posture for MediPilot AI before putti
 - Local no-cost AI behavior is available through Ollama when installed and `local-clinical-rules-v2` when the LLM runtime is unavailable.
 - External AI adapters remain disabled unless `ALLOW_EXTERNAL_AI=true` and provider keys are explicitly configured.
 - Tests cover unit behavior, validation, frontend smoke rendering, E2E workflows, and database-backed tenant isolation.
+- Operations checks can be run with `npm run ops:monitor` against a deployed domain or trusted internal URL.
 - Screenshots and a demo script are included for recruiter review.
 
 ## Required Before Real Clinical Use
@@ -41,6 +42,7 @@ npm run test:e2e
 npm run test:integration
 npm run build
 npm run release:check
+npm run ops:monitor
 npm audit --audit-level=moderate
 ```
 
