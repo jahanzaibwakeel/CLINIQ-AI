@@ -50,6 +50,8 @@ Generate strong local secrets with:
 npm run secrets:generate
 ```
 
+For a recruiter-only public demo, use `.env.demo.example` with Vercel, Neon, and optional Upstash. See [docs/VERCEL_DEMO_DEPLOY.md](docs/VERCEL_DEMO_DEPLOY.md).
+
 ## Database
 
 Development:

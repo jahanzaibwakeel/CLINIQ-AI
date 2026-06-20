@@ -133,6 +133,7 @@ For VPS auto-deploy, configure these repository secrets:
 
 The VPS should contain `docker-compose.prod.yml` and a production `.env`.
 For domain launch with the included HTTPS proxy, follow [docs/DOMAIN_GO_LIVE.md](docs/DOMAIN_GO_LIVE.md).
+For a fast recruiter demo on Vercel + Neon + Upstash, follow [docs/VERCEL_DEMO_DEPLOY.md](docs/VERCEL_DEMO_DEPLOY.md).
 
 ## Documentation
 
@@ -147,6 +148,7 @@ For domain launch with the included HTTPS proxy, follow [docs/DOMAIN_GO_LIVE.md]
 - [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md)
 - [docs/OPERATIONS_RUNBOOK.md](docs/OPERATIONS_RUNBOOK.md)
 - [docs/DOMAIN_GO_LIVE.md](docs/DOMAIN_GO_LIVE.md)
+- [docs/VERCEL_DEMO_DEPLOY.md](docs/VERCEL_DEMO_DEPLOY.md)
 - [docs/PRODUCTION_REVIEW.md](docs/PRODUCTION_REVIEW.md)
 - [docs/SCREENSHOTS.md](docs/SCREENSHOTS.md)
 - [docs/RESUME_BULLETS.md](docs/RESUME_BULLETS.md)
