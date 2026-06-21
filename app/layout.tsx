@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "MediPilot AI",
+  title: "CLINIK AI",
   description: "Local-first AI clinical workflow assistant for doctors and small clinics."
 };
 

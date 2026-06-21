@@ -21,7 +21,7 @@ async function main() {
   mkdirSync(backupDir, { recursive: true });
 
   const timestamp = new Date().toISOString().replaceAll(":", "-").replace(/\.\d{3}Z$/, "Z");
-  const backupPath = join(backupDir, `medipilot-ai-${timestamp}.dump`);
+  const backupPath = join(backupDir, `clinik-ai-${timestamp}.dump`);
 
   const result = spawnSync("pg_dump", [
     "--format=custom",

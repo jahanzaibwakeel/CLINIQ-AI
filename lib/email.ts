@@ -70,7 +70,7 @@ export function patientPortalEmailHtml(title: string, body: string, actionLabel?
       <h1 style="font-size:20px;margin:0 0 12px">${escapeHtml(title)}</h1>
       <p>${escapeHtml(body)}</p>
       ${actionLabel && actionUrl ? `<p><a href="${escapeHtml(actionUrl)}" style="background:#0f766e;color:#fff;padding:10px 14px;text-decoration:none;border-radius:6px;display:inline-block">${escapeHtml(actionLabel)}</a></p>` : ""}
-      <p style="font-size:13px;color:#5f6b7a">MediPilot AI is not an emergency service or diagnostic replacement. Contact your clinic or emergency services for urgent symptoms.</p>
+      <p style="font-size:13px;color:#5f6b7a">CLINIK AI is not an emergency service or diagnostic replacement. Contact your clinic or emergency services for urgent symptoms.</p>
     </div>
   `;
 }

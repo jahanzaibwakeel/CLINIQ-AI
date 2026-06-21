@@ -98,7 +98,7 @@ export async function runMonitor(env = process.env) {
   }
 
   const status = summarizeChecks(checks, { requireMetrics });
-  return { service: "medipilot-ai", status, generatedAt, baseUrl, checks };
+  return { service: "clinik-ai", status, generatedAt, baseUrl, checks };
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
@@ -108,7 +108,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     if (result.status === "failed") process.exit(1);
   } catch (error) {
     console.error(JSON.stringify({
-      service: "medipilot-ai",
+      service: "clinik-ai",
       status: "failed",
       error: error instanceof Error ? error.message : String(error)
     }, null, 2));

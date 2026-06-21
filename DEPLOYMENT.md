@@ -132,7 +132,7 @@ To enable automatic VPS deploys, set these repository secrets:
 - `VPS_HOST`: server hostname or IP
 - `VPS_USER`: SSH user
 - `VPS_SSH_KEY`: private key with access to the server
-- `VPS_APP_DIR`: app directory on the server, for example `/opt/medipilot-ai`
+- `VPS_APP_DIR`: app directory on the server, for example `/opt/clinik-ai`
 
 On the server, keep a production `.env` beside `docker-compose.prod.yml`. The deploy job pulls the latest GHCR image, runs Compose, applies migrations, checks `/api/ready`, runs `scripts/production-check.mjs`, and runs the operations monitor inside the web container.
 
@@ -188,7 +188,7 @@ BACKUP_DIR=/secure/backups npm run db:backup
 Restore requires an explicit confirmation flag because it can replace live data:
 
 ```bash
-CONFIRM_RESTORE=true npm run db:restore -- /secure/backups/medipilot-ai-2026-06-13T10-00-00Z.dump
+CONFIRM_RESTORE=true npm run db:restore -- /secure/backups/clinik-ai-2026-06-13T10-00-00Z.dump
 ```
 
 Both commands use `DATABASE_URL`, so they work with any configured host and port.
@@ -232,7 +232,7 @@ The CI pipeline uploads `npm-audit.json` as an artifact so dependency risks can 
 
 ## Troubleshooting
 
-- AI badge shows local draft engine: Ollama is missing or unreachable, so MediPilot is using the no-cost deterministic local draft engine. Verify Ollama is running, the model is pulled, and `/api/ai/status` reports `ready` if you want LLM-backed drafts.
+- AI badge shows local draft engine: Ollama is missing or unreachable, so CLINIK AI is using the no-cost deterministic local draft engine. Verify Ollama is running, the model is pulled, and `/api/ai/status` reports `ready` if you want LLM-backed drafts.
 - Login fails: run seed and check demo credentials.
 - Migrations fail: verify `DATABASE_URL`.
 - Semantic search empty: upload/process documents or seed demo data.

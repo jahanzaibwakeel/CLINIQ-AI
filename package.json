@@ -1,8 +1,8 @@
 {
-  "name": "medipilot-ai",
+  "name": "clinik-ai",
   "version": "0.1.0",
   "private": true,
-  "description": "MediPilot AI - local-first AI clinical workflow assistant for doctors and small clinics.",
+  "description": "CLINIK AI - local-first AI clinical workflow assistant for doctors and small clinics.",
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",

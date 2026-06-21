@@ -26,10 +26,10 @@ export async function POST(request: Request) {
 
       await sendEmail({
         to: user.email,
-        subject: "Reset your MediPilot AI password",
-        text: `Reset your MediPilot AI password: ${resetUrl}`,
+        subject: "Reset your CLINIK AI password",
+        text: `Reset your CLINIK AI password: ${resetUrl}`,
         html: accountEmailHtml(
-          "Reset your MediPilot AI password",
+          "Reset your CLINIK AI password",
           `A password reset was requested for your clinic account. This link expires at ${expiresAt.toLocaleString()}.`,
           "Reset password",
           resetUrl

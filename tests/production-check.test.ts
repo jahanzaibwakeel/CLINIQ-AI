@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 const baseEnv = {
   ...process.env,
-  DATABASE_URL: "postgresql://medipilot:medipilot@localhost/medipilot_ai?schema=public",
+  DATABASE_URL: "postgresql://clinik:clinik@localhost/clinik_ai?schema=public",
   SESSION_SECRET: "test-secret-test-secret-test-secret-123",
   NEXT_PUBLIC_APP_URL: "https://clinic.example.com",
   TRUSTED_ORIGINS: "https://clinic.example.com",

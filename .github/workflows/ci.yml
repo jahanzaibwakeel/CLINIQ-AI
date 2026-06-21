@@ -1,4 +1,4 @@
-name: MediPilot AI CI/CD
+name: CLINIK AI CI/CD
 
 on:
   pull_request:
@@ -14,7 +14,7 @@ on:
         options: ["false", "true"]
 
 concurrency:
-  group: medipilot-${{ github.workflow }}-${{ github.ref }}
+  group: clinik-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -30,7 +30,7 @@ env:
   ALLOW_EXTERNAL_AI: "false"
   NEXT_PUBLIC_APP_URL: http://localhost
   TRUSTED_ORIGINS: http://localhost
-  DATABASE_URL: postgresql://medipilot:medipilot@localhost/medipilot_ai?schema=public
+  DATABASE_URL: postgresql://clinik:clinik@localhost/clinik_ai?schema=public
   VALKEY_URL: redis://localhost
 
 jobs:
@@ -98,13 +98,13 @@ jobs:
       postgres:
         image: postgres:16-alpine
         env:
-          POSTGRES_USER: medipilot
-          POSTGRES_PASSWORD: medipilot
-          POSTGRES_DB: medipilot_ai
+          POSTGRES_USER: clinik
+          POSTGRES_PASSWORD: clinik
+          POSTGRES_DB: clinik_ai
         ports:
           - 5432/tcp
         options: >-
-          --health-cmd "pg_isready -U medipilot -d medipilot_ai"
+          --health-cmd "pg_isready -U clinik -d clinik_ai"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -119,7 +119,7 @@ jobs:
           --health-retries 5
 
     env:
-      DATABASE_URL: postgresql://medipilot:medipilot@127.0.0.1:${{ job.services.postgres.ports[5432] }}/medipilot_ai?schema=public
+      DATABASE_URL: postgresql://clinik:clinik@127.0.0.1:${{ job.services.postgres.ports[5432] }}/clinik_ai?schema=public
       VALKEY_URL: redis://127.0.0.1:${{ job.services.valkey.ports[6379] }}
       RUN_INTEGRATION_TESTS: "1"
 
@@ -155,13 +155,13 @@ jobs:
       postgres:
         image: postgres:16-alpine
         env:
-          POSTGRES_USER: medipilot
-          POSTGRES_PASSWORD: medipilot
-          POSTGRES_DB: medipilot_ai
+          POSTGRES_USER: clinik
+          POSTGRES_PASSWORD: clinik
+          POSTGRES_DB: clinik_ai
         ports:
           - 5432/tcp
         options: >-
-          --health-cmd "pg_isready -U medipilot -d medipilot_ai"
+          --health-cmd "pg_isready -U clinik -d clinik_ai"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -176,7 +176,7 @@ jobs:
           --health-retries 5
 
     env:
-      DATABASE_URL: postgresql://medipilot:medipilot@127.0.0.1:${{ job.services.postgres.ports[5432] }}/medipilot_ai?schema=public
+      DATABASE_URL: postgresql://clinik:clinik@127.0.0.1:${{ job.services.postgres.ports[5432] }}/clinik_ai?schema=public
       VALKEY_URL: redis://127.0.0.1:${{ job.services.valkey.ports[6379] }}
 
     steps:
@@ -320,11 +320,11 @@ jobs:
           script_stop: true
           script: |
             set -euo pipefail
-            APP_DIR="${APP_DIR:-/opt/medipilot-ai}"
+            APP_DIR="${APP_DIR:-/opt/clinik-ai}"
             cd "$APP_DIR"
             echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin
             docker pull "$IMAGE"
-            export MEDIPILOT_IMAGE="$IMAGE"
+            export CLINIK_IMAGE="$IMAGE"
             docker compose -f docker-compose.prod.yml up -d --remove-orphans
             docker compose -f docker-compose.prod.yml exec -T web npm run db:deploy
             docker compose -f docker-compose.prod.yml exec -T web node -e "const port = process.env.PORT; if (!port) process.exit(1); fetch('http://127.0.0.1:' + port + '/api/ready').then(r => { if (!r.ok) process.exit(1); console.log('ready') }).catch(() => process.exit(1))"
@@ -344,7 +344,7 @@ jobs:
         shell: bash
         run: |
           {
-            echo "## MediPilot AI CI/CD Summary"
+            echo "## CLINIK AI CI/CD Summary"
             echo ""
             echo "| Stage | Result |"
             echo "| --- | --- |"

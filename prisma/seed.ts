@@ -35,7 +35,7 @@ async function main() {
     prisma.user.create({
       data: {
         clinicId: clinic.id,
-        email: "doctor@medipilot.local",
+        email: "doctor@clinik.local",
         passwordHash,
         name: "Dr. Aisha Rahman",
         title: "Family Physician",
@@ -45,7 +45,7 @@ async function main() {
     prisma.user.create({
       data: {
         clinicId: clinic.id,
-        email: "admin@medipilot.local",
+        email: "admin@clinik.local",
         passwordHash,
         name: "Nadia Khan",
         title: "Clinic Administrator",
@@ -55,7 +55,7 @@ async function main() {
     prisma.user.create({
       data: {
         clinicId: clinic.id,
-        email: "assistant@medipilot.local",
+        email: "assistant@clinik.local",
         passwordHash,
         name: "Omar Siddiqui",
         title: "Medical Assistant",
@@ -329,8 +329,8 @@ async function main() {
     }
   });
 
-  console.log("Seeded MediPilot AI demo data.");
-  console.log("Login: doctor@medipilot.local / DemoPassword123!");
+  console.log("Seeded CLINIK AI demo data.");
+  console.log("Login: doctor@clinik.local / DemoPassword123!");
 }
 
 main()

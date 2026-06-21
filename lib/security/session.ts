@@ -3,7 +3,7 @@ import { jwtVerify, SignJWT } from "jose";
 import type { Role } from "@prisma/client";
 import { env } from "@/lib/env";
 
-const cookieName = "medipilot_session";
+const cookieName = "clinik_session";
 const secret = new TextEncoder().encode(env.SESSION_SECRET);
 
 function isLocalHttpUrl(value: string | undefined) {

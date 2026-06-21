@@ -34,7 +34,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     if (updated.patient.email && updated.status !== existing.status) {
       const result = await sendEmail({
         to: updated.patient.email,
-        subject: `MediPilot portal request ${statusLabel(updated.status)}`,
+        subject: `CLINIK AI portal request ${statusLabel(updated.status)}`,
         text: `Your request "${updated.subject}" is now ${statusLabel(updated.status)}.`,
         html: patientPortalEmailHtml(
           "Portal request status update",

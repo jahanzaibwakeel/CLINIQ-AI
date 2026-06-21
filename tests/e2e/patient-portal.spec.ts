@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test("patient can open portal and send a clinic request", async ({ page }) => {
   await page.goto("/portal");
   await expect(page.getByRole("heading", { name: /View clinic updates/ })).toBeVisible();
-  await page.waitForFunction(() => document.cookie.includes("medipilot_csrf="));
+  await page.waitForFunction(() => document.cookie.includes("clinik_csrf="));
 
   await page.getByRole("button", { name: "Open demo portal" }).click();
   await expect(page.getByRole("heading", { name: "Sara Malik" })).toBeVisible({ timeout: 20_000 });

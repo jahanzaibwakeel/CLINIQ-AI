@@ -4,7 +4,7 @@ export function csrfHeaders(headers: Record<string, string> = {}) {
       ? ""
       : document.cookie
           .split("; ")
-          .find((item) => item.startsWith("medipilot_csrf="))
+          .find((item) => item.startsWith("clinik_csrf="))
           ?.split("=")[1] ?? "";
 
   return {

@@ -1,6 +1,6 @@
 # Resume Bullets
 
-- Built MediPilot AI, a full-stack clinical workflow assistant for doctors using Next.js, TypeScript, Prisma, PostgreSQL, Valkey, and Docker.
+- Built CLINIK AI, a full-stack clinical workflow assistant for doctors using Next.js, TypeScript, Prisma, PostgreSQL, Valkey, and Docker.
 - Designed a free local-first AI architecture with Ollama and `qwen2.5:7b` default inference, prompt versioning, structured JSON validation, semantic search, a deterministic `local-clinical-rules-v2` drafting fallback, and gated external provider adapters.
 - Modeled realistic healthcare workflows including patients, consultations, notes, documents, chunks, embeddings, AI generations, tasks, follow-ups, RBAC users, and audit logs.
 - Implemented AI features for SOAP notes, consultation summaries, history timelines, report parsing, follow-up instructions, task extraction, risk flag explanation, referral letters, visit summaries, and patient-context Q&A.

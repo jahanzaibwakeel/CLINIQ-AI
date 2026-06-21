@@ -1,10 +1,10 @@
 # Customer Portal Flow
 
-This note documents the patient/customer-facing flow added to MediPilot AI and why it matters for a complete clinical product demo.
+This note documents the patient/customer-facing flow added to CLINIK AI and why it matters for a complete clinical product demo.
 
 ## Product Intent
 
-MediPilot AI is primarily a doctor and clinic operations tool, but a real clinic workflow does not end at the staff dashboard. Patients need a safe way to view basic clinic updates and send requests without exposing raw clinical records or unreviewed AI output.
+CLINIK AI is primarily a doctor and clinic operations tool, but a real clinic workflow does not end at the staff dashboard. Patients need a safe way to view basic clinic updates and send requests without exposing raw clinical records or unreviewed AI output.
 
 The patient portal adds that customer layer while preserving the app's safety boundary:
 
@@ -104,13 +104,13 @@ It does not expose:
 - internal audit events
 
 Public portal writes are rate-limited, validated with Zod, CSRF/origin protected by middleware, and audited with `actorId: null`.
-Magic-link access uses hashed single-use `PatientPortalToken` records and a separate `medipilot_patient_portal` session cookie, not the internal staff session.
+Magic-link access uses hashed single-use `PatientPortalToken` records and a separate `clinik_patient_portal` session cookie, not the internal staff session.
 Patients can view request history after MRN/date-of-birth verification, but replies require the stronger magic-link session so an MRN/DOB demo lookup cannot impersonate an ongoing secure conversation.
 AI reply assist runs only inside the staff portal queue, stores the draft as an internal `AiGeneration`, and never sends a patient message automatically.
 
 ## Why This Improves The Portfolio Project
 
-This moves MediPilot AI from a staff-only dashboard into a fuller clinical workflow platform:
+This moves CLINIK AI from a staff-only dashboard into a fuller clinical workflow platform:
 
 - patient UX exists
 - assistant role has meaningful least-privilege scope

@@ -1,4 +1,4 @@
--- Initial MediPilot AI schema. Generated for PostgreSQL deployment readiness.
+-- Initial CLINIK AI schema. Generated for PostgreSQL deployment readiness.
 -- In local development, run `npm run db:migrate` to let Prisma manage future migrations.
 
 CREATE TYPE "Role" AS ENUM ('DOCTOR', 'CLINIC_ADMIN', 'ASSISTANT');

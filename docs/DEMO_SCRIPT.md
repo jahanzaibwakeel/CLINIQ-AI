@@ -1,11 +1,11 @@
-# MediPilot AI Demo Script
+# CLINIK AI Demo Script
 
 Use this path for a focused 5-7 minute portfolio walkthrough.
 
 ## 1. Login And Safety Boundary
 
 - Open the configured app URL.
-- Sign in as `doctor@medipilot.local` with `DemoPassword123!`.
+- Sign in as `doctor@clinik.local` with `DemoPassword123!`.
 - Point out the visible safety banner: AI drafts are productivity support, not diagnosis, and doctor review is required.
 
 ## 2. Doctor Dashboard
@@ -35,7 +35,7 @@ Use this path for a focused 5-7 minute portfolio walkthrough.
 
 - Open AI Review and show editable JSON plus readable AI sections.
 - Open Settings/Ops for readiness, telemetry, and AI provider status.
-- Sign in as `admin@medipilot.local` to show Staff role controls, failed-login counters, and account state.
+- Sign in as `admin@clinik.local` to show Staff role controls, failed-login counters, and account state.
 
 ## 7. Patient Portal And Assistant Workflow
 

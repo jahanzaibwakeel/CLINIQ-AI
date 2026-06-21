@@ -34,7 +34,7 @@ export function logEvent(
   const payload = {
     level,
     event,
-    service: "medipilot-ai",
+    service: "clinik-ai",
     timestamp: new Date().toISOString(),
     ...fields
   };

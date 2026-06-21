@@ -24,7 +24,7 @@ async function restoreSession(page: Page, email: string) {
   }
 }
 
-export async function login(page: Page, email = "doctor@medipilot.local") {
+export async function login(page: Page, email = "doctor@clinik.local") {
   if (await restoreSession(page, email)) return;
 
   await page.goto("/login");

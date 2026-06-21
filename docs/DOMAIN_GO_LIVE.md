@@ -1,6 +1,6 @@
 # Domain Go-Live Guide
 
-Use this guide when moving MediPilot AI from portfolio/demo mode to a real hosted domain.
+Use this guide when moving CLINIK AI from portfolio/demo mode to a real hosted domain.
 
 ## 1. Prepare The Server
 
@@ -86,7 +86,7 @@ For rollback:
 
 - keep the previous GHCR image tag
 - run `docker compose -f docker-compose.prod.yml pull`
-- set `MEDIPILOT_IMAGE` to the previous tag
+- set `CLINIK_IMAGE` to the previous tag
 - run `docker compose -f docker-compose.prod.yml up -d`
 - restore a backup only when data rollback is explicitly approved
 

@@ -1,6 +1,6 @@
 # AI Task Catalog
 
-MediPilot AI uses consistent names for every AI workflow. Each output remains an `AI draft, doctor review required.` The doctor can review, edit, approve, reject, or apply supported drafts from the AI Review queue.
+CLINIK AI uses consistent names for every AI workflow. Each output remains an `AI draft, doctor review required.` The doctor can review, edit, approve, reject, or apply supported drafts from the AI Review queue.
 
 | Internal type | User-facing draft name | Output purpose |
 | --- | --- | --- |

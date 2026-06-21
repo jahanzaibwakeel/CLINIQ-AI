@@ -8,7 +8,7 @@ import { csrfHeaders } from "@/lib/client/csrf";
 
 export function LoginForm() {
   const router = useRouter();
-  const [email, setEmail] = useState("doctor@medipilot.local");
+  const [email, setEmail] = useState("doctor@clinik.local");
   const [password, setPassword] = useState("DemoPassword123!");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");

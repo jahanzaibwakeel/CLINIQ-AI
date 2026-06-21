@@ -52,7 +52,7 @@ export default async function SettingsPage() {
             <span className="badge good">No paid API required</span>
           </div>
           <p className="muted">
-            MediPilot is designed to run day-to-day AI workflows through Ollama and open-weight models. Use `qwen2.5:7b` for stronger local summarization and structured note drafting, or switch to a smaller local model on low-memory machines.
+            CLINIK AI is designed to run day-to-day AI workflows through Ollama and open-weight models. Use `qwen2.5:7b` for stronger local summarization and structured note drafting, or switch to a smaller local model on low-memory machines.
           </p>
           <div className="chart-bars">
             <div className="bar-row">

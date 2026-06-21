@@ -78,9 +78,9 @@ npm run release:check
 ## Demo Credentials
 
 ```text
-doctor@medipilot.local / DemoPassword123!
-admin@medipilot.local / DemoPassword123!
-assistant@medipilot.local / DemoPassword123!
+doctor@clinik.local / DemoPassword123!
+admin@clinik.local / DemoPassword123!
+assistant@clinik.local / DemoPassword123!
 ```
 
 ## Demo Limitations

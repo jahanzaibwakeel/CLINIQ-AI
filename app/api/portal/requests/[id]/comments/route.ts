@@ -60,7 +60,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     if (staffUser && portalRequest.patient.email) {
       const result = await sendEmail({
         to: portalRequest.patient.email,
-        subject: "MediPilot portal reply from your clinic",
+        subject: "CLINIK AI portal reply from your clinic",
         text: `${staffUser.name} replied to "${portalRequest.subject}": ${comment.body}`,
         html: patientPortalEmailHtml(
           "New portal reply from your clinic",

@@ -1,6 +1,6 @@
-# MediPilot AI
+# CLINIK AI
 
-MediPilot AI is a production-minded, local-first AI clinical workflow assistant for doctors and small clinics. It helps clinicians manage patients, consultations, documents, notes, tasks, follow-ups, and AI-generated drafts while preserving a clear safety boundary: **AI output is not a diagnostic replacement and always requires doctor review.**
+CLINIK AI is a production-minded, local-first AI clinical workflow assistant for doctors and small clinics. It helps clinicians manage patients, consultations, documents, notes, tasks, follow-ups, and AI-generated drafts while preserving a clear safety boundary: **AI output is not a diagnostic replacement and always requires doctor review.**
 
 ## Highlights
 
@@ -39,9 +39,9 @@ MediPilot AI is a production-minded, local-first AI clinical workflow assistant 
 
 After seeding:
 
-- Doctor: `doctor@medipilot.local`
-- Clinic admin: `admin@medipilot.local`
-- Assistant: `assistant@medipilot.local`
+- Doctor: `doctor@clinik.local`
+- Clinic admin: `admin@clinik.local`
+- Assistant: `assistant@clinik.local`
 - Password: `DemoPassword123!`
 
 Patient portal demo:
@@ -87,7 +87,7 @@ ollama pull nomic-embed-text
 
 ## Safety Positioning
 
-MediPilot AI is designed for workflow productivity, not autonomous diagnosis. Every generated output is stored with provider, model, prompt version, timestamp, source context, and review status. External AI providers are disabled unless `ALLOW_EXTERNAL_AI=true`.
+CLINIK AI is designed for workflow productivity, not autonomous diagnosis. Every generated output is stored with provider, model, prompt version, timestamp, source context, and review status. External AI providers are disabled unless `ALLOW_EXTERNAL_AI=true`.
 
 ## Screenshots
 

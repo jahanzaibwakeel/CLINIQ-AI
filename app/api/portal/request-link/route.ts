@@ -31,10 +31,10 @@ export async function POST(request: Request) {
 
       await sendEmail({
         to: patient.email,
-        subject: "Your MediPilot patient portal link",
-        text: `Open your MediPilot patient portal: ${accessUrl}`,
+        subject: "Your CLINIK AI patient portal link",
+        text: `Open your CLINIK AI patient portal: ${accessUrl}`,
         html: patientPortalEmailHtml(
-          "Your MediPilot patient portal link",
+          "Your CLINIK AI patient portal link",
           `Use this time-limited link to view clinic updates from ${patient.clinic.name}. It expires at ${expiresAt.toLocaleString()}.`,
           "Open patient portal",
           accessUrl

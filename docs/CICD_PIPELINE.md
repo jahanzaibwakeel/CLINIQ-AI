@@ -1,6 +1,6 @@
 # CI/CD Pipeline
 
-MediPilot AI uses GitHub Actions as a production-style delivery pipeline. The workflow is intentionally split into clear stages so failures are easy to understand during recruiter review, pull requests, or production release.
+CLINIK AI uses GitHub Actions as a production-style delivery pipeline. The workflow is intentionally split into clear stages so failures are easy to understand during recruiter review, pull requests, or production release.
 
 Workflow file:
 

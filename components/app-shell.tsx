@@ -53,7 +53,7 @@ export async function AppShell({ children, active = "/" }: { children: React.Rea
             <CalendarCheck size={23} />
           </div>
           <div>
-            <p className="brand-title">MediPilot AI</p>
+            <p className="brand-title">CLINIK AI</p>
             <p className="brand-subtitle">Clinical workflow copilot</p>
           </div>
         </div>

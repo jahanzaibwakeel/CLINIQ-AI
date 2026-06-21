@@ -7,7 +7,7 @@ export async function GET(request: Request) {
   const requestId = requestIdFrom(request);
   return NextResponse.json({
     status: "ok",
-    service: "medipilot-ai",
+    service: "clinik-ai",
     requestId,
     timestamp: new Date().toISOString()
   });

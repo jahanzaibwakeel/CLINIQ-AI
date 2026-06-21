@@ -1,6 +1,6 @@
 # API Documentation
 
-All API routes return JSON. Protected endpoints require the `medipilot_session` cookie created by `/api/auth/login`.
+All API routes return JSON. Protected endpoints require the `clinik_session` cookie created by `/api/auth/login`.
 
 ## Auth
 
@@ -9,7 +9,7 @@ All API routes return JSON. Protected endpoints require the `medipilot_session` 
 Body:
 
 ```json
-{ "email": "doctor@medipilot.local", "password": "DemoPassword123!" }
+{ "email": "doctor@clinik.local", "password": "DemoPassword123!" }
 ```
 
 Known active accounts are temporarily locked after repeated failed password attempts. Lockout and login events are written to the audit log with request metadata.
@@ -27,7 +27,7 @@ Returns the current user or `null`.
 Public route that sends a time-limited reset link when the account exists. The response is intentionally generic to avoid email enumeration.
 
 ```json
-{ "email": "doctor@medipilot.local" }
+{ "email": "doctor@clinik.local" }
 ```
 
 ### `POST /api/auth/reset-password`
@@ -213,7 +213,7 @@ Returns the same portal-safe patient payload when a valid patient portal session
 ### `POST /api/portal/requests`
 
 Public route with CSRF/origin checks and rate limiting. Re-verifies patient identity before creating a clinic-scoped `PatientPortalRequest` and a public-origin audit log event.
-When the patient has an email address, MediPilot sends a request-received notification through the configured SMTP provider or development log fallback.
+When the patient has an email address, CLINIK AI sends a request-received notification through the configured SMTP provider or development log fallback.
 
 ```json
 {
@@ -240,7 +240,7 @@ Lists recent patient portal requests for the signed-in clinic.
 Allowed roles: doctor, clinic admin, assistant.
 
 Updates portal request workflow status and writes a staff audit event.
-When the patient has an email address, MediPilot sends a status update notification.
+When the patient has an email address, CLINIK AI sends a status update notification.
 
 ```json
 { "status": "IN_REVIEW" }

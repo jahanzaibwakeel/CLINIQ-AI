@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-const csrfCookieName = "medipilot_csrf";
+const csrfCookieName = "clinik_csrf";
 const protectedMethods = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 
 function configuredOrigins() {

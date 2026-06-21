@@ -169,9 +169,9 @@ export function PatientPortal() {
     <div className="portal-screen">
       <header className="portal-topbar">
         <Link className="brand" href="/login" style={{ margin: 0 }}>
-          <div className="brand-mark">MP</div>
+          <div className="brand-mark">CA</div>
           <div>
-            <p className="brand-title">MediPilot AI</p>
+            <p className="brand-title">CLINIK AI</p>
             <p className="brand-subtitle">Patient portal</p>
           </div>
         </Link>

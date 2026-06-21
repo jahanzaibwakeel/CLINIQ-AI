@@ -114,7 +114,7 @@ export async function getAiRuntimeStatus(): Promise<AiRuntimeStatus> {
       modelAvailable: false,
       availableModels: [],
       checkedAt: new Date().toISOString(),
-      message: "Local Ollama is not reachable. MediPilot is using local rule-based drafts until a model is available."
+      message: "Local Ollama is not reachable. CLINIK AI is using local rule-based drafts until a model is available."
     };
   }
 }

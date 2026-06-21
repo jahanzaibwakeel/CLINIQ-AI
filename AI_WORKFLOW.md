@@ -21,7 +21,7 @@ For a no-cost clinic demo, use Ollama with an open-weight local model. The defau
 
 ## AI Modules
 
-MediPilot AI implements these generation types:
+CLINIK AI implements these generation types:
 
 - `CONSULTATION_SUMMARY`
 - `SOAP_NOTE`
@@ -69,11 +69,11 @@ All prompts instruct the model to:
 
 ## Fallbacks
 
-If the configured LLM provider is unavailable, MediPilot uses `local-clinical-rules-v2`, a deterministic no-cost drafting engine. It extracts obvious bullets, lab mentions, follow-up needs, operational tasks, SOAP sections, patient instructions, referral skeletons, and risk-review flags from the supplied text. It does not replace a language model, does not infer final diagnoses, and still marks every output as `AI draft, doctor review required.` This keeps demos and clinic workflows useful without paid APIs or external PHI transfer.
+If the configured LLM provider is unavailable, CLINIK AI uses `local-clinical-rules-v2`, a deterministic no-cost drafting engine. It extracts obvious bullets, lab mentions, follow-up needs, operational tasks, SOAP sections, patient instructions, referral skeletons, and risk-review flags from the supplied text. It does not replace a language model, does not infer final diagnoses, and still marks every output as `AI draft, doctor review required.` This keeps demos and clinic workflows useful without paid APIs or external PHI transfer.
 
 ## Runtime Status
 
-Signed-in users can call `/api/ai/status` or open Settings to confirm whether the configured runtime is ready. For Ollama, MediPilot checks `/api/tags`, confirms the configured model is installed, and reports whether the app is using local AI, a missing local model, an unreachable local service with local draft-engine fallback, an external provider, or fallback mode.
+Signed-in users can call `/api/ai/status` or open Settings to confirm whether the configured runtime is ready. For Ollama, CLINIK AI checks `/api/tags`, confirms the configured model is installed, and reports whether the app is using local AI, a missing local model, an unreachable local service with local draft-engine fallback, an external provider, or fallback mode.
 
 ## Semantic Search
 

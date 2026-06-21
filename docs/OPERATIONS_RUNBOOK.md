@@ -1,6 +1,6 @@
 # Operations Runbook
 
-This runbook covers the production-style operating steps for MediPilot AI before and after putting it behind a real domain.
+This runbook covers the production-style operating steps for CLINIK AI before and after putting it behind a real domain.
 
 ## Monitoring
 
@@ -37,7 +37,7 @@ BACKUP_DIR=/secure/backups npm run db:backup
 Verify the generated `.sha256` file, then test restore against a separate non-production database:
 
 ```bash
-CONFIRM_RESTORE=true npm run db:restore -- /secure/backups/medipilot-ai-example.dump
+CONFIRM_RESTORE=true npm run db:restore -- /secure/backups/clinik-ai-example.dump
 ```
 
 Do not restore over production unless the incident commander explicitly approves it.

@@ -1,6 +1,6 @@
 # Production Review
 
-This review summarizes the current hosting posture for MediPilot AI before putting it behind a real clinic or portfolio domain.
+This review summarizes the current hosting posture for CLINIK AI before putting it behind a real clinic or portfolio domain.
 
 ## Ready For Portfolio Hosting
 

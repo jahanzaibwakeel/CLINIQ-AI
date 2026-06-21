@@ -7,9 +7,9 @@ export default async function ResetPasswordPage({ searchParams }: { searchParams
     <div className="login-screen">
       <section className="login-panel">
         <div className="brand" style={{ marginBottom: 34 }}>
-          <div className="brand-mark">MP</div>
+          <div className="brand-mark">CA</div>
           <div>
-            <p className="brand-title">MediPilot AI</p>
+            <p className="brand-title">CLINIK AI</p>
             <p className="brand-subtitle" style={{ color: "rgba(255,255,255,.8)" }}>Secure account recovery</p>
           </div>
         </div>

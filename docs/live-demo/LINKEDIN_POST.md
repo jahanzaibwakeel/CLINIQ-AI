@@ -12,7 +12,7 @@
 
 ## LinkedIn Caption
 
-I just launched a live demo of MediPilot AI, a full-stack AI clinical workflow assistant built for doctors and small clinics.
+I just launched a live demo of CLINIK AI, a full-stack AI clinical workflow assistant built for doctors and small clinics.
 
 This project is not a landing page. It is a working healthcare productivity platform with:
 
@@ -30,7 +30,7 @@ The biggest goal was to show production-minded engineering: not just UI screens,
 Live demo: https://cliniq-ai-ruby.vercel.app
 
 Demo login:
-doctor@medipilot.local / DemoPassword123!
+doctor@clinik.local / DemoPassword123!
 
 Tech stack:
 Next.js, TypeScript, Prisma, PostgreSQL, Redis/Valkey, Vercel, Neon, Upstash, Docker, GitHub Actions.
@@ -39,7 +39,7 @@ Next.js, TypeScript, Prisma, PostgreSQL, Redis/Valkey, Vercel, Neon, Upstash, Do
 
 ## Shorter Caption
 
-Launched MediPilot AI, a full-stack AI clinical workflow assistant for doctors and small clinics.
+Launched CLINIK AI, a full-stack AI clinical workflow assistant for doctors and small clinics.
 
 It includes role-based auth, patient records, consultations, document intelligence, AI SOAP/summary/task/referral drafts, semantic search, patient portal workflows, audit logs, CI/CD, Docker, and deployment-ready architecture.
 
@@ -48,6 +48,6 @@ AI outputs are always marked as drafts and require doctor review.
 Live demo: https://cliniq-ai-ruby.vercel.app
 
 Demo login:
-doctor@medipilot.local / DemoPassword123!
+doctor@clinik.local / DemoPassword123!
 
 #AI #HealthTech #NextJS #TypeScript #PostgreSQL #FullStackDevelopment

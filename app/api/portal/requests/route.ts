@@ -75,7 +75,7 @@ export async function POST(request: Request) {
     if (patient.email) {
       const result = await sendEmail({
         to: patient.email,
-        subject: "MediPilot portal request received",
+        subject: "CLINIK AI portal request received",
         text: `Your clinic request was received: ${portalRequest.subject}`,
         html: patientPortalEmailHtml(
           "Your clinic request was received",

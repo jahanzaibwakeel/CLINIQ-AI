@@ -2,7 +2,7 @@
 
 ## System Shape
 
-MediPilot AI uses a Next.js monolith: server-rendered dashboard pages, API route handlers, Prisma/PostgreSQL persistence, Valkey-backed cache, and an AI service layer. This keeps the project deployable on a single VPS or container platform while preserving clean backend boundaries.
+CLINIK AI uses a Next.js monolith: server-rendered dashboard pages, API route handlers, Prisma/PostgreSQL persistence, Valkey-backed cache, and an AI service layer. This keeps the project deployable on a single VPS or container platform while preserving clean backend boundaries.
 
 ## Layers
 

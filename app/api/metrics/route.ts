@@ -70,7 +70,7 @@ export async function GET(request: Request) {
     ]);
 
     return NextResponse.json({
-      service: "medipilot-ai",
+      service: "clinik-ai",
       status: failedDocuments > 0 || overdueTasks > 0 ? "attention_required" : "ok",
       requestId,
       accessMode: auth.accessMode,

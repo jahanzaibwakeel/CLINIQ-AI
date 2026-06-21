@@ -57,11 +57,11 @@ export async function POST(request: Request) {
 
     await sendEmail({
       to: updated.email,
-      subject: "You're invited to MediPilot AI",
-      text: `Set up your MediPilot AI account: ${inviteUrl}`,
+      subject: "You're invited to CLINIK AI",
+      text: `Set up your CLINIK AI account: ${inviteUrl}`,
       html: accountEmailHtml(
-        "You're invited to MediPilot AI",
-        `${auth.user.name} invited you to join MediPilot AI as ${updated.role.replace("_", " ")}. This link expires at ${expiresAt.toLocaleString()}.`,
+        "You're invited to CLINIK AI",
+        `${auth.user.name} invited you to join CLINIK AI as ${updated.role.replace("_", " ")}. This link expires at ${expiresAt.toLocaleString()}.`,
         "Set up account",
         inviteUrl
       ),

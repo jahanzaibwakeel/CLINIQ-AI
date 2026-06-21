@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { jwtVerify, SignJWT } from "jose";
 import { env } from "@/lib/env";
 
-const cookieName = "medipilot_patient_portal";
+const cookieName = "clinik_patient_portal";
 const secret = new TextEncoder().encode(env.SESSION_SECRET);
 
 export type PatientPortalSession = {
