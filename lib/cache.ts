@@ -8,16 +8,22 @@ type CacheEntry = {
 
 const memoryCache = new Map<string, CacheEntry>();
 let redis: Redis | null = null;
+let redisUnavailableUntil = 0;
 
 function getRedis() {
   if (!env.VALKEY_URL) return null;
+  if (redisUnavailableUntil > Date.now()) return null;
   if (!redis) {
     redis = new Redis(env.VALKEY_URL, {
       maxRetriesPerRequest: 1,
-      connectTimeout: 750,
-      commandTimeout: 750,
+      connectTimeout: 500,
+      commandTimeout: 500,
       lazyConnect: true,
-      enableOfflineQueue: false
+      enableOfflineQueue: false,
+      retryStrategy: () => null
+    });
+    redis.on("error", () => {
+      redisUnavailableUntil = Date.now() + 30_000;
     });
   }
   return redis;
@@ -31,6 +37,7 @@ export async function cacheGet<T>(key: string): Promise<T | null> {
       return cached ? (JSON.parse(cached) as T) : null;
     } catch {
       // Fall back to memory cache when Valkey is unavailable.
+      redisUnavailableUntil = Date.now() + 30_000;
     }
   }
 
@@ -51,6 +58,7 @@ export async function cacheSet<T>(key: string, value: T, ttlSeconds = 300) {
       return;
     } catch {
       // Fall back to memory cache when Valkey is unavailable.
+      redisUnavailableUntil = Date.now() + 30_000;
     }
   }
 
@@ -67,6 +75,7 @@ export async function cacheHealth() {
     await client.ping();
     return "ok";
   } catch {
+    redisUnavailableUntil = Date.now() + 30_000;
     return "degraded";
   }
 }

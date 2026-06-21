@@ -16,6 +16,17 @@ function clientKey(request: Request) {
   );
 }
 
+function demoEmailAliases(email: string) {
+  const aliases = [email];
+  if (email.endsWith("@clinik.local")) {
+    aliases.push(email.replace("@clinik.local", "@medipilot.local"));
+  }
+  if (email.endsWith("@medipilot.local")) {
+    aliases.push(email.replace("@medipilot.local", "@clinik.local"));
+  }
+  return [...new Set(aliases)];
+}
+
 export async function POST(request: Request) {
   try {
     const requestId = requestIdFrom(request);
@@ -28,7 +39,11 @@ export async function POST(request: Request) {
     const emailLimited = await rateLimit(`login:email:${email}:${ip}`, 10, 300);
     if (emailLimited) return emailLimited;
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    let user = null;
+    for (const candidateEmail of demoEmailAliases(email)) {
+      user = await prisma.user.findUnique({ where: { email: candidateEmail } });
+      if (user) break;
+    }
     if (!user || !user.isActive) {
       return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
     }
@@ -41,7 +56,7 @@ export async function POST(request: Request) {
           action: "LOGIN_BLOCKED_LOCKED_ACCOUNT",
           entityType: "User",
           entityId: user.id,
-          metadata: { ip, requestId, lockedUntil: user.lockedUntil }
+          metadata: { ip, requestId, requestedEmail: email, lockedUntil: user.lockedUntil }
         }
       });
       return NextResponse.json({ error: lockoutCopy(user.lockedUntil) }, { status: 423 });
@@ -61,7 +76,7 @@ export async function POST(request: Request) {
           action: "LOGIN_FAILED",
           entityType: "User",
           entityId: user.id,
-          metadata: { ip, requestId, failedLoginCount: failedState.failedLoginCount, lockedUntil: failedState.lockedUntil }
+          metadata: { ip, requestId, requestedEmail: email, failedLoginCount: failedState.failedLoginCount, lockedUntil: failedState.lockedUntil }
         }
       });
       return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
@@ -91,7 +106,7 @@ export async function POST(request: Request) {
         action: "LOGIN_SUCCESS",
         entityType: "User",
         entityId: user.id,
-        metadata: { ip, requestId }
+        metadata: { ip, requestId, requestedEmail: email }
       }
     });
 
